@@ -1,0 +1,11 @@
+# Runtime-variant configurations
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/springboot_mariadb
+    username:
+    password:
+
+logging:
+  level:
+    org.springframework.web: INFO
+    com.github.francescojo: DEBUG
