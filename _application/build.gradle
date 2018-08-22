@@ -1,0 +1,135 @@
+apply plugin: "java"
+apply plugin: "kotlin-allopen"
+apply plugin: "idea"
+apply plugin: "eclipse"
+apply plugin: "org.springframework.boot"
+apply plugin: "propdeps"
+apply plugin: "propdeps-maven"
+apply plugin: "propdeps-idea"
+apply plugin: "com.adarshr.test-logger"
+
+apply from: "$project.rootDir/gradle/scripts/deployment.gradle"
+apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
+apply from: "$project.rootDir/gradle/scripts/testing.gradle"
+
+static def logD(String message) { System.out.println("DEBUG: $message") }
+static def logI(String message) { System.out.println("INFO : $message") }
+static def logW(String message) { System.err.println("WARN : $message") }
+static def logE(String message) { System.err.println("ERROR: $message") }
+
+jar {
+    baseName = "${rootProject.name}-application"
+    version = "$versioning_tag-$versioning_sha-b$versioning_commitCount"
+
+    manifest {
+        attributes "Main-Class": "com.github.francescojo.Application"
+    }
+
+    // FatJar
+    // https://issues.gradle.org/browse/GRADLE-1361
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+allOpen {
+    annotation("com.github.francescojo.annotation.AllOpen")
+}
+
+sourceSets {
+    def allowedBuildTargets = ["dev", "alpha", "beta", "release"]
+    def buildConfig
+    if (project.hasProperty("buildConfig")) {
+        buildConfig = project.properties["buildConfig"].toString().toLowerCase(Locale.US)
+    } else {
+        buildConfig = "dev"
+        logW("No build configuration is specified - '$buildConfig' is used by default")
+    }
+
+    if (!allowedBuildTargets.contains(buildConfig)) {
+        throw new IllegalArgumentException("Only these build targets are accepted: $allowedBuildTargets")
+    }
+
+    logI("Building JAR for '$buildConfig' environment")
+    main {
+        java {
+            srcDirs srcDirs = [srcDirs, "src/$buildConfig/java", "src/$buildConfig/kotlin"]
+        }
+
+        resources {
+            srcDirs srcDirs = [srcDirs, "src/$buildConfig/resources"]
+        }
+    }
+
+    integrationTest {
+        java {
+            final srcBase = "src/integrationTest"
+            srcDirs srcDirs = [srcDirs, "$srcBase/groovy", "$srcBase/java", "$srcBase/kotlin"]
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+
+        resources {
+            srcDirs srcDirs = [srcDirs, "src/integrationTest/resources"]
+        }
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+compileJava.dependsOn(processResources)
+
+task integrationTest(type: Test) {
+    /*
+     * Prevent re-execution of Test classes which is already defined as custom test suite
+     * in TestDriver class
+     */
+    exclude "com/github/francescojo/**"
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { true }
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter(test)
+
+task deploy(dependsOn: 'build') {
+    def targetDir = "${rootProject.buildDir}/outputs"
+    def targetDirFile = new File(targetDir)
+    targetDirFile.mkdirs()
+    if (!targetDirFile.exists() || !targetDirFile.isDirectory()) {
+        throw new IOException("Unable to create deploy target directory $targetDir")
+    }
+
+    doLast {
+        def archiveDir = "$buildDir/libs/"
+        def jarFile = new File("$archiveDir/${project.name}.jar")
+        if (!jarFile.exists()) {
+            throw new FileNotFoundException("Expected build file $jarFile is not found!!")
+        }
+
+        targetDirFile.listFiles().each { file ->
+            if (file.name != jarFile.name) {
+                file.delete()
+            }
+        }
+
+        def targetFile = "$targetDir/${rootProject.name}-$versioning_tag-$versioning_sha-b${versioning_commitCount}.jar"
+        def result = jarFile.renameTo(new File(targetFile))
+
+        if (!result) {
+            throw new IOException("Unable to deploy JAR archive into $targetDir")
+        }
+    }
+}
+
+dependencies {
+    compile project(":_library")
+    compile project(":_fcmClient")
+
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
+}

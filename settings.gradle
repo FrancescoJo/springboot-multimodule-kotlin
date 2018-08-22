@@ -1,3 +1,2 @@
-rootProject.name = 'gs-multi-module'
-include ":library", ":application"
-
+rootProject.name = "fj-springboot-multimodule-kotlin"
+include ":_application", ":_library", ":_fcmClient"

@@ -6,7 +6,7 @@ def jvmSrcVersion = 1.8
 sourceCompatibility = jvmSrcVersion
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version_kotlin"
 }
 
 compileKotlin {

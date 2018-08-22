@@ -1,0 +1,36 @@
+/*
+ * This script generates an automatic version metadata using git.
+ */
+buildscript {
+    def isNullOrEmpty = { s -> return s == null || s.isEmpty() }
+
+    String gitSha = "git rev-parse --short HEAD".execute([], project.rootDir).text.trim()
+    if (isNullOrEmpty(gitSha)) {
+        gitSha = "0000000"
+    }
+
+    String gitTag = "git describe --tags --abbrev=0".execute([], project.rootDir).text.trim()
+    if (isNullOrEmpty(gitTag)) {
+        gitTag = "INCUBATION"
+    }
+
+    String gitCommitCount = "git rev-list --count HEAD".execute([], project.rootDir).text.trim()
+    if (isNullOrEmpty(gitCommitCount)) {
+        gitCommitCount = "0"
+    }
+
+    ext.versioning_sha = gitSha
+    ext.versioning_tag = gitTag
+    ext.versioning_commitCount = Integer.parseInt(gitCommitCount)
+    ext.versioning_buildTime = new Date().format("yyyy-MM-dd HH:mm':00 UTC'", TimeZone.getTimeZone("UTC"))
+}
+
+task writeVersionFile() {
+    doLast {
+        new File("$project.rootDir/version.properties").text = """version=$versioning_tag
+revision=$versioning_sha
+build=$versioning_commitCount
+build_date=$versioning_buildTime
+"""
+    }
+}

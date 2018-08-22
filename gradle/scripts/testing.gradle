@@ -1,0 +1,39 @@
+/*
+ * Testing with Spock framework is preferred, but it has a huge drawbacks (currently in 2018):
+ *
+ * 1. It cannot be used with Kotlin. Gradle compilation step is done by following sequences:
+ *    `compileJava` -> `compileGroovy` -> `compileKotlin`.
+ *    Thus Kotlin classes are not found during Groovy compilation.
+ *    Read these documents for further information.
+ *
+ *    https://stackoverflow.com/questions/42200880/groovy-is-unable-to-resolve-kotlin-classes
+ *    https://discuss.gradle.org/t/kotlin-groovy-groovy-unable-to-resolve-kotlin-class/23245
+ *    https://discuss.gradle.org/t/kotlin-groovy-and-java-compilation/14903
+ *
+ * 2. Since Groovy is a script language, test compilation failure does not happens when a huge
+ *    class design changes has been made. For example, imagine a situation that changing the public
+ *    signature of a class constructor. With JUnit or Spek, compile error will be broke out to alert
+ *    that the change may impact on test cases. When with Groovy, however, there's not. Usually,
+ *    we have to run all tests and it will fail, because there's wrong with test scripts.
+ *    This delayed feedback is not desirable for early stage of development.
+ */
+dependencies {
+    testCompile "org.junit.jupiter:junit-jupiter-engine:$version_junit"
+    testCompile "org.mockito:mockito-core:$version_mockito"
+}
+
+/*
+apply plugin: "groovy"
+
+// Spock test configuration
+dependencies {
+    // mandatory dependencies for using Spock
+    compile "org.codehaus.groovy:groovy-all:$version_groovy"
+    testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
+
+    // optional dependencies for using Spock
+    testCompile "org.hamcrest:hamcrest-core:1.3"    // only necessary if Hamcrest matchers are used
+    testRuntime "net.bytebuddy:byte-buddy:1.6.5"    // allows mocking of classes (in addition to interfaces)
+    testRuntime "org.objenesis:objenesis:2.5.1"     // allows mocking of classes without default constructor (together with CGLIB)
+}
+*/

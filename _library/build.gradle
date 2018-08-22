@@ -1,0 +1,38 @@
+apply plugin: "io.spring.dependency-management"
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "eclipse"
+apply plugin: "propdeps"
+apply plugin: "propdeps-maven"
+apply plugin: "propdeps-idea"
+apply plugin: "propdeps-eclipse"
+
+apply from: "$project.rootDir/gradle/scripts/deployment.gradle"
+apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
+apply from: "$project.rootDir/gradle/scripts/testing.gradle"
+
+jar {
+    baseName = "${rootProject.name}-library"
+    version = "$versioning_tag-$versioning_sha-b$versioning_commitCount"
+}
+
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile "org.slf4j:slf4j-api:$version_slf4j"
+
+    compile "org.springframework.boot:spring-boot-starter:$version_springBoot"
+    compile "org.springframework.boot:spring-boot-starter-web:$version_springBoot"
+
+    compile "javax.inject:javax.inject:1"
+
+    // 3rd party dependencies
+    compile "com.google.guava:guava:$version_guava"
+
+    testCompile "org.springframework.boot:spring-boot-starter-test:$version_springBoot"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:$version_springBoot"
+    }
+}

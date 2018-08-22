@@ -1,35 +1,39 @@
 # Spring boot multi-module skeleton
-Skeleton construct of any REST API microservices
+Skeleton construct of Spring boot based REST API application. Simple
+use case is included for implementation reference.
 
-## How to run
-System environment values described below are required to run this app:
-```
-$ export EXAMPLE_APP_PROFILE={dev|alpha|beta|release}
-```
+This project is intended to run as stand-alone HTTPS server with
+Let's encrypt certificate. However, due to the nature of Java Keystore
+system, [server restart is required](https://github.com/spring-projects/spring-boot/issues/5450)
+after the certificate expires. To avoid this problem, it is better to
+setup a reverse proxy with well known HTTP daemons such as `nginx` or
+`httpd`.
 
-Provide overriding configuration if there is/are problem(s) to run this app:
+## How to build and run
 ```
---spring.config.location=file:./application.yml
+./gradlew clean deploy [writeVersionFile] [-PbuildConfig={DEV|ALPHA|BETA|RELEASE}]
 ```
-Read [Externalised configurations](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html) 
-documentation of Spring framework for more information. 
+- Build target will be defaulted as DEV if the option is omitted.
+- `writeVersionFile` task will generate a file named `version.properties`
+  on project root directory.
+- Standalone executable JAR file will be created in `build/outputs`
+  directory after `deploy` task is finished.
 
 ## Technical stacks/libs used:
-- Java 8
-- Spring boot 1.5
-    - Externalised configurations
-    - I18n support
-- Kotlin 1.1
-- Guava 23
-- Gson 2.8.2
-
-- \[TBD\] JUnit5 / Spek
-- Mockito 1.9
+ - Kotlin 1.1
+ - Spring boot 2
+   * Externalised configurations
+   * I18n support
+ - Firebase Cloud Messaging client
 
 ## TO-DOs
-- Database correlation
+- Firebase push config
+- Undertow
 - Error handlers
-- Test code
-- Java9 migration
-- Spring boot 2 migration
-- Make HTTPS as default
+- JPA
+- Make HTTPS as default (letsencrypt + pkcs12 key)
+- Unit test with JUnit5 Test code
+- Integration test
+- Static analysis
+- Coverage report
+- FCMClient externalisation

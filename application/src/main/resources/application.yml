@@ -1,6 +1,0 @@
-# Common configurations for all execution profiles.
-server:
-  port: 80
-
-management:
-  add-application-context-header: false
