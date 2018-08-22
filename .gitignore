@@ -13,4 +13,5 @@ out
 
 # Used in development
 version.properties
-/application.yml
+application.yml
+keystore.p12

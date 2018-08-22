@@ -1,3 +1,4 @@
+apply plugin: "io.spring.dependency-management"
 apply plugin: "java"
 apply plugin: "kotlin-allopen"
 apply plugin: "idea"
@@ -33,7 +34,7 @@ jar {
 }
 
 allOpen {
-    annotation("com.github.francescojo.annotation.AllOpen")
+    annotation("com.github.fj.lib.annotation.AllOpen")
 }
 
 sourceSets {
@@ -78,6 +79,8 @@ sourceSets {
 configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
+
+    compile.exclude module: "spring-boot-starter-tomcat"
 }
 
 compileJava.dependsOn(processResources)
@@ -131,5 +134,20 @@ dependencies {
     compile project(":_library")
     compile project(":_fcmClient")
 
+    compile "javax.inject:javax.inject:1"
+
+    compile "org.springframework.boot:spring-boot-starter:$version_springBoot"
+    compile ("org.springframework.boot:spring-boot-starter-web:$version_springBoot") {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
+    }
+    compile "org.springframework.boot:spring-boot-starter-undertow:$version_springBoot"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
+
+    testCompile "org.springframework.boot:spring-boot-starter-test:$version_springBoot"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:$version_springBoot"
+    }
 }

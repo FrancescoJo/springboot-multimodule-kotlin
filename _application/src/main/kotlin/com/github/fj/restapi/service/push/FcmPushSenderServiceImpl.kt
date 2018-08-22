@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.service.push
+package com.github.fj.restapi.service.push
 
 import com.github.fj.fcmclient.PushMessage
 import com.github.fj.fcmclient.PushPlatform.ANDROID
@@ -12,9 +12,11 @@ import com.github.fj.fcmclient.legacy.FcmLegacyClient
 import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
 import com.github.fj.fcmclient.legacy.dto.notification.IosNotification
 import com.github.fj.lib.io.asString
-import com.github.fj.service.push.FcmPushSenderServiceImpl.Mode.HTTP_V1
-import com.github.fj.service.push.FcmPushSenderServiceImpl.Mode.LEGACY
+import com.github.fj.restapi.service.push.FcmPushSenderServiceImpl.Mode.HTTP_V1
+import com.github.fj.restapi.service.push.FcmPushSenderServiceImpl.Mode.LEGACY
+import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.IOException
 
 /**
  * FcmClient simple usage example.
@@ -22,13 +24,31 @@ import java.io.File
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 21 - Aug - 2018
  */
-class FcmPushSenderServiceImpl(private val mode: Mode = HTTP_V1,
-                               privateKeyLocation: String,
+class FcmPushSenderServiceImpl(privateKeyLocation: String,
                                serverKey: String,
-                               projectId: String) {
+                               projectId: String,
+                               clientMode: Mode = HTTP_V1) {
+    private val mode: Mode
+    private val fcmCredential: String
+
+    init {
+        @Suppress("LocalVariableName")
+        var _mode = clientMode
+
+        fcmCredential = try {
+            File(privateKeyLocation).inputStream().asString()
+        } catch (t: IOException) {
+            LOG.warn("Error while accessing Firebase credential file. Operating in legacy mode.")
+            LOG.warn("{}", t.message)
+            _mode = Mode.LEGACY
+            ""
+        }
+
+        mode = _mode
+    }
+
     private val legacyClient = FcmLegacyClient(serverKey)
-    private val httpV1Client = FcmHttpV1Client(serverKey, projectId,
-            File(privateKeyLocation).inputStream().asString())
+    private val httpV1Client = FcmHttpV1Client(serverKey, projectId, fcmCredential)
 
     fun validatePushToken(applicationName: String, pushToken: String): Boolean {
         val pushService = when (mode) {
@@ -119,6 +139,8 @@ class FcmPushSenderServiceImpl(private val mode: Mode = HTTP_V1,
     }
 
     companion object {
+        private val LOG = LoggerFactory.getLogger(FcmPushSenderServiceImpl::class.java)
+
         private const val KEY_DATA   = "data"
         private const val KEY_TYPE   = "type"
         private const val KEY_TITLE  = "title"

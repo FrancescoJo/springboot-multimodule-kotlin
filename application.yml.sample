@@ -1,0 +1,40 @@
+# Configuration template file. Copy it by removing 'sample' extension to apply upon runtime.
+security:
+  require-ssl: false
+
+server:
+  port: 8080
+  ssl:
+    enabled: false
+    key-store: keystore.p12
+    key-store-password:
+    keyStoreType:
+    keyAlias:
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: springboot-multimodule-kotlin
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+
+management:
+  add-application-context-header: false
+
+logging:
+  path:
+  pattern:
+    file:
+    config:
+  level:
+    org.springframework.web: DEBUG
+
+app:
+  push:
+    fcm-private-key-location:
+    fcm-server-key:
+    fcm-project-id:

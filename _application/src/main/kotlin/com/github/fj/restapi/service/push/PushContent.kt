@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.service.push
+package com.github.fj.restapi.service.push
 
 import com.github.fj.fcmclient.PushPlatform
 import java.util.*

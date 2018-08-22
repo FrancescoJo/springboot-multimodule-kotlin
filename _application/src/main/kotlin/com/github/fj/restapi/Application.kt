@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj
+package com.github.fj.restapi
 
 import com.google.common.base.Joiner
 import org.springframework.boot.autoconfigure.SpringBootApplication

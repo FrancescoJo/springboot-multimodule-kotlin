@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj
+package com.github.fj.restapi
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
