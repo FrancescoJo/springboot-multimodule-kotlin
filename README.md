@@ -3,14 +3,16 @@ Skeleton construct of Spring boot based REST API application. Simple
 use case is included for implementation reference.
 
 ## Technical stacks/libs used:
- - Java 1.8
- - [Kotlin](https://kotlinlang.org/) 1.1
- - [Gradle](https://gradle.org/) 4.x
- - [Spring boot](http://spring.io/projects/spring-boot) 2
-   * Externalised configurations
-   * I18n support
- - [Undertow](http://undertow.io/)
- - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) 
+  - Java 1.8
+  - [Kotlin](https://kotlinlang.org/) 1.2
+  - [Gradle](https://gradle.org/) 4.x
+  - [Spring boot](http://spring.io/projects/spring-boot) 2
+    * Externalised configurations
+    * I18n support
+  - [Undertow](http://undertow.io/)
+  - JPA with [Hibernate](http://hibernate.org/)
+  - [HicariCP](https://github.com/brettwooldridge/HikariCP)
+  - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
 
 ## How to build
 ```
@@ -103,11 +105,11 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 ```
 
 ## TO-DOs
-- JPA
 - Unit test with JUnit5 Test code
 - Integration test
 - Static analysis
 - Coverage report
 - Swagger integration
+- Docker integration + Local database environment
 - Spring security
 - FCMClient externalisation

@@ -138,13 +138,20 @@ dependencies {
     compile "javax.inject:javax.inject:1"
 
     compile "org.springframework.boot:spring-boot-starter:$version_springBoot"
-    compile ("org.springframework.boot:spring-boot-starter-web:$version_springBoot") {
+    compile("org.springframework.boot:spring-boot-starter-web:$version_springBoot") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
     }
-    compile ("org.springframework.boot:spring-boot-starter-undertow:$version_springBoot") {
+    compile("org.springframework.boot:spring-boot-starter-undertow:$version_springBoot") {
         // Since this application is for REST Api and we don't need websocket.
         exclude group: "io.undertow", module: "undertow-websockets-jsr"
     }
+
+    compile "org.springframework.boot:spring-boot-starter-data-jpa:$version_springBoot"
+    compile "org.springframework:spring-tx:$version_spring"
+    compile "com.zaxxer:HikariCP:$version_hicariCP"
+    // Change this to your favourite database (and apply it to application.yml configuration file)
+    compile "mysql:mysql-connector-java:8.0.11"
+
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$version_springBoot"

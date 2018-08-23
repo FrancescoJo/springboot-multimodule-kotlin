@@ -1,4 +1,6 @@
 # Configuration template file. Copy it by removing 'sample' extension to apply upon runtime.
+# Don't put sensitive information like passwords into source code control!
+
 security:
   require-ssl: false
 
@@ -17,6 +19,18 @@ server:
 spring:
   application:
     name: springboot-multimodule-kotlin
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/fj_test?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&serverTimezone=UTC&character_set_server=utf8mb4
+    username:
+    password:
+  jpa:
+    hibernate:
+      # Better to use create-drop for integration tests
+      ddl-auto: none
+      show_sql: true
+      format_sql: true
   mvc:
     throw-exception-if-no-handler-found: true
   resources:
@@ -31,7 +45,9 @@ logging:
     file:
     config:
   level:
+    # Better to raise over than INFO in production environment
     org.springframework.web: DEBUG
+    org.hibernate: DEBUG
 
 app:
   push:

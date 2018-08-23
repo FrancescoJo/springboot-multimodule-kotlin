@@ -29,8 +29,4 @@ class HelloController {
     fun onPost(@RequestBody request: HelloRequestDto): Response {
         return Response.ok("POST Hello, ${request.name}")
     }
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(HelloController::class.java)
-    }
 }
