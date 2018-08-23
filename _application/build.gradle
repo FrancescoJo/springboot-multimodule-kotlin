@@ -90,13 +90,14 @@ task integrationTest(type: Test) {
      * Prevent re-execution of Test classes which is already defined as custom test suite
      * in TestDriver class
      */
-    exclude "com/github/francescojo/**"
+    exclude "com/github/fj/restapi/**"
 
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     outputs.upToDateWhen { true }
 }
 
+check.dependsOn test
 check.dependsOn integrationTest
 integrationTest.mustRunAfter(test)
 
@@ -140,7 +141,10 @@ dependencies {
     compile ("org.springframework.boot:spring-boot-starter-web:$version_springBoot") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
     }
-    compile "org.springframework.boot:spring-boot-starter-undertow:$version_springBoot"
+    compile ("org.springframework.boot:spring-boot-starter-undertow:$version_springBoot") {
+        // Since this application is for REST Api and we don't need websocket.
+        exclude group: "io.undertow", module: "undertow-websockets-jsr"
+    }
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$version_springBoot"

@@ -28,6 +28,63 @@ java -jar `ls build/outputs/*.jar`
 ```
 - Or just double click the JAR file in `build/outputs` at your desktop environment.
 
+## Invoking `Hello, world`
+GET request and response
+```
+$ curl --insecure \
+  -X GET \
+  -H "content-type: application/json" \
+  https://localhost:8080/hello
+{
+  "body": "GET Hello, world",
+  "type": "OK"
+}
+```
+
+POST request and response
+```
+$ curl --insecure \
+  -X POST \
+  -H "content-type: application/json" \
+  -d '{"name":"FrancescoJo"}' \
+  https://localhost:8080/hello
+{
+  "body": "POST Hello, FrancescoJo",
+  "type": "OK"
+}
+```
+
+## Error handling
+All logical problems are directed to `com.github.fj.restapi.endpoint.CustomErrorHandler` first,
+and converted as `com.github.fj.restapi.dto.ErrorResponse` for *consistent* response handling.
+The error response will be look like:
+
+```
+{
+  "body": {
+    "message": "Not Found",
+    "reason": "GeneralHttpException"
+  },
+  "type": "ERROR"
+}
+```
+
+Without this `@ControllerAdvice`, all programme exceptions will be handled at
+`org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error` by default,
+which produces error as follows:
+
+```
+{
+  "timestamp": "2018-08-23T02:15:48.527+0000",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Not Found",
+  "path": "/"
+}
+```
+
+Looks quite different to OK responses.
+
 ## How to set up a SSL
 This project is intended to run as stand-alone HTTPS server with
 Let's encrypt certificate. However, due to the nature of Java Keystore
@@ -38,12 +95,19 @@ setup a reverse proxy with well known HTTP daemons such as `nginx` or
 
 There are some demo scripts under `settings/letsencrypt` directory for it, and customise it at your own needs.
 
+## Package naming and structure
+
+## How to run tests and its results
+```
+./gradlew [test] [integrationTest]
+```
+
 ## TO-DOs
-- Error handlers
 - JPA
 - Unit test with JUnit5 Test code
 - Integration test
 - Static analysis
 - Coverage report
+- Swagger integration
 - Spring security
 - FCMClient externalisation

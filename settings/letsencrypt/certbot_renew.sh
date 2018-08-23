@@ -1,6 +1,9 @@
 #!/bin/bash
-# Letsencrypt certificate automatic renewal. This script must be run as root.
-# This script assumes that it run automatically by CRON.
+# Letsencrypt certificate automatic renewal. You should run this script automatically by CRON.
+if [ "$(id -u)" != "0" ]; then
+    echo "ERROR: This script must be run as root."
+    exit 1
+fi
 
 # This is the system user name
 APP_USER_NAME="user"
