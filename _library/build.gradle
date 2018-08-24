@@ -1,20 +1,22 @@
 apply plugin: "java"
 apply plugin: "idea"
 apply plugin: "eclipse"
+apply plugin: "kotlin"
 
-apply from: "$project.rootDir/gradle/scripts/deployment.gradle"
-apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
-apply from: "$project.rootDir/gradle/scripts/testing.gradle"
+def jvmSrcVersion = 1.8
+
+sourceCompatibility = jvmSrcVersion
+
+compileKotlin { kotlinOptions.jvmTarget = "$jvmSrcVersion" }
+compileTestKotlin { kotlinOptions.jvmTarget = "$jvmSrcVersion" }
 
 jar {
-    baseName = "${rootProject.name}-library"
-    version = "$versioning_tag-$versioning_sha-b$versioning_commitCount"
+    baseName = "fj-lib-kotlin"
+    version = "1.0-SNAPSHOT"
 }
 
 dependencies {
-    // The production code uses the SLF4J logging API at compile time
-    compile "org.slf4j:slf4j-api:$version_slf4j"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version_kotlin"
 
-    // 3rd party dependencies
-    compile "com.google.guava:guava:$version_guava"
+    testCompile "org.junit.jupiter:junit-jupiter-engine:5.1.0"
 }

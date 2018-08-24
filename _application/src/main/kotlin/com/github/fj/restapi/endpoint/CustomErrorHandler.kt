@@ -5,8 +5,8 @@
 package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.github.fj.restapi.dto.ErrorResponse
-import com.github.fj.restapi.dto.Response
+import com.github.fj.restapi.dto.ErrorResponseDto
+import com.github.fj.restapi.dto.ResponseDto
 import com.github.fj.restapi.exception.AbstractBaseException
 import com.github.fj.restapi.exception.GeneralHttpException
 import org.slf4j.LoggerFactory
@@ -36,35 +36,35 @@ import javax.servlet.http.HttpServletRequest
 @RestControllerAdvice
 class CustomErrorHandler {
     @ExceptionHandler(NoHandlerFoundException::class)
-    fun handleSpring404(req: HttpServletRequest): ResponseEntity<ErrorResponse> {
+    fun handleSpring404(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
         return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND))
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     @ExceptionHandler(Exception::class)
-    fun handleError(req: HttpServletRequest, ex: Exception): ResponseEntity<ErrorResponse> {
+    fun handleError(req: HttpServletRequest, ex: Exception): ResponseEntity<ErrorResponseDto> {
         val status: Int
         val response = when (ex) {
             is AbstractBaseException -> {
                 LOG.error("Handled exception: ", ex)
                 status = ex.httpStatusCode
-                Response.error(ex.message, ex.reason)
+                ResponseDto.error(ex.message, ex.reason)
             }
             is HttpMessageNotReadableException -> {
                 LOG.error("Spring handled exception: ", ex)
                 status = HttpStatus.BAD_REQUEST.value()
-                Response.error("Cannot process given request.")
+                ResponseDto.error("Cannot process given request.")
             }
             is JsonProcessingException -> {
                 LOG.error("JSON parsing exception: ", ex)
                 status = HttpStatus.BAD_REQUEST.value()
-                Response.error("Cannot process given request.")
+                ResponseDto.error("Cannot process given request.")
             }
             else -> {
                 LOG.error("Unhandled exception: ", ex)
                 status = getStatus(req).value()
                 val message = "Unhandled internal server error"
-                Response.error(message)
+                ResponseDto.error(message)
             }
         }
 

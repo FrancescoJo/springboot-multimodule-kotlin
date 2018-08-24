@@ -4,8 +4,7 @@
  */
 package com.github.fj.restapi.endpoint.hello
 
-import com.github.fj.restapi.dto.Response
-import org.slf4j.LoggerFactory
+import com.github.fj.restapi.dto.ResponseDto
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -21,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class HelloController {
     @RequestMapping(method = [RequestMethod.GET])
-    fun onGet(): Response {
-        return Response.ok("GET Hello, world")
+    fun onGet(): ResponseDto<*> {
+        return HelloResponseDto.create("GET Hello, world")
     }
 
     @RequestMapping(method = [RequestMethod.POST])
-    fun onPost(@RequestBody request: HelloRequestDto): Response {
-        return Response.ok("POST Hello, ${request.name}")
+    fun onPost(@RequestBody request: HelloRequestDto): ResponseDto<*> {
+        return HelloResponseDto.create("POST Hello, ${request.name}")
     }
 }

@@ -1,0 +1,4 @@
+dependencies {
+    testCompile "org.junit.jupiter:junit-jupiter-engine:$version_junit5"
+    testCompile "org.mockito:mockito-core:$version_mockito"
+}

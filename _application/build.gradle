@@ -11,7 +11,9 @@ apply plugin: "com.adarshr.test-logger"
 
 apply from: "$project.rootDir/gradle/scripts/deployment.gradle"
 apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
-apply from: "$project.rootDir/gradle/scripts/testing.gradle"
+apply from: "$project.rootDir/gradle/scripts/testing-junit.gradle"
+apply from: "integration-test.gradle"
+apply from: "task-deploy.gradle"
 
 static def logD(String message) { System.out.println("DEBUG: $message") }
 static def logI(String message) { System.out.println("INFO : $message") }
@@ -23,7 +25,7 @@ jar {
     version = "$versioning_tag-$versioning_sha-b$versioning_commitCount"
 
     manifest {
-        attributes "Main-Class": "com.github.francescojo.Application"
+        attributes "Main-Class": "com.github.fj.restapi.Application"
     }
 
     // FatJar
@@ -61,75 +63,13 @@ sourceSets {
             srcDirs srcDirs = [srcDirs, "src/$buildConfig/resources"]
         }
     }
-
-    integrationTest {
-        java {
-            final srcBase = "src/integrationTest"
-            srcDirs srcDirs = [srcDirs, "$srcBase/groovy", "$srcBase/java", "$srcBase/kotlin"]
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-        }
-
-        resources {
-            srcDirs srcDirs = [srcDirs, "src/integrationTest/resources"]
-        }
-    }
 }
 
 configurations {
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
-
     compile.exclude module: "spring-boot-starter-tomcat"
 }
 
 compileJava.dependsOn(processResources)
-
-task integrationTest(type: Test) {
-    /*
-     * Prevent re-execution of Test classes which is already defined as custom test suite
-     * in TestDriver class
-     */
-    exclude "com/github/fj/restapi/**"
-
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    outputs.upToDateWhen { true }
-}
-
-check.dependsOn test
-check.dependsOn integrationTest
-integrationTest.mustRunAfter(test)
-
-task deploy(dependsOn: 'build') {
-    def targetDir = "${rootProject.buildDir}/outputs"
-    def targetDirFile = new File(targetDir)
-    targetDirFile.mkdirs()
-    if (!targetDirFile.exists() || !targetDirFile.isDirectory()) {
-        throw new IOException("Unable to create deploy target directory $targetDir")
-    }
-
-    doLast {
-        def archiveDir = "$buildDir/libs/"
-        def jarFile = new File("$archiveDir/${project.name}.jar")
-        if (!jarFile.exists()) {
-            throw new FileNotFoundException("Expected build file $jarFile is not found!!")
-        }
-
-        targetDirFile.listFiles().each { file ->
-            if (file.name != jarFile.name) {
-                file.delete()
-            }
-        }
-
-        def targetFile = "$targetDir/${rootProject.name}-$versioning_tag-$versioning_sha-b${versioning_commitCount}.jar"
-        def result = jarFile.renameTo(new File(targetFile))
-
-        if (!result) {
-            throw new IOException("Unable to deploy JAR archive into $targetDir")
-        }
-    }
-}
 
 dependencies {
     compile project(":_library")

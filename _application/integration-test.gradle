@@ -1,0 +1,70 @@
+/*
+ * Testing with Spock framework is preferred since its great test case readability,
+ * but it has a huge drawbacks (currently in 2018):
+ *
+ * 1. It cannot be used with Kotlin. Gradle compilation step is done by following sequences:
+ *    `compileJava` -> `compileGroovy` -> `compileKotlin`.
+ *    Thus Kotlin classes are not found during Groovy compilation.
+ *    Read these documents for further information.
+ *
+ *    https://stackoverflow.com/questions/42200880/groovy-is-unable-to-resolve-kotlin-classes
+ *    https://discuss.gradle.org/t/kotlin-groovy-groovy-unable-to-resolve-kotlin-class/23245
+ *    https://discuss.gradle.org/t/kotlin-groovy-and-java-compilation/14903
+ *
+ * 2. Since Groovy is a script language, test compilation failure does not happens when a huge
+ *    class design changes has been made. For example, imagine a situation that changing the public
+ *    signature of a class constructor. With JUnit or Spek, compile error will be broke out to alert
+ *    that the change may impact on test cases. When with Groovy, however, there's not. Usually,
+ *    we have to run all tests and it will fail, because there's wrong with test scripts.
+ *    This delayed feedback is not desirable for early stage of development.
+ *
+ * Therefore we decided to use Spock for integration tests, because the test scenario should be
+ * based on user behaviours. This type of test is considered as black box testing and code fix
+ * should not impact test cases.
+ */
+apply plugin: "groovy"
+
+sourceSets {
+    integrationTest {
+        java {
+            final srcBase = "src/integrationTest"
+            srcDirs srcDirs = [srcDirs, "$srcBase/groovy", "$srcBase/java", "$srcBase/kotlin"]
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+
+        resources {
+            srcDirs srcDirs = [srcDirs, "src/integrationTest/resources"]
+        }
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+task integrationTest(type: Test) {
+    group "verification"
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { true }
+}
+
+check.dependsOn test
+check.dependsOn integrationTest
+integrationTest.mustRunAfter(test)
+
+dependencies {
+    integrationTestCompile "org.codehaus.groovy:groovy-all:2.4.13"
+
+    integrationTestCompile "org.spockframework:spock-core:1.1-groovy-2.4"
+    integrationTestCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+
+    integrationTestRuntime 'cglib:cglib-nodep:3.2.4'
+    integrationTestRuntime "net.bytebuddy:byte-buddy:1.6.5"
+    // allows mocking of classes (in addition to interfaces)
+    integrationTestRuntime "org.objenesis:objenesis:2.5.1"
+    // allows mocking of classes without default constructor (together with CGLIB)
+}

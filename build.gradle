@@ -10,7 +10,7 @@ buildscript {
     ext.version_slf4j = "1.7.21"
     ext.version_guava = "26.0-jre"
 
-    ext.version_junit = "5.1.0"
+    ext.version_junit5  = "5.1.0"
     ext.version_mockito = "2.20.0"
 
     repositories {

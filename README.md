@@ -13,6 +13,8 @@ use case is included for implementation reference.
   - JPA with [Hibernate](http://hibernate.org/)
   - [HicariCP](https://github.com/brettwooldridge/HikariCP)
   - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
+  - [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
+  - [Spock framework](http://spockframework.org/) with [Groovy language](http://groovy-lang.org/)
 
 ## How to build
 ```
@@ -95,6 +97,20 @@ after the certificate expires. To avoid this problem, it is better to
 setup a reverse proxy with well known HTTP daemons such as `nginx` or
 `httpd`.
 
+Setting operation mode as SSL is dead simple, just create a jks key by [`keytool`](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html)
+command or import a CA certificate and convert it by [`openssl`](https://www.openssl.org/docs/man1.0.2/apps/openssl.html),
+and change your `application.yml` as follows:
+
+```
+# Setting 'true' will accept HTTPS requests only
+security:
+  require-ssl: true
+
+server:
+  ssl:
+    enabled: true
+```
+
 There are some demo scripts under `settings/letsencrypt` directory for it, and customise it at your own needs.
 
 ## Package naming and structure
@@ -103,13 +119,12 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 ```
 ./gradlew [test] [integrationTest]
 ```
+- In contrast to `test` task, `integrationTest` is required to be run under a separated environment.
+  Please check files under `_application/src/integrationTest/resources` directory for an example.
 
 ## TO-DOs
-- Unit test with JUnit5 Test code
-- Integration test
-- Static analysis
-- Coverage report
+- Static analysis & Test coverage report
 - Swagger integration
 - Docker integration + Local database environment
 - Spring security
-- FCMClient externalisation
+- Make this works on eclipse

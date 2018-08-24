@@ -2,34 +2,43 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.service.push
+package com.github.fj.fcmclient
 
-import com.github.fj.fcmclient.PushMessage
+import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.HTTP_V1
+import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.LEGACY
 import com.github.fj.fcmclient.PushPlatform.ANDROID
 import com.github.fj.fcmclient.PushPlatform.IOS
 import com.github.fj.fcmclient.httpv1.FcmHttpV1Client
 import com.github.fj.fcmclient.legacy.FcmLegacyClient
+import com.github.fj.fcmclient.legacy.ValidateKeyResponse
 import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
 import com.github.fj.fcmclient.legacy.dto.notification.IosNotification
-import com.github.fj.lib.io.asString
-import com.github.fj.restapi.service.push.FcmPushSenderServiceImpl.Mode.HTTP_V1
-import com.github.fj.restapi.service.push.FcmPushSenderServiceImpl.Mode.LEGACY
+import com.google.api.client.http.GenericUrl
+import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
+import com.google.api.client.http.HttpResponseException
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.util.ExponentialBackOff
+import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.net.SocketException
+import java.nio.charset.Charset
 
 /**
- * FcmClient simple usage example.
+ * FcmClient simple usage example. This class is hard to test.
  *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 21 - Aug - 2018
  */
-class FcmPushSenderServiceImpl(privateKeyLocation: String,
-                               serverKey: String,
-                               projectId: String,
+open class SimpleFcmPushSender(privateKeyLocation: String,
+                               protected val serverKey: String,
+                               protected val projectId: String,
                                clientMode: Mode = HTTP_V1) {
-    private val mode: Mode
-    private val fcmCredential: String
+    protected val mode: Mode
+    protected val fcmCredential: String
 
     init {
         @Suppress("LocalVariableName")
@@ -47,30 +56,74 @@ class FcmPushSenderServiceImpl(privateKeyLocation: String,
         mode = _mode
     }
 
-    private val legacyClient = FcmLegacyClient(serverKey)
-    private val httpV1Client = FcmHttpV1Client(serverKey, projectId, fcmCredential)
+    protected val legacyClient = FcmLegacyClient(serverKey, LOG)
+    protected val httpV1Client = FcmHttpV1Client(projectId, fcmCredential, LOG)
 
-    fun validatePushToken(applicationName: String, pushToken: String): Boolean {
-        val pushService = when (mode) {
-            LEGACY -> legacyClient
-            HTTP_V1 -> httpV1Client
+    private val gson = Gson()
+
+    open fun validatePushToken(applicationName: String, pushToken: String): Boolean {
+        val url = "https://iid.googleapis.com/iid/info/$pushToken"
+
+        val response = try {
+            NetHttpTransport().createRequestFactory().buildGetRequest(GenericUrl(url)).apply {
+                headers.authorization = "key=$serverKey"
+                /*
+                 * HttpBackOffUnsuccessfulResponseHandler is designed to work with only one HttpRequest at a time.
+                 * As a result, you MUST create a new instance of HttpBackOffUnsuccessfulResponseHandler with a new
+                 * instance of BackOff for each instance of HttpRequest.
+                 */
+                unsuccessfulResponseHandler = HttpBackOffUnsuccessfulResponseHandler(ExponentialBackOff())
+
+                LOG.debug("FCM >> {}", url)
+                headers.forEach { name, value -> LOG.debug("FCM >> {}: {}", name, value) }
+            }.execute()
+        } catch (e: HttpResponseException) {
+            LOG.warn("Unexpected response from server", e)
+            return false
+        } catch (e: SocketException) {
+            LOG.warn("Network is unreachable", e)
+            return false
         }
 
-        return pushService.validatePushToken(applicationName, pushToken)
+        LOG.debug("FCM << {} {}", response.statusCode, response.statusMessage)
+        response.headers.forEach { name, value -> LOG.debug("FCM << {}: {}", name, value) }
+        val responseText = response.parseAsString()
+        val responses = try {
+            gson.fromJson<Map<String, Any>>(responseText, Map::class.java)
+        } catch (ex: JsonParseException) {
+            LOG.warn("Unable to parse response as Map: {}", responseText)
+            return false
+        }
+
+        if (responses.containsKey("error")) {
+            LOG.warn("Response contains an error: {}", responseText)
+            return false
+        }
+
+        val filteredMap = responses.filterKeys { ValidateKeyResponse.FIELDS.contains(it) }
+        val result = try {
+            ValidateKeyResponse.createFrom(filteredMap)
+        } catch (ex: IllegalArgumentException) {
+            LOG.warn("Unable to construct response as ValidateKeyResponse: {}", filteredMap)
+            return false
+        }
+
+        LOG.debug("Expected application name: {}, FCM registered application name: {}",
+                applicationName, result.application)
+
+        return result.application == applicationName
     }
 
-    fun sendPush(pushContent: PushContent) {
-        val pushService = when (mode) {
-            LEGACY -> legacyClient
-            HTTP_V1 -> httpV1Client
-        }
-
+    open fun sendPush(pushContent: PushContent) {
         val pushMessage = when (mode) {
             LEGACY -> createLegacyPushMessage(pushContent)
             HTTP_V1 -> TODO("Not implemented")
         }
 
-        return pushService.sendPush(pushMessage)
+        return when (mode) {
+            LEGACY -> legacyClient.sendPush(pushMessage)
+            HTTP_V1 -> httpV1Client.sendPush(pushMessage)
+        }
     }
 
     private fun createLegacyPushMessage(pushContent: PushContent): PushMessage {
@@ -81,7 +134,7 @@ class FcmPushSenderServiceImpl(privateKeyLocation: String,
                 IOS -> {
                     recipients.add(pushContent.receiverDeviceToken)
                     notification = IosNotification().apply {
-                        title = pushContent.senderId
+                        title = pushContent.title
                         body = pushContent.text.toString()
                     }
                     // https://github.com/firebase/quickstart-ios/issues/246
@@ -120,7 +173,7 @@ class FcmPushSenderServiceImpl(privateKeyLocation: String,
                         // May diverge to support multiple business requirements
                         put(KEY_TYPE, "push")
                         put(KEY_DATA, HashMap<String, Any>().apply {
-                            put(KEY_TITLE, pushContent.senderId)
+                            put(KEY_TITLE, pushContent.title)
                             put(KEY_BODY, pushContent.text.toString())
                             put(KEY_EXTRAS, payloadData)
                         })
@@ -131,6 +184,10 @@ class FcmPushSenderServiceImpl(privateKeyLocation: String,
         }
     }
 
+    private fun InputStream.asString(charset: Charset = Charsets.UTF_8): String {
+        return this.bufferedReader(charset).use { it.readText() }
+    }
+
     enum class Mode {
         /** Operates with legacy client only. */
         LEGACY,
@@ -139,12 +196,12 @@ class FcmPushSenderServiceImpl(privateKeyLocation: String,
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(FcmPushSenderServiceImpl::class.java)
+        private val LOG = LoggerFactory.getLogger(SimpleFcmPushSender::class.java)
 
-        private const val KEY_DATA   = "data"
-        private const val KEY_TYPE   = "type"
-        private const val KEY_TITLE  = "title"
-        private const val KEY_BODY   = "body"
+        private const val KEY_DATA = "data"
+        private const val KEY_TYPE = "type"
+        private const val KEY_TITLE = "title"
+        private const val KEY_BODY = "body"
         private const val KEY_EXTRAS = "extras"
     }
 }

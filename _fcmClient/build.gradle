@@ -4,7 +4,7 @@ apply plugin: "eclipse"
 
 apply from: "$project.rootDir/gradle/scripts/deployment.gradle"
 apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
-apply from: "$project.rootDir/gradle/scripts/testing.gradle"
+apply from: "$project.rootDir/gradle/scripts/testing-junit.gradle"
 
 jar {
     baseName = "${rootProject.name}-fcmClient"

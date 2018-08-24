@@ -5,7 +5,7 @@
 package com.github.fj.restapi.appconfig.service
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.service.push.FcmPushSenderServiceImpl
+import com.github.fj.fcmclient.SimpleFcmPushSender
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -29,6 +29,6 @@ class Push {
     private var fcmProjectId = ""
 
     @Bean
-    fun fcmPushSenderService() = FcmPushSenderServiceImpl(fcmPrivateKeyLocation,
+    fun fcmPushSenderService() = SimpleFcmPushSender(fcmPrivateKeyLocation,
             fcmServerKey, fcmProjectId)
 }

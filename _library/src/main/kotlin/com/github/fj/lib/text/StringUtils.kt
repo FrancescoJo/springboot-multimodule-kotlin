@@ -27,7 +27,7 @@ private val UNICODE_BLANK_CHARS: Set<Char> = HashSet<Char>().apply {
     add('\u2000')   // EN QUAD
     add('\u2001')   // EM QUAD
     add('\u2002')   // EN SPACE
-    add('\u2003')   // EN SPACE
+    add('\u2003')   // EM SPACE
     add('\u2004')   // THREE-PER-EM SPACE
     add('\u2005')   // FOUR-PER-EM SPACE
     add('\u2006')   // SIX-PER-EM SPACE
@@ -43,7 +43,7 @@ private val UNICODE_BLANK_CHARS: Set<Char> = HashSet<Char>().apply {
 fun String.matchesIn(pattern: Pattern) = pattern.matcher(this).matches()
 
 fun String?.isUnicodeBlank(): Boolean {
-    if (isNullOrBlank() || isNullOrEmpty()) {
+    if (isNullOrBlank()) {
         return true
     }
 

@@ -1,6 +1,7 @@
 # Configuration template file. Copy it by removing 'sample' extension to apply upon runtime.
 # Don't put sensitive information like passwords into source code control!
 
+# Setting 'true' will accept HTTPS requests only
 security:
   require-ssl: false
 

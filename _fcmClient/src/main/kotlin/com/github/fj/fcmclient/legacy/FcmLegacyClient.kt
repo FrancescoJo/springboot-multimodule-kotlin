@@ -6,9 +6,7 @@
  */
 package com.github.fj.fcmclient.legacy
 
-import com.github.fj.fcmclient.FcmClientUtils
 import com.github.fj.fcmclient.PushMessage
-import com.github.fj.fcmclient.PushService
 import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.GenericUrl
@@ -16,20 +14,16 @@ import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.util.ExponentialBackOff
 import com.google.gson.Gson
-import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 import java.io.IOException
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 6 - Feb - 2018
  */
-class FcmLegacyClient(private val serverKey: String): PushService {
+class FcmLegacyClient(private val serverKey: String, private val log: Logger) {
     @Throws(IOException::class)
-    override fun validatePushToken(applicationName: String, pushToken: String): Boolean =
-            FcmClientUtils.validatePushToken(LOG, serverKey, applicationName, pushToken)
-
-    @Throws(IOException::class)
-    override fun sendPush(message: PushMessage) {
+    fun sendPush(message: PushMessage) {
         if (message !is DownstreamMessage) {
             throw IllegalArgumentException("Only ${DownstreamMessage::javaClass} is allowed as " +
                                            "message content.")
@@ -50,15 +44,15 @@ class FcmLegacyClient(private val serverKey: String): PushService {
              */
             unsuccessfulResponseHandler = HttpBackOffUnsuccessfulResponseHandler(ExponentialBackOff())
 
-            LOG.debug("FCM >> {}", url)
-            headers.forEach { name, value -> LOG.debug("FCM >> {}: {}", name, value) }
-            LOG.debug("FCM >> {}", contents)
+            log.debug("FCM >> {}", url)
+            headers.forEach { name, value -> log.debug("FCM >> {}: {}", name, value) }
+            log.debug("FCM >> {}", contents)
         }.execute()
 
-        LOG.debug("FCM << {} {}", response.statusCode, response.statusMessage)
-        response.headers.forEach { name, value -> LOG.debug("FCM << {}: {}", name, value) }
+        log.debug("FCM << {} {}", response.statusCode, response.statusMessage)
+        response.headers.forEach { name, value -> log.debug("FCM << {}: {}", name, value) }
         val responseText = response.parseAsString()
-        LOG.debug("FCM << {}", responseText)
+        log.debug("FCM << {}", responseText)
 
         val result = Gson().fromJson(responseText, FcmLegacyResponse.JsonReceiver::class.java).materialise()
         if (result.failureCount > 0) {
@@ -74,9 +68,5 @@ class FcmLegacyClient(private val serverKey: String): PushService {
 
             throw DownstreamErrorResponseException(result)
         }
-    }
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(FcmLegacyClient::class.java)
     }
 }

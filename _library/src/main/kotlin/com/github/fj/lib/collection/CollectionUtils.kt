@@ -7,7 +7,6 @@
 package com.github.fj.lib.collection
 
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Creates a new list that has size of `desiredSize`. Contents of newly created
@@ -24,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 29 - Jun - 2018
  */
-fun <T> List<T>.resize(desiredSize: Int, filler: (Int) -> T): List<T> {
+fun <T> List<T>.resize(desiredSize: Int, filler: ((Int) -> T)? = null): List<T> {
     return when {
         size > desiredSize -> {
             val newList = ArrayList<T>(desiredSize)
@@ -34,6 +33,10 @@ fun <T> List<T>.resize(desiredSize: Int, filler: (Int) -> T): List<T> {
             newList
         }
         size < desiredSize -> {
+            if (filler == null) {
+                throw IllegalArgumentException("Filler function must not be null when expanding a list!!")
+            }
+
             val newList = ArrayList<T>(desiredSize)
             for (i in 0 until size) {
                 newList.add(this[i])
@@ -68,35 +71,6 @@ fun <T> Iterable<T>.sumLong(selector: (T) -> Long): Long {
 
 fun Collection<*>?.isNullOrEmpty(): Boolean {
     return this == null || isEmpty()
-}
-
-/**
- * Shallow copies given list. Original type of given `list` is
- * reserved if it is one of well-known Java lists.
- *
- * Using reflection to preserve all the list implementations in Android
- * would be an overkill; thus any custom implementations will be
- * transformed to [java.util.ArrayList] type.
- *
- * @param list any [java.util.List] object. Must be either
- * [java.util.ArrayList], [java.util.LinkedList],
- * [java.util.Vector] or [java.util.concurrent.CopyOnWriteArrayList].
- * @param <T>  any data type contained in given `list`.
- * @return a shallow copy of given `list` if it contains any object.
- * An *empty list* if `list == null || list.size() == 0`.
- */
-fun <T> List<T>.shallowCopy(): MutableList<T> {
-    if (isNullOrEmpty()) {
-        return ArrayList()
-    }
-
-    return when (this) {
-        is ArrayList<*>            -> ArrayList(this)
-        is LinkedList<*>           -> LinkedList(this)
-        is Vector<*>               -> Vector(this)
-        is CopyOnWriteArrayList<*> -> CopyOnWriteArrayList(this)
-        else -> throw IllegalArgumentException("$javaClass is not supported.")
-    }
 }
 
 /**

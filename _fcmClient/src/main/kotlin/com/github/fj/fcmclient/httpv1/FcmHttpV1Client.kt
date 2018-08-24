@@ -6,9 +6,7 @@
  */
 package com.github.fj.fcmclient.httpv1
 
-import com.github.fj.fcmclient.FcmClientUtils
 import com.github.fj.fcmclient.PushMessage
-import com.github.fj.fcmclient.PushService
 import com.github.fj.fcmclient.httpv1.dto.HttpV1Message
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.http.ByteArrayContent
@@ -16,7 +14,7 @@ import com.google.api.client.http.GenericUrl
 import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.util.ExponentialBackOff
-import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 import java.io.ByteArrayInputStream
 import java.io.IOException
 
@@ -27,8 +25,8 @@ import java.io.IOException
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 2 - Feb - 2018
  */
-class FcmHttpV1Client(private val serverKey: String, private val projectId: String,
-                      private val credentials: String): PushService {
+class FcmHttpV1Client(private val projectId: String, private val credentials: String,
+                      private val log: Logger) {
     /**
      * Acquires access token of Firebase services.
      *
@@ -43,11 +41,7 @@ class FcmHttpV1Client(private val serverKey: String, private val projectId: Stri
     }
 
     @Throws(IOException::class)
-    override fun validatePushToken(applicationName: String, pushToken: String): Boolean =
-            FcmClientUtils.validatePushToken(LOG, serverKey, applicationName, pushToken)
-
-    @Throws(IOException::class)
-    override fun sendPush(message: PushMessage) {
+    fun sendPush(message: PushMessage) {
         if (message !is HttpV1Message) {
             throw IllegalArgumentException("Only ${HttpV1Message::javaClass} is allowed as " +
                                            "message content.")
@@ -68,17 +62,13 @@ class FcmHttpV1Client(private val serverKey: String, private val projectId: Stri
              */
             unsuccessfulResponseHandler = HttpBackOffUnsuccessfulResponseHandler(ExponentialBackOff())
 
-            LOG.debug("FCM >> {}", url)
-            headers.forEach { name, value -> LOG.debug("FCM >> {}: {}", name, value) }
-            LOG.debug("FCM >> {}", contents)
+            log.debug("FCM >> {}", url)
+            headers.forEach { name, value -> log.debug("FCM >> {}: {}", name, value) }
+            log.debug("FCM >> {}", contents)
         }.execute()
 
-        LOG.debug("FCM Response - {} {}", response.statusCode, response.statusMessage)
-        response.headers.forEach { name, value -> LOG.debug("{}: {}", name, value) }
-        LOG.debug(response.parseAsString())
-    }
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(FcmHttpV1Client::class.java)
+        log.debug("FCM Response - {} {}", response.statusCode, response.statusMessage)
+        response.headers.forEach { name, value -> log.debug("{}: {}", name, value) }
+        log.debug(response.parseAsString())
     }
 }

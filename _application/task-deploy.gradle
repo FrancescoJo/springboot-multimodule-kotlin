@@ -1,0 +1,29 @@
+task deploy(dependsOn: 'build') {
+    def targetDir = "${rootProject.buildDir}/outputs"
+    def targetDirFile = new File(targetDir)
+    targetDirFile.mkdirs()
+    if (!targetDirFile.exists() || !targetDirFile.isDirectory()) {
+        throw new IOException("Unable to create deploy target directory $targetDir")
+    }
+
+    doLast {
+        def archiveDir = "$buildDir/libs/"
+        def jarFile = new File("$archiveDir/${project.name}.jar")
+        if (!jarFile.exists()) {
+            throw new FileNotFoundException("Expected build file $jarFile is not found!!")
+        }
+
+        targetDirFile.listFiles().each { file ->
+            if (file.name != jarFile.name) {
+                file.delete()
+            }
+        }
+
+        def targetFile = "$targetDir/${rootProject.name}-$versioning_tag-$versioning_sha-b${versioning_commitCount}.jar"
+        def result = jarFile.renameTo(new File(targetFile))
+
+        if (!result) {
+            throw new IOException("Unable to deploy JAR archive into $targetDir")
+        }
+    }
+}
