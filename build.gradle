@@ -12,6 +12,7 @@ buildscript {
 
     ext.version_junit5  = "5.1.0"
     ext.version_mockito = "2.20.0"
+    ext.version_detekt = "1.0.0.RC8"
 
     repositories {
         jcenter()
@@ -28,6 +29,7 @@ buildscript {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$version_springBoot"
         classpath "io.spring.gradle:propdeps-plugin:$version_springPropDeps"
         classpath "com.adarshr:gradle-test-logger-plugin:1.1.2"
+        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$version_detekt"
     }
 }
 

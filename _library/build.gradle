@@ -1,14 +1,8 @@
 apply plugin: "java"
 apply plugin: "idea"
 apply plugin: "eclipse"
-apply plugin: "kotlin"
 
-def jvmSrcVersion = 1.8
-
-sourceCompatibility = jvmSrcVersion
-
-compileKotlin { kotlinOptions.jvmTarget = "$jvmSrcVersion" }
-compileTestKotlin { kotlinOptions.jvmTarget = "$jvmSrcVersion" }
+apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
 
 jar {
     baseName = "fj-lib-kotlin"

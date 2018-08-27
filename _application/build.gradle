@@ -12,6 +12,8 @@ apply plugin: "com.adarshr.test-logger"
 apply from: "$project.rootDir/gradle/scripts/deployment.gradle"
 apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
 apply from: "$project.rootDir/gradle/scripts/testing-junit.gradle"
+apply from: "$project.rootDir/gradle/scripts/static-analysis-detekt.gradle"
+apply from: "$project.rootDir/gradle/scripts/coverage-jacoco.gradle"
 apply from: "integration-test.gradle"
 apply from: "task-deploy.gradle"
 

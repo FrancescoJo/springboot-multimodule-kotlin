@@ -1,0 +1,4 @@
+# Defekt configuration file. Read following link for more instructions.
+# https://arturbosch.github.io/detekt/configurations.html
+autoCorrect: false
+failFast: true

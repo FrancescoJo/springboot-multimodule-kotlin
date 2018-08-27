@@ -3,18 +3,22 @@ Skeleton construct of Spring boot based REST API application. Simple
 use case is included for implementation reference.
 
 ## Technical stacks/libs used:
-  - Java 1.8
-  - [Kotlin](https://kotlinlang.org/) 1.2
-  - [Gradle](https://gradle.org/) 4.x
-  - [Spring boot](http://spring.io/projects/spring-boot) 2
-    * Externalised configurations
-    * I18n support
-  - [Undertow](http://undertow.io/)
-  - JPA with [Hibernate](http://hibernate.org/)
-  - [HicariCP](https://github.com/brettwooldridge/HikariCP)
-  - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
-  - [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
-  - [Spock framework](http://spockframework.org/) with [Groovy language](http://groovy-lang.org/)
+  - Build tools:
+    * [Gradle](https://gradle.org/) 4.x
+  - Languages:
+    * Java 1.8 - platform runtime
+    * [Kotlin](https://kotlinlang.org/) 1.2 - implementation, unit test
+    * [Groovy](http://groovy-lang.org/) 2.4 - integration test
+  - Frameworks and runtimes:
+    * [Undertow](http://undertow.io/) - for Web application server
+    * [Spring boot](http://spring.io/projects/spring-boot) 2 - application framework
+    * JPA with [Hibernate](http://hibernate.org/) - persistent data
+    * [HicariCP](https://github.com/brettwooldridge/HikariCP) - database connection pool
+    * [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - push message service
+  - Code quality:
+    * [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
+    * [Spock framework](http://spockframework.org/) with [Groovy](http://groovy-lang.org/)
+    * [detekt](https://arturbosch.github.io/detekt/index.html)
 
 ## How to build
 ```
@@ -87,7 +91,7 @@ which produces error as follows:
 }
 ```
 
-Looks quite different to OK responses.
+Looks quite different to our custom OK/ERROR responses.
 
 ## How to set up a SSL
 This project is intended to run as stand-alone HTTPS server with
@@ -113,18 +117,22 @@ server:
 
 There are some demo scripts under `settings/letsencrypt` directory for it, and customise it at your own needs.
 
-## Package naming and structure
-
-## How to run tests and its results
+## How to run tests and create report files
 ```
-./gradlew [test] [integrationTest]
+./gradlew test integrationTest jacocoTestReport
 ```
 - In contrast to `test` task, `integrationTest` is required to be run under a separated environment.
   Please check files under `_application/src/integrationTest/resources` directory for an example.
 
+## How to run static analysis and create report files
+```
+./gradlew detekt
+```
+- This project uses [detekt](https://arturbosch.github.io/detekt/index.html) as a static analyser.
+  For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
+
 ## TO-DOs
-- Static analysis & Test coverage report
 - Swagger integration
-- Docker integration + Local database environment
 - Spring security
+- Docker integration + Local database environment
 - Make this works on eclipse

@@ -1,0 +1,12 @@
+apply plugin: "io.gitlab.arturbosch.detekt"
+
+detekt {
+    version = "$version_detekt"
+    defaultProfile {
+        input = file("src/main/kotlin")
+        config = "$project.rootDir/settings/static-analysis/detekt.yml"
+        filters = ".*/resources/.*,.*/build/.*"
+        output = "$project.rootDir/build/reports"
+        outputName = "reports-detekt"
+    }
+}
