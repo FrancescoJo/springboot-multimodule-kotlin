@@ -1,6 +1,10 @@
-# Spring boot multi-module skeleton
-Skeleton construct of Spring boot based REST API application. Simple
-use case is included for implementation reference.
+# Spring boot + Kotlin multi-module demo
+Skeleton construct of Spring boot based REST API application. Simple use case is included for
+implementation reference.
+
+Although the framework setup difficulty has reduced after release of Spring boot, configuring
+Spring framework is still not an easy task. This template project is for reducing such costs
+at the initial development stage.
 
 ## Technical stacks/libs used:
   - Build tools:
@@ -14,7 +18,7 @@ use case is included for implementation reference.
     * [Spring boot](http://spring.io/projects/spring-boot) 2 - application framework
     * JPA with [Hibernate](http://hibernate.org/) - persistent data
     * [HicariCP](https://github.com/brettwooldridge/HikariCP) - database connection pool
-    * [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - push message service
+    * [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - message push service
   - Code quality:
     * [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
     * [Spock framework](http://spockframework.org/) with [Groovy](http://groovy-lang.org/)
@@ -24,7 +28,7 @@ use case is included for implementation reference.
 ```
 ./gradlew clean deploy [writeVersionFile] [-PbuildConfig={DEV|ALPHA|BETA|RELEASE}]
 ```
-- Build target will be defaulted as DEV if the option is omitted.
+- `buildConfig` will be defaulted as `DEV` if the option is omitted.
 - `writeVersionFile` task will generate a file named `version.properties`
   on project root directory.
 - Standalone executable JAR file will be created in `build/outputs`
@@ -91,15 +95,18 @@ which produces error as follows:
 }
 ```
 
-Looks quite different to our custom OK/ERROR responses.
+looks quite different to our custom OK/ERROR responses.
 
-## How to set up a SSL
-This project is intended to run as stand-alone HTTPS server with
+## How to setup a SSL
+This project is constructed to run as stand-alone HTTPS server with
 Let's encrypt certificate. However, due to the nature of Java Keystore
 system, [server restart is required](https://github.com/spring-projects/spring-boot/issues/5450)
 after the certificate expires. To avoid this problem, it is better to
 setup a reverse proxy with well known HTTP daemons such as `nginx` or
-`httpd`.
+`httpd`. Moreover, a good point of utilising such services is, restarting
+it is much faster than Spring application. Therefore, if you can configure
+reverse proxy, setup it only on the reverse proxy side and run this
+project as HTTP mode.
 
 Setting operation mode as SSL is dead simple, just create a jks key by [`keytool`](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html)
 command or import a CA certificate and convert it by [`openssl`](https://www.openssl.org/docs/man1.0.2/apps/openssl.html),

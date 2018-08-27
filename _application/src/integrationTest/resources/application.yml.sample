@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: springboot-multimodule-kotlin-integrationTest
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/fj_test_IT?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&serverTimezone=UTC&character_set_server=utf8mb4
+    username: jteam
+    password: "0000"
+  jpa:
+    hibernate:
+      # Better to use create-drop for integration tests
+      ddl-auto: create-drop
+      show_sql: true
+      format_sql: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+
+management:
+  add-application-context-header: false
+
+logging:
+  path:
+  pattern:
+    file:
+    config:
+  level:
+    # Better to raise over than INFO in production environment
+    org.springframework.web: INFO
+    org.hibernate: INFO
+
+app:
+  push:
+    fcm-private-key-location:
+    fcm-server-key:
+    fcm-project-id:
