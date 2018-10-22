@@ -8,7 +8,7 @@ package com.github.fj.restapi.dto
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 15 - Jan - 2018
  */
-abstract class ResponseDto<T>(val type: Type) {
+abstract class AbstractResponseDto<T>(val type: Type) {
     abstract val body: T
 
     companion object {

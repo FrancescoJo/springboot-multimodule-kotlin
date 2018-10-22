@@ -7,6 +7,7 @@
 package com.github.fj.lib.time
 
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 fun utcNow(): LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)

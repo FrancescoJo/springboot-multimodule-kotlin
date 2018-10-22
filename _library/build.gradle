@@ -3,6 +3,7 @@ apply plugin: "idea"
 apply plugin: "eclipse"
 
 apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
+apply from: "$project.rootDir/gradle/scripts/testing-junit.gradle"
 
 jar {
     baseName = "fj-lib-kotlin"
@@ -10,7 +11,5 @@ jar {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version_kotlin"
 
-    testCompile "org.junit.jupiter:junit-jupiter-engine:5.1.0"
 }

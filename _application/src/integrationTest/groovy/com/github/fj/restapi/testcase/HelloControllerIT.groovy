@@ -5,8 +5,8 @@
 package com.github.fj.restapi.testcase
 
 import com.github.fj.restapi.TestcaseTemplate
-import com.github.fj.restapi.endpoint.hello.HelloRequestDto
-import com.github.fj.restapi.endpoint.hello.HelloResponseDto
+import com.github.fj.restapi.dto.hello.HelloRequestDto
+import com.github.fj.restapi.dto.hello.HelloResponseDto
 import org.springframework.http.HttpStatus
 
 /**
@@ -21,10 +21,10 @@ class HelloControllerIT extends TestcaseTemplate {
 
         when:
         final response = post("/hello", request)
-        final responseDto = response.getResponseDto(HelloResponseDto.Body)
+        final responseDto = response.parseOk(HelloResponseDto)
 
         then:
         response.status == HttpStatus.OK
-        responseDto.body.message == "POST Hello, $name"
+        responseDto.message == "POST Hello, $name"
     }
 }

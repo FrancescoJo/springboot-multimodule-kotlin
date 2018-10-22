@@ -12,7 +12,7 @@ at the initial development stage.
   - Languages:
     * Java 1.8 - platform runtime
     * [Kotlin](https://kotlinlang.org/) 1.2 - implementation, unit test
-    * [Groovy](http://groovy-lang.org/) 2.4 - integration test
+    * [Groovy](http://groovy-lang.org/) 2.5 - integration test
   - Frameworks and runtimes:
     * [Undertow](http://undertow.io/) - for Web application server
     * [Spring boot](http://spring.io/projects/spring-boot) 2 - application framework
@@ -48,7 +48,9 @@ $ curl --insecure \
   -H "content-type: application/json" \
   https://localhost:8080/hello
 {
-  "body": "GET Hello, world",
+  "body": {
+      "message": "GET Hello, world"
+    },
   "type": "OK"
 }
 ```
@@ -61,7 +63,9 @@ $ curl --insecure \
   -d '{"name":"FrancescoJo"}' \
   https://localhost:8080/hello
 {
-  "body": "POST Hello, FrancescoJo",
+  "body": {
+    "message": "POST Hello, FrancescoJo"
+  },
   "type": "OK"
 }
 ```
@@ -75,7 +79,7 @@ The error response will be look like:
 {
   "body": {
     "message": "Not Found",
-    "reason": "GeneralHttpException"
+    "reason": "Resource /hello is not found."
   },
   "type": "ERROR"
 }
@@ -139,7 +143,7 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
   For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
 
 ## TO-DOs
-- Swagger integration
+- Logback configuration with logRotate
+- Fix integrationTest to load application.yml correctly
 - Spring security
 - Docker integration + Local database environment
-- Make this works on eclipse

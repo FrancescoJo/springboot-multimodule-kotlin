@@ -5,14 +5,17 @@
 package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import com.github.fj.restapi.AppProfile
+import com.github.fj.restapi.BuildConfig
 import com.github.fj.restapi.dto.ErrorResponseDto
-import com.github.fj.restapi.dto.ResponseDto
+import com.github.fj.restapi.dto.AbstractResponseDto
 import com.github.fj.restapi.exception.AbstractBaseException
 import com.github.fj.restapi.exception.GeneralHttpException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
@@ -46,25 +49,31 @@ class CustomErrorHandler {
         val status: Int
         val response = when (ex) {
             is AbstractBaseException -> {
-                LOG.error("Handled exception: ", ex)
+                logError("Handled exception:", ex)
                 status = ex.httpStatusCode
-                ResponseDto.error(ex.message, ex.reason)
+                AbstractResponseDto.error(ex.message, ex.reason)
             }
             is HttpMessageNotReadableException -> {
-                LOG.error("Spring handled exception: ", ex)
+                logError("Spring handled exception:", ex)
                 status = HttpStatus.BAD_REQUEST.value()
-                ResponseDto.error("Cannot process given request.")
+                AbstractResponseDto.error("Cannot process given request.", "Malformed request message")
             }
             is JsonProcessingException -> {
-                LOG.error("JSON parsing exception: ", ex)
+                logError("JSON parsing exception:", ex)
                 status = HttpStatus.BAD_REQUEST.value()
-                ResponseDto.error("Cannot process given request.")
+                AbstractResponseDto.error("Cannot process given request.", "Malformed JSON")
+            }
+            is MethodArgumentNotValidException -> {
+                logError("Validation failure exception:", ex)
+                status = HttpStatus.BAD_REQUEST.value()
+                val reason = ex.bindingResult.globalError?.defaultMessage
+                        ?.takeIf { it.isNotEmpty() } ?: ""
+                AbstractResponseDto.error("Cannot process given request.", reason)
             }
             else -> {
-                LOG.error("Unhandled exception: ", ex)
+                logError("Unhandled exception:", ex)
                 status = getStatus(req).value()
-                val message = "Unhandled internal server error"
-                ResponseDto.error(message)
+                AbstractResponseDto.error("Unhandled internal server error")
             }
         }
 
@@ -75,6 +84,29 @@ class CustomErrorHandler {
         return (request.getAttribute("javax.servlet.error.status_code") as? Int)?.let {
             HttpStatus.valueOf(it)
         } ?: HttpStatus.INTERNAL_SERVER_ERROR
+    }
+
+    private fun logError(message: String, ex: Exception) {
+        if (BuildConfig.currentProfile == AppProfile.RELEASE) {
+            // Minimise log outputs in RELEASE binary
+            LOG.error(message)
+            logCauses(ex)
+        } else {
+            LOG.error(message, ex)
+        }
+    }
+
+    private fun logCauses(cause: Throwable?) {
+        if (cause == null) {
+            return
+        } else {
+            if (cause.cause == null) {
+                LOG.error("  by $cause")
+            } else {
+                LOG.error("  by ${cause::class}")
+                logCauses(cause.cause)
+            }
+        }
     }
 
     companion object {

@@ -6,7 +6,8 @@ package com.github.fj.restapi
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.fj.restapi.dto.ResponseDto
+import com.github.fj.restapi.dto.AbstractResponseDto
+import com.github.fj.restapi.dto.ErrorResponseDto
 import org.springframework.http.HttpStatus
 
 /**
@@ -31,27 +32,31 @@ class TestcaseResponse {
         return Arrays.copyOf(content, content.length)
     }
 
-    def <T> ResponseDto<T> getResponseDto(final Class<T> responseBodyType) {
+    def <T> T parseOk(final Class<T> responseBodyType) {
         final rawResponseDto = new ObjectMapper().readValue(content, RawResponseDto.class)
         final body = rawResponseDto.body
 
-        final ResponseDto<T> response
         switch (rawResponseDto.type) {
             case "OK":
-                final payload = new ObjectMapper().treeToValue(body, responseBodyType)
-                response = new ResponseDto.Companion().ok(payload)
-                break
+                return new ObjectMapper().treeToValue(body, responseBodyType)
+            default:
+                throw new IllegalArgumentException("Not a OK response: ${rawResponseDto.type}")
+        }
+    }
+
+    def ErrorResponseDto parseError() {
+        final rawResponseDto = new ObjectMapper().readValue(content, RawResponseDto.class)
+        final body = rawResponseDto.body
+
+        switch (rawResponseDto.type) {
             case "ERROR":
-                response = new ResponseDto.Companion().error(
+                return new AbstractResponseDto.Companion().error(
                         body.get("message").asText(),
                         body.get("reason").asText()
-                ) as ResponseDto<T>
-                break
+                )
             default:
-                throw new IllegalArgumentException("Unparsable response type: ${rawResponseDto.type}")
+                throw new IllegalArgumentException("Not a ERROR response: ${rawResponseDto.type}")
         }
-
-        return response
     }
 
     /**

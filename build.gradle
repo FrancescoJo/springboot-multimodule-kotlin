@@ -1,8 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.version_kotlin = "1.2.61"
-    ext.version_spring = "5.0.7.RELEASE"
-    ext.version_springBoot = "2.0.3.RELEASE"
+    ext.version_kotlin = "1.2.71"
+    ext.version_spring = "5.1.1.RELEASE"
+    ext.version_springBoot = "2.0.6.RELEASE"
     ext.version_springPropDeps = "0.0.9.RELEASE"
 
     // Common lib version definitions

@@ -48,7 +48,7 @@ open class SimpleFcmPushSender(privateKeyLocation: String,
             File(privateKeyLocation).inputStream().asString()
         } catch (t: IOException) {
             LOG.warn("Error while accessing Firebase credential file. Operating in legacy mode.")
-            LOG.warn("{}", t.message)
+            LOG.warn("Key location: {}", privateKeyLocation)
             _mode = Mode.LEGACY
             ""
         }

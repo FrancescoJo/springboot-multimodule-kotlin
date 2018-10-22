@@ -44,7 +44,7 @@ class TestcaseTemplate extends Specification {
                     return
                 }
 
-                final String value
+                String value
                 if (it.second() == null) {
                     value = ""
                 } else {

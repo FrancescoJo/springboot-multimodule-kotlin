@@ -57,10 +57,10 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter(test)
 
 dependencies {
-    integrationTestCompile "org.codehaus.groovy:groovy-all:2.4.13"
+    integrationTestCompile "org.codehaus.groovy:groovy-all:2.5.3"
 
-    integrationTestCompile "org.spockframework:spock-core:1.1-groovy-2.4"
-    integrationTestCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+    integrationTestCompile "org.spockframework:spock-core:1.2-groovy-2.5"
+    integrationTestCompile 'org.spockframework:spock-spring:1.2-groovy-2.5'
 
     integrationTestRuntime 'cglib:cglib-nodep:3.2.4'
     integrationTestRuntime "net.bytebuddy:byte-buddy:1.6.5"
@@ -68,3 +68,6 @@ dependencies {
     integrationTestRuntime "org.objenesis:objenesis:2.5.1"
     // allows mocking of classes without default constructor (together with CGLIB)
 }
+
+// https://stackoverflow.com/questions/50681096/groovy-2-5-0-gives-noclassdeffounderror-for-methodcalltransformation
+ext["groovy.version"] = '2.5.0'
