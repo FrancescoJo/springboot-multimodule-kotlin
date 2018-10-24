@@ -23,6 +23,9 @@ at the initial development stage.
     * [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
     * [Spock framework](http://spockframework.org/) with [Groovy](http://groovy-lang.org/)
     * [detekt](https://arturbosch.github.io/detekt/index.html)
+  - Automatic documentation:
+    * [Swagger](https://swagger.io/) - API document generator
+    * [Swagger springfox](http://springfox.github.io/springfox/) - Swagger integration with Spring boot
 
 ## How to build
 ```
@@ -143,7 +146,6 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
   For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
 
 ## TO-DOs
-- Logback configuration with logRotate
-- Fix integrationTest to load application.yml correctly
 - Spring security
-- Docker integration + Local database environment
+- Spring REST Docs
+- Docker integration

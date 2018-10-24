@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- LOG_PATH will be set as the value of logging.path of application.properties if not defined at here -->
+    <!--<property name="LOG_PATH" value="/var/temp/log/" />-->
+    <!-- LOG_FILE will be set as the value of logging.file of application.properties if not defined at here -->
+    <!--<property name="LOG_FILE" value="springboot-multimodule-kotlin"/>-->
+    <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%thread] %logger{40} : %msg%n"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+     Refer to a Spring known property to make it available from Logback
+     (see: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#_environment_properties)
+    -->
+    <springProperty name="spring.application.name" source="spring.application.name"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+
+        <file>${LOG_PATH}/${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Append date suffix when rotate log files -->
+            <FileNamePattern>${LOG_PATH}/archives/${spring.application.name}-%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <!-- each file should be at most 150MB, keep 20 days worth of history, but at most 5GB -->
+            <maxFileSize>150MB</maxFileSize>
+            <maxHistory>20</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Both all log levels are written via console and file -->
+    <root level="VERBOSE">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

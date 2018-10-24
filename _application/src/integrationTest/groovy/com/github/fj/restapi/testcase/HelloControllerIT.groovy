@@ -7,6 +7,7 @@ package com.github.fj.restapi.testcase
 import com.github.fj.restapi.TestcaseTemplate
 import com.github.fj.restapi.dto.hello.HelloRequestDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto
+import com.github.fj.restapi.endpoint.ApiPaths
 import org.springframework.http.HttpStatus
 
 /**
@@ -20,7 +21,7 @@ class HelloControllerIT extends TestcaseTemplate {
         final request = new HelloRequestDto(name)
 
         when:
-        final response = post("/hello", request)
+        final response = post("${ApiPaths.VERSION}/hello", request)
         final responseDto = response.parseOk(HelloResponseDto)
 
         then:

@@ -1,0 +1,22 @@
+# Configuration template file for all running profiles / build configurations.
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: springboot-multimodule-kotlin
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+management:
+  server:
+    add-application-context-header: false

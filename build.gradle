@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.version_kotlin = "1.2.71"
-    ext.version_spring = "5.1.1.RELEASE"
+    // ext.version_spring = "5.1.1.RELEASE"
     ext.version_springBoot = "2.0.6.RELEASE"
     ext.version_springPropDeps = "0.0.9.RELEASE"
 
@@ -9,8 +9,10 @@ buildscript {
     ext.version_hicariCP = "3.2.0"
     ext.version_slf4j = "1.7.21"
     ext.version_guava = "26.0-jre"
+    ext.version_google_api_client = "1.23.0"
+    ext.version_gson = "2.8.5"
 
-    ext.version_junit5  = "5.1.0"
+    ext.version_junit5 = "5.1.0"
     ext.version_mockito = "2.20.0"
     ext.version_detekt = "1.0.0.RC8"
 
@@ -41,11 +43,16 @@ allprojects {
         maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
+    apply plugin: "java"
     apply plugin: "idea"
     idea {
         module {
             outputDir file("build/classes/main")
             testOutputDir file("build/classes/test")
         }
+    }
+
+    dependencies {
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     }
 }

@@ -1,14 +1,7 @@
-# Configuration template file. Copy it by removing 'sample' extension to apply upon runtime.
-# These configurations will be loaded both under development and production.
+# Configuration template file for integration test.
 # Don't put sensitive information like passwords into source code control!
 server:
   port: 8080
-  ssl:
-    enabled: false
-    key-store: keystore.p12
-    key-store-password:
-    keyStoreType:
-    keyAlias:
 
 spring:
   profiles:
@@ -17,19 +10,19 @@ spring:
   datasource:
     # Automatic database initialisation. Maybe conflict to hibernate.
     # https://docs.spring.io/spring-boot/docs/current/reference/html/howto-database-initialization.html
-    initialization-mode: ALWAYS
-    schema: classpath:/schemas/v1.0/schema.sql
-    data: classpath:/schemas/v1.0/data.sql
-    validation-query: SELECT 1
+    initialization-mode: NEVER
+    schema:
+    data:
+    validation-query:
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name:
-    url:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
     username:
     password:
   jpa:
     hibernate:
       # Better to use create-drop for integration tests
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         show_sql: true

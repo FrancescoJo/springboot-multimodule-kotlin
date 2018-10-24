@@ -5,6 +5,7 @@
 package com.github.fj.restapi.model
 
 import com.github.fj.lib.util.EmptyObject
+import java.io.Serializable
 import javax.persistence.*
 
 /**
@@ -13,16 +14,14 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "members")
-data class Member(
+data class Member @JvmOverloads constructor(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(unique = true, nullable = false)
-        val id: Long,
+        val id: Long = 0L,
 
         @Column(nullable = false)
-        val name: String) {
-    constructor() : this(0L, "")
-
+        val name: String = "") : Serializable {
     companion object : EmptyObject<Member> {
         override val EMPTY = Member()
     }
