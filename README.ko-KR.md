@@ -10,7 +10,7 @@ Spring boot 출시 이후 설정이 많이 쉬워졌다곤 하지만 Spring fram
   - 언어:
     * Java 1.8 - 프로그램 실행 플랫폼
     * [Kotlin](https://kotlinlang.org/) 1.2 - 구현 및 단위 테스트에 사용
-    * [Groovy](http://groovy-lang.org/) 2.4 - 통합 테스트에 사용
+    * [Groovy](http://groovy-lang.org/) 2.5 - 통합 테스트에 사용
   - 프레임워크 및 앱 런타임:
     * [Undertow](http://undertow.io/) - Tomcat/Jetty 등을 대신하는 서블릿 컨테이너
     * [Spring boot](http://spring.io/projects/spring-boot) 2 - 애플리케이션 프레임워크
@@ -44,7 +44,9 @@ $ curl --insecure \
   -H "content-type: application/json" \
   https://localhost:8080/hello
 {
-  "body": "GET Hello, world",
+  "body": {
+    "message": "GET Hello, world"
+  },
   "type": "OK"
 }
 ```
@@ -57,7 +59,9 @@ $ curl --insecure \
   -d '{"name":"FrancescoJo"}' \
   https://localhost:8080/hello
 {
-  "body": "POST Hello, FrancescoJo",
+  "body": {
+    "message": "POST Hello, FrancescoJo"
+  },
   "type": "OK"
 }
 ```

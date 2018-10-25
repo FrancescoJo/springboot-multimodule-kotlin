@@ -52,8 +52,8 @@ $ curl --insecure \
   https://localhost:8080/hello
 {
   "body": {
-      "message": "GET Hello, world"
-    },
+    "message": "GET Hello, world"
+  },
   "type": "OK"
 }
 ```
@@ -146,6 +146,7 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
   For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
 
 ## TO-DOs
+- Redesign Integration test execution
 - Spring security
 - Spring REST Docs
 - Docker integration

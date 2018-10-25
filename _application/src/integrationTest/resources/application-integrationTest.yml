@@ -1,17 +1,10 @@
-# Configuration template file. Copy it by removing 'sample' extension to apply upon runtime.
-# These configurations will be loaded both under development and production.
+# Configuration template file for integration test.
 # Don't put sensitive information like passwords into source code control!
 server:
   port: 8080
   error:
     whitelabel:
       enabled: false
-  ssl:
-    enabled: false
-    key-store: keystore.p12
-    key-store-password:
-    keyStoreType:
-    keyAlias:
 
 spring:
   application:
@@ -22,12 +15,12 @@ spring:
   datasource:
     # Automatic database initialisation. Maybe conflict to hibernate.
     # https://docs.spring.io/spring-boot/docs/current/reference/html/howto-database-initialization.html
-    initialization-mode: ALWAYS
-    schema: classpath:/sql/v1.0/schemas/*.sql
-    data: classpath:/sql/v1.0/data/*.sql
+    initialization-mode: NEVER
+    schema:
+    data:
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name:
-    url:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
     username:
     password:
   jpa:
@@ -36,7 +29,7 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       # Better to use create-drop for integration tests
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         show_sql: true
@@ -44,7 +37,7 @@ spring:
   resources:
     add-mappings: false
   mvc:
-    throw-exception-if-no-handler-found: true
+    throw-exception-if-no-handler-found: false
 
 management:
   server:
@@ -56,7 +49,7 @@ logging:
   level:
     # Better to raise over than INFO in production environment
     org.springframework.web: INFO
-    # All exceptions are handled and logged by com.github.fj.restapi.endpoint.CustomErrorHandler
+    # All logs are handled and logged by com.github.fj.restapi.endpoint.CustomErrorHandler
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: OFF
     org.hibernate: INFO
     com.github.fj: DEBUG

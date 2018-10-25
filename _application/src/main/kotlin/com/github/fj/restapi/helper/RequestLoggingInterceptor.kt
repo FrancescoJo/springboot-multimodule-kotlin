@@ -22,19 +22,16 @@ class RequestLoggingInterceptor: HandlerInterceptorAdapter() {
         val ip     = request.run { "$remoteHost ($remoteAddr:$remotePort)" }
         val method = Strings.padEnd(request.method, 6, ' ')
         val path   = request.servletPath
-
-        val logMessage = if (handler is HandlerMethod) {
+        val handlerInfo = if (handler is HandlerMethod) {
             val hm = handler.method
             val className  = hm.declaringClass.canonicalName
             val methodName = hm.name
-            val handlerInfo = String.format("%s#%s", className, methodName)
-            String.format("%s %s from %s << %s", method, path, ip, handlerInfo)
+            String.format("%s#%s", className, methodName)
         } else {
-            String.format("%s %s from %s << %s", method, path, ip, handler.javaClass)
+            handler.javaClass.toString()
         }
 
-        LOG.info(logMessage)
-
+        LOG.info(String.format("%s %s from %s << %s", method, path, ip, handlerInfo))
         return super.preHandle(request, response, handler)
     }
 

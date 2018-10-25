@@ -12,7 +12,7 @@ de demostración es para reducir tal costos en la etapa de desarrollo inicial.
   - Idiomas:
     * Java 1.8 - para ejecutar está proyecto
     * [Kotlin](https://kotlinlang.org/) 1.2 - para implementaciónes, prueba de unidad
-    * [Groovy](http://groovy-lang.org/) 2.4 - para prueba de integración
+    * [Groovy](http://groovy-lang.org/) 2.5 - para prueba de integración
   - Marcos de softwares y motores de ejecuciónes:
     * [Undertow](http://undertow.io/) - para Web application server
     * [Spring boot](http://spring.io/projects/spring-boot) 2 - para marcos de softwares
@@ -47,7 +47,9 @@ $ curl --insecure \
   -H "content-type: application/json" \
   https://localhost:8080/hello
 {
-  "body": "GET Hello, world",
+  "body": {
+    "message": "GET Hello, world"
+  },
   "type": "OK"
 }
 ```
@@ -60,7 +62,9 @@ $ curl --insecure \
   -d '{"name":"FrancescoJo"}' \
   https://localhost:8080/hello
 {
-  "body": "POST Hello, FrancescoJo",
+  "body": {
+    "message": "POST Hello, FrancescoJo"
+  },
   "type": "OK"
 }
 ```

@@ -72,7 +72,6 @@ configurations {
 compileJava.dependsOn(processResources)
 
 dependencies {
-    compile project(":_library")
     compile project(":_fcmClient")
 
     compile "javax.inject:javax.inject:1"
@@ -91,19 +90,19 @@ dependencies {
     // Spring Data + JPA
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework:spring-tx")
-    compile "com.zaxxer:HikariCP:$version_hicariCP"
+    compile("com.zaxxer:HikariCP")
     // Change this to your favourite database (and apply it to application.yml configuration file)
-    compile "org.mariadb.jdbc:mariadb-java-client:2.3.0"
+    compile("org.mariadb.jdbc:mariadb-java-client")
 
     // Jackson Kotlin support
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Swagger integration
     compile "io.springfox:springfox-swagger2:2.9.2"
     compile "io.springfox:springfox-swagger-ui:2.9.2"
 
-
-    testCompile ("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("com.h2database:h2")
 }
 
 dependencyManagement {
