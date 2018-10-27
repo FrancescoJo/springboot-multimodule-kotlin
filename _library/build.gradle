@@ -2,6 +2,7 @@ apply from: "$project.rootDir/gradle/scripts/kotlin.gradle"
 apply from: "$project.rootDir/gradle/scripts/testing-junit.gradle"
 
 jar {
+    enabled = true
     baseName = "fj-lib-kotlin"
     version = "1.0-SNAPSHOT"
 }
@@ -9,4 +10,6 @@ jar {
 dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile "org.slf4j:slf4j-api:$version_slf4j"
+
+    compile "de.skuzzle:semantic-version:1.2.0"
 }

@@ -4,7 +4,6 @@
  */
 package test.com.github.fj.restapi.testcase
 
-
 import com.github.fj.restapi.dto.OkResponseDto
 import com.github.fj.restapi.dto.hello.HelloRequestDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto

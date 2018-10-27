@@ -10,6 +10,8 @@ import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 
+private val EMPTY_INET_ADDRESS = InetAddress.getByName("0.0.0.0")
+
 /**
  * IPv4 to IPv6 rule is from
  * [RFC 4291](https://tools.ietf.org/html/rfc4291#section-2.5.5.2).
@@ -28,3 +30,42 @@ fun InetAddress.toIpV6AddressBytes(): ByteArray {
                 "Not an IP compatible address: $hostAddress")
     }
 }
+
+/**
+ * Converts given [kotlin.ByteArray] which may represents IPv4 or IPv6 address,
+ * to [java.net.InetAddress] representation.
+ *
+ * The operating [kotlin.ByteArray] size must be either 4 or 16.
+ */
+fun ByteArray.toInetAddress(): InetAddress {
+    return if (size != 4 && size != 16) {
+        EMPTY_INET_ADDRESS
+    } else {
+        InetAddress.getByAddress(this)
+    }
+}
+
+/**
+ * Determines that operating [java.net.InetAddress] represents whether an IPv4 address or not.
+ */
+fun InetAddress.isIpV4Address(): Boolean {
+    return this is Inet4Address
+}
+
+class InetAddressExtensions {
+    companion object {
+        /**
+         * Workaround for
+         *
+         * ```
+         * fun InetAddress.Companion.empty(): InetAddress = EMPTY_INET_ADDRESS
+         * ```
+         *
+         * which is currently(Kotlin 1.0) impossible.
+         * Read [Kotlin Youtrack issues](https://youtrack.jetbrains.com/issue/KT-11968) for more information.
+         */
+        val EMPTY_INET_ADDRESS: InetAddress = com.github.fj.lib.net.EMPTY_INET_ADDRESS
+    }
+}
+
+fun InetAddress?.isNullOrEmpty(): Boolean = this == null || this == EMPTY_INET_ADDRESS

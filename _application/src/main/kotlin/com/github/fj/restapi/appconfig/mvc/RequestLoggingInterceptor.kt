@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.helper
+package com.github.fj.restapi.appconfig.mvc
 
 import com.google.common.base.Strings
 import org.slf4j.LoggerFactory

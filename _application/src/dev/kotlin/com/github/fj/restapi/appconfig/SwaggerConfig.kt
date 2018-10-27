@@ -6,6 +6,7 @@ package com.github.fj.restapi.appconfig
 
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.google.common.base.Predicate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
@@ -33,28 +34,22 @@ class SwaggerConfig : WebMvcConfigurer {
      */
     // For multiple Docket configuration see https://github.com/springfox/springfox/issues/748
     @Bean
-    fun api(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
-                .useDefaultResponseMessages(false)
-                .groupName(ApiPaths.VERSION_V1)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.regex("(/hello)"))
-                .build()
-                .apiInfo(ApiInfo(
-                        "REST API Demo",
-                        "Collections of ${ApiPaths.VERSION_V1} hello world API.",
-                        ApiPaths.BASE_PATH,
-                        "Terms of service",
-                        Contact("Francesco Jo",
-                                "https://github.com/FrancescoJo/springboot-multimodule-kotlin",
-                                "nimbusob@gmail.com"
-                        ),
-                        "Distributed under no licences and warranty.",
-                        "https://tldrlegal.com/license/no-limit-public-license",
-                        Collections.emptyList())
-                )
-    }
+    fun hello(): Docket =
+            newDocket("Hello world",
+                    "/${ApiPaths.HELLO}", "Collection of hello world APIs.",
+                    PathSelectors.ant("/${ApiPaths.HELLO}"))
+
+    @Bean
+    fun account(): Docket =
+            newDocket("Account",
+                    "/${ApiPaths.ACCOUNT}", "Collection of account related APIs.",
+                    PathSelectors.ant("/${ApiPaths.ACCOUNT}"))
+
+    @Bean
+    fun api(): Docket =
+            newDocket("API: ${ApiPaths.V1}",
+                    "/${ApiPaths.API_V1}", "Collection of ${ApiPaths.V1} APIs.",
+                    PathSelectors.ant("/${ApiPaths.API_V1}/**"))
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("swagger-ui.html")
@@ -62,5 +57,31 @@ class SwaggerConfig : WebMvcConfigurer {
 
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/")
+    }
+
+    companion object {
+        private fun newDocket(group: String, title: String, description: String,
+                              pathPredicate: Predicate<String>) = Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
+                .groupName(group)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(pathPredicate)
+                .build()
+                .apiInfo(newApiInfo(title, description))
+
+        private fun newApiInfo(title: String, description: String) = ApiInfo(
+                title,
+                description,
+                ApiPaths.API_V1,
+                "Terms of service",
+                Contact("Francesco Jo",
+                        "https://github.com/FrancescoJo/springboot-multimodule-kotlin",
+                        "nimbusob@gmail.com"
+                ),
+                "Distributed under no licences and warranty.",
+                "https://tldrlegal.com/license/no-limit-public-license",
+                Collections.emptyList()
+        )
     }
 }

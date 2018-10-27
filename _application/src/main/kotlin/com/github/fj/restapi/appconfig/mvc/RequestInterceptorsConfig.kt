@@ -2,10 +2,9 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.appconfig.servlet
+package com.github.fj.restapi.appconfig.mvc
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.helper.RequestLoggingInterceptor
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer

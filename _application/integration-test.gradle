@@ -69,6 +69,7 @@ check.dependsOn integrationTest
 def groovyVersion = "2.5.3"
 
 dependencies {
+    integrationTestCompile project(path: ":_library", configuration: "testArtifacts")
     integrationTestCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
 
     integrationTestCompile "org.spockframework:spock-core:1.2-groovy-2.5"

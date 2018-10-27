@@ -6,6 +6,7 @@
  */
 package com.github.fj.lib.text
 
+import java.util.*
 import java.util.regex.Pattern
 
 /*
@@ -85,4 +86,17 @@ fun Boolean.toYn(): String {
     } else {
         "N"
     }
+}
+
+private const val RANDOM_ALPHANUMERIC_CHARS = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890"
+
+fun getRandomAlphaNumericString(length: Int): String {
+    val random = Random()
+    val sb = StringBuffer(length)
+    for (loop in 0 until length) {
+        val index = random.nextInt(RANDOM_ALPHANUMERIC_CHARS.length)
+        sb.append(RANDOM_ALPHANUMERIC_CHARS[index])
+    }
+
+    return sb.toString()
 }

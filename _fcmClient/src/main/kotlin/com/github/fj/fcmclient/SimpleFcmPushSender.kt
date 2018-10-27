@@ -117,7 +117,7 @@ open class SimpleFcmPushSender(privateKeyLocation: String,
     open fun sendPush(pushContent: PushContent) {
         val pushMessage = when (mode) {
             LEGACY -> createLegacyPushMessage(pushContent)
-            HTTP_V1 -> TODO("Not implemented")
+            HTTP_V1 -> TODO("Replace to better implementation")
         }
 
         return when (mode) {

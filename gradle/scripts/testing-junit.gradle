@@ -1,6 +1,22 @@
 dependencies {
-    testCompile "org.junit.jupiter:junit-jupiter-engine:$version_junit5"
+    testCompile "org.junit.jupiter:junit-jupiter-api:$version_junit5"
+    testCompile "org.junit.jupiter:junit-jupiter-params:$version_junit5"
     testCompile "org.mockito:mockito-core:$version_mockito"
+
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:$version_junit5"
 }
 
 check.dependsOn test
+
+configurations {
+    testArtifacts.extendsFrom testRuntime
+}
+
+task testJar(type: Jar) {
+    classifier "test"
+    from sourceSets.test.output
+}
+
+artifacts {
+    testArtifacts testJar
+}

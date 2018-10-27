@@ -15,8 +15,11 @@ apply from: "integration-test.gradle"
 apply from: "task-deploy.gradle"
 
 static def logD(String message) { System.out.println("DEBUG: $message") }
+
 static def logI(String message) { System.out.println("INFO : $message") }
+
 static def logW(String message) { System.err.println("WARN : $message") }
+
 static def logE(String message) { System.err.println("ERROR: $message") }
 
 jar {
@@ -87,6 +90,7 @@ dependencies {
         exclude group: "io.undertow", module: "undertow-websockets-jsr"
     }
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-security")
 
     // Spring Data + JPA
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -102,7 +106,10 @@ dependencies {
     compile "io.springfox:springfox-swagger2:$version_swagger2"
     compile "io.springfox:springfox-swagger-ui:$version_swagger2"
 
+    testCompile project(path: ":_library", configuration: "testArtifacts")
+
     testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.security:spring-security-test")
     testCompile("com.h2database:h2")
 }
 

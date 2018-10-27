@@ -50,7 +50,7 @@ logging:
     # Better to raise over than INFO in production environment
     org.springframework.web: INFO
     org.hibernate: INFO
-    com.github.fj: DEBUG
+    com.github.fj: TRACE
 
 app:
   push:

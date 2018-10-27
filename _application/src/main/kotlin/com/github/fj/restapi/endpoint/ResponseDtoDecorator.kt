@@ -5,6 +5,7 @@
 package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.github.fj.restapi.dto.AbstractResponseDto
 import com.github.fj.restapi.dto.OkResponseDto
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
@@ -36,6 +37,6 @@ class ResponseDtoDecorator : ResponseBodyAdvice<Any> {
             return null
         }
 
-        return OkResponseDto(body)
+        return AbstractResponseDto.ok(body)
     }
 }
