@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration
 @AllOpen
 @Configuration
 @EnableConfigurationProperties
-class Push {
+class PushConfig {
     @Value("\${app.push.fcm-private-key-location}")
     private var fcmPrivateKeyLocation = ""
 

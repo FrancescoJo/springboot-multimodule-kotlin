@@ -25,7 +25,7 @@ class HelloControllerIT extends IntegrationTestBase {
         when:
         final responseSpec = testClient()
                 .post()
-                .uri("${ApiPaths.VERSION}/hello")
+                .uri("/hello")
                 .body(BodyInserters.fromObject(request))
                 .exchange()
 

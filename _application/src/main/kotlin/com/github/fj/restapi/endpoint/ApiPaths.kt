@@ -9,5 +9,6 @@ package com.github.fj.restapi.endpoint
  * @since 22 - Oct - 2018
  */
 object ApiPaths {
-    const val VERSION = "/v1"
+    const val VERSION_V1 = "v1"
+    const val BASE_PATH = "/api/$VERSION_V1"
 }

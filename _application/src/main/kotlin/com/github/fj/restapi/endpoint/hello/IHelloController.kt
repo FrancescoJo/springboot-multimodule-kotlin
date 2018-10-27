@@ -22,7 +22,7 @@ import javax.validation.Valid
  * @since 23 - Aug - 2018
  */
 @Api(value = "Hello", description = "Hello controller")
-@RequestMapping(path = ["${ApiPaths.VERSION}/hello"],
+@RequestMapping(path = ["/hello"],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         consumes = [MediaType.APPLICATION_JSON_VALUE])
 interface IHelloController {

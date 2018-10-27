@@ -36,15 +36,15 @@ class SwaggerConfig : WebMvcConfigurer {
     fun api(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
-                .groupName(ApiPaths.VERSION)
+                .groupName(ApiPaths.VERSION_V1)
                 .select()
                 .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.ant("/${ApiPaths.VERSION}/**"))
+                .paths(PathSelectors.regex("(/hello)"))
                 .build()
                 .apiInfo(ApiInfo(
                         "REST API Demo",
-                        "Collections of ${ApiPaths.VERSION} hello world API.",
-                        ApiPaths.VERSION,
+                        "Collections of ${ApiPaths.VERSION_V1} hello world API.",
+                        ApiPaths.BASE_PATH,
                         "Terms of service",
                         Contact("Francesco Jo",
                                 "https://github.com/FrancescoJo/springboot-multimodule-kotlin",

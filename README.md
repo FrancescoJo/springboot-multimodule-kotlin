@@ -6,6 +6,9 @@ Although the framework setup difficulty has reduced after release of Spring boot
 Spring framework is still not an easy task. This template project is for reducing such costs
 at the initial development stage.
 
+This project requires IntelliJ IDEA since the Gradle/Kotlin of Eclipse is not working properly
+(current: Oct. 2018).
+
 ## Technical stacks/libs used:
   - Build tools:
     * [Gradle](https://gradle.org/) 4.x
@@ -103,6 +106,15 @@ which produces error as follows:
 ```
 
 looks quite different to our custom OK/ERROR responses.
+
+## Authentication
+
+This demo shows a custom token-based authentication scheme. This demo assumes that an user 
+information must be provided to use security protected function, therefore even with a JWT token
+we still need to find from wherever the user information is stored.
+
+Using spring security gives advantages still though, that we can allow or deny by their own roles
+without writing `if - else` checks on every handler methods.
 
 ## How to setup a SSL
 This project is constructed to run as stand-alone HTTPS server with
