@@ -9,6 +9,7 @@ buildscript {
     ext.version_google_api_client = "1.26.0"
     ext.version_gson = "2.8.5"
 
+    ext.version_swagger2 = "2.9.2"
     ext.version_junit5 = "5.1.1"
     ext.version_mockito = "2.20.0"
     ext.version_detekt = "1.0.0.RC8"

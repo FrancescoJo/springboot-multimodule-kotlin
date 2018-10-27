@@ -81,6 +81,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
     }
+    compile("org.springframework.boot:spring-boot-starter-webflux")
     compile("org.springframework.boot:spring-boot-starter-undertow") {
         // Since this application is for REST Api and we don't need websocket.
         exclude group: "io.undertow", module: "undertow-websockets-jsr"
@@ -98,8 +99,8 @@ dependencies {
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Swagger integration
-    compile "io.springfox:springfox-swagger2:2.9.2"
-    compile "io.springfox:springfox-swagger-ui:2.9.2"
+    compile "io.springfox:springfox-swagger2:$version_swagger2"
+    compile "io.springfox:springfox-swagger-ui:$version_swagger2"
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("com.h2database:h2")

@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  */
 @AllOpen
 @Configuration
-class RequestInterceptors(private val requestLoggingInterceptor: RequestLoggingInterceptor) :
+class RequestInterceptorsConfig(private val requestLoggingInterceptor: RequestLoggingInterceptor) :
         WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(requestLoggingInterceptor)

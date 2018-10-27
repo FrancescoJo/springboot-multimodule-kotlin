@@ -1,4 +1,4 @@
-# Configuration template file for unit test.
+# Configuration template file for unit/integration test.
 # Don't put sensitive information like passwords into source code control!
 server:
   port: 8080
@@ -49,8 +49,6 @@ logging:
   level:
     # Better to raise over than INFO in production environment
     org.springframework.web: INFO
-    # All logs are handled and logged by com.github.fj.restapi.endpoint.CustomErrorHandler
-    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: OFF
     org.hibernate: INFO
     com.github.fj: DEBUG
 
