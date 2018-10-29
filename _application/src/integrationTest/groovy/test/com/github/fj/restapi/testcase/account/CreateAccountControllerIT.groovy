@@ -5,10 +5,10 @@
 package test.com.github.fj.restapi.testcase.account
 
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.service.account.AccountRequestHelper
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import test.com.github.fj.restapi.IntegrationTestBase
-import test.com.github.fj.restapi.helper.account.AccountControllerRequestHelper
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -43,7 +43,7 @@ class CreateAccountControllerIT extends IntegrationTestBase {
 
     def "Request should be accepted with good request"() {
         given:
-        final request = AccountControllerRequestHelper.newRandomCreateAccountRequest()
+        final request = AccountRequestHelper.newRandomCreateAccountRequest()
 
         when:
         final responseSpec = testClient()

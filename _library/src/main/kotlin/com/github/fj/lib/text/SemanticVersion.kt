@@ -281,7 +281,7 @@ class SemanticVersion private constructor(private val version: Version?) : Compa
      *
      * @return The version as a String.
      */
-    override fun toString(): String = ">>>>>>>>>" + version?.toString() ?: ""
+    override fun toString(): String = version?.toString() ?: ""
 
     companion object {
         val EMPTY = SemanticVersion(null)

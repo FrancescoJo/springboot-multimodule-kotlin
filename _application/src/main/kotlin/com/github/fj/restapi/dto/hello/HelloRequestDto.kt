@@ -12,7 +12,6 @@ import com.github.fj.restapi.helper.validation.ValidationFailures
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import org.springframework.validation.Errors
-import org.springframework.validation.Validator
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)

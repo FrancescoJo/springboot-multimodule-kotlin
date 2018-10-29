@@ -5,13 +5,10 @@
 package com.github.fj.restapi.persistence.entity
 
 import com.github.fj.lib.net.InetAddressExtensions
-import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.util.EmptyObject
 import com.github.fj.restapi.persistence.consts.account.Gender
-import com.github.fj.restapi.persistence.consts.account.LoginType
-import com.github.fj.restapi.persistence.consts.account.PlatformType
-import com.github.fj.restapi.persistence.consts.account.Status
-import com.github.fj.restapi.persistence.converter.entity.*
+import com.github.fj.restapi.persistence.converter.entity.ByteArrayInetAddressConverter
+import com.github.fj.restapi.persistence.converter.entity.GenderConverter
 import java.io.Serializable
 import java.net.InetAddress
 import java.time.LocalDateTime

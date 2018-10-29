@@ -6,7 +6,6 @@ package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.github.fj.restapi.dto.AbstractResponseDto
-import com.github.fj.restapi.dto.OkResponseDto
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter

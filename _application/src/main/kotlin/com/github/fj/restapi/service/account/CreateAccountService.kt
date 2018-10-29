@@ -5,9 +5,12 @@
 package com.github.fj.restapi.service.account
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
+import com.github.fj.restapi.dto.account.CreateAccountRequestDto
+import com.github.fj.restapi.exception.account.AccountAlreadyExistException
+import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.repository.UserRepository
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.stereotype.Service
 import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
@@ -19,12 +22,23 @@ import javax.servlet.http.HttpServletRequest
 @AllOpen
 @Service
 class CreateAccountService @Inject constructor(private val userRepo: UserRepository) {
-    fun createAccount(accountRequest: CreateAccountRequestDto, httpRequest: HttpServletRequest):
+    fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto {
-        // TODO: [1] Search same identity before saving
-        // (b: name + credential // other: based on login type and credential)
+        val maybeUser = when (req.loginType) {
+            LoginType.GUEST -> {
+                userRepo.findByGuestCredential(req.credential.toByteArray())
+            }
+            LoginType.BASIC -> {
+                userRepo.findByBasicCredential(req.username ?: "", req.credential.toByteArray())
+            }
+            else -> {
+                throw HttpMessageNotReadableException("${req.loginType} login is not supported.")
+            }
+        }
 
-        // TODO: [2] HTTP 403 if same identity is already registered
+        if (maybeUser.isPresent) {
+            throw AccountAlreadyExistException("Account already exists.")
+        }
 
         // TODO: [3] Convert request to User + Member
 
@@ -34,6 +48,6 @@ class CreateAccountService @Inject constructor(private val userRepo: UserReposit
 
         // TODO: [7] return service.createUserFrom(request, httpServletRequest)
 
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("UNDER DEVELOPMENT") //To change body of created functions use File | Settings | File Templates.
     }
 }

@@ -13,17 +13,17 @@ import org.springframework.http.HttpStatus
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 15 - Jan - 2018
  */
-class GeneralHttpException private constructor(httpCode: Int,
+class GeneralHttpException private constructor(status: HttpStatus,
                                                message: String = "", cause: Throwable? = null) :
-        AbstractBaseException(message, cause) {
-    override val httpStatusCode = httpCode
+        AbstractBaseHttpException(message, cause) {
+    override val httpStatus = status
 
     companion object {
         fun create(httpStatus: HttpStatus, resourceName: String = "", cause: Throwable? = null) =
                 if (resourceName.isEmpty()) {
-                    GeneralHttpException(httpStatus.value(), httpStatus.reasonPhrase, cause)
+                    GeneralHttpException(httpStatus, httpStatus.reasonPhrase, cause)
                 } else {
-                    GeneralHttpException(httpStatus.value(), httpStatus.reasonPhrase + ": $resourceName", cause)
+                    GeneralHttpException(httpStatus, httpStatus.reasonPhrase + ": $resourceName", cause)
                 }
     }
 }

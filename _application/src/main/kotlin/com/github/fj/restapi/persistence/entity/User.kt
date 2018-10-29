@@ -83,7 +83,7 @@ class User : Serializable {
     var invitedBy: Long = 0L
 
     @Column(columnDefinition = "VARBINARY(127)")
-    var credential: Blob? = null
+    var credential: ByteArray? = null
 
     // May this produce inefficient query? We have to investigate.
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)

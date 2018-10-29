@@ -9,7 +9,7 @@ import com.github.fj.restapi.AppProfile
 import com.github.fj.restapi.BuildConfig
 import com.github.fj.restapi.dto.ErrorResponseDto
 import com.github.fj.restapi.dto.AbstractResponseDto
-import com.github.fj.restapi.exception.AbstractBaseException
+import com.github.fj.restapi.exception.AbstractBaseHttpException
 import com.github.fj.restapi.exception.GeneralHttpException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -40,44 +40,44 @@ import javax.servlet.http.HttpServletRequest
 class CustomErrorHandler {
     @ExceptionHandler(NoHandlerFoundException::class)
     fun handleSpring404(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
-        return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND))
+        return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND, req.requestURI ?: ""))
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     @ExceptionHandler(Exception::class)
     fun handleError(req: HttpServletRequest, ex: Exception): ResponseEntity<ErrorResponseDto> {
-        val status: Int
+        val status: HttpStatus
         val response = when (ex) {
-            is AbstractBaseException -> {
+            is AbstractBaseHttpException -> {
                 logError("Handled exception:", ex)
-                status = ex.httpStatusCode
+                status = ex.httpStatus
                 AbstractResponseDto.error(ex.message, ex.reason)
             }
             is HttpMessageNotReadableException -> {
                 logError("Spring handled exception:", ex)
-                status = HttpStatus.BAD_REQUEST.value()
+                status = HttpStatus.BAD_REQUEST
                 AbstractResponseDto.error("Cannot process given request.", "Malformed request message")
             }
             is JsonProcessingException -> {
                 logError("JSON parsing exception:", ex)
-                status = HttpStatus.BAD_REQUEST.value()
+                status = HttpStatus.BAD_REQUEST
                 AbstractResponseDto.error("Cannot process given request.", "Malformed JSON")
             }
             is MethodArgumentNotValidException -> {
                 logError("Validation failure exception:", ex)
-                status = HttpStatus.BAD_REQUEST.value()
+                status = HttpStatus.BAD_REQUEST
                 val reason = ex.bindingResult.globalError?.defaultMessage
                         ?.takeIf { it.isNotEmpty() } ?: ""
                 AbstractResponseDto.error("Cannot process given request.", reason)
             }
             else -> {
                 logError("Unhandled exception:", ex)
-                status = getStatus(req).value()
+                status = getStatus(req)
                 AbstractResponseDto.error("Unhandled internal server error")
             }
         }
 
-        return ResponseEntity(response, HttpStatus.valueOf(status))
+        return ResponseEntity(response, status)
     }
 
     private fun getStatus(request: HttpServletRequest): HttpStatus {

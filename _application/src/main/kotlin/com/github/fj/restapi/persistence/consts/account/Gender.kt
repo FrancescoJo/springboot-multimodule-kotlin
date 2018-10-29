@@ -6,11 +6,13 @@ package com.github.fj.restapi.persistence.consts.account
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
+import com.github.fj.lib.annotation.UndefinableEnum
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
  */
+@UndefinableEnum
 enum class Gender(val key: String) {
     /** Basic authentication: user provided name and password */
     MALE("m"),
