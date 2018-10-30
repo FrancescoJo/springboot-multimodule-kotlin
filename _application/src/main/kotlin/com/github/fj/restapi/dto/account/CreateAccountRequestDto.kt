@@ -6,6 +6,7 @@ package com.github.fj.restapi.dto.account
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.github.fj.lib.text.isNullOrUnicodeBlank
 import com.github.fj.lib.util.EmptyObject
 import com.github.fj.restapi.helper.validation.NullsafeValidator
 import com.github.fj.restapi.helper.validation.ValidEmail
@@ -69,7 +70,12 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
                 example = "username@company.com", required = false)
         @JsonProperty
         @ValidEmail
-        val email: String? = ""
+        val email: String? = "",
+
+        @ApiModelProperty("Invitation host's user id token, which is 16 digit alphanumeric literal.",
+                example = "E91U5ORCURK7ZK5N", required = false)
+        @JsonProperty
+        val invitedBy: String? = ""
 ) {
     companion object : EmptyObject<CreateAccountRequestDto> {
         override val EMPTY = CreateAccountRequestDto("")
@@ -81,11 +87,11 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
             override fun validateNonNull(target: CreateAccountRequestDto, e: Errors): ValidationFailures? =
                     with(target) {
                         return@with when {
-                            pushToken.isEmpty() || credential.isEmpty() || nickname.isEmpty() ||
-                                    platformVersion.isEmpty() || appVersion.isEmpty() ->
+                            pushToken.isBlank() || credential.isBlank() || nickname.isNullOrUnicodeBlank() ||
+                                    platformVersion.isNullOrUnicodeBlank() || appVersion.isNullOrUnicodeBlank() ->
                                 ValidationFailures.VALUE_INSUFFICIENT
 
-                            loginType == LoginType.BASIC && (username.isNullOrEmpty() || username!!.let {
+                            loginType == LoginType.BASIC && (username.isNullOrEmpty() || username.let {
                                 it.length < User.MINIMUM_NAME_LENGTH || it.length > User.MAXIMUM_NAME_LENGTH
                             } && credential.isEmpty()) -> ValidationFailures.VALUE_INSUFFICIENT
 

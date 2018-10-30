@@ -28,7 +28,7 @@ class StringUtilsTest {
 
     @Test
     fun `isUnicodeBlank yields expected result upon given input`() {
-        val withInput: (String) -> Boolean = { it.isUnicodeBlank() }
+        val withInput: (String) -> Boolean = { it.isNullOrUnicodeBlank() }
 
         assertEquals(true, withInput(""))
         assertEquals(true, withInput("   "))

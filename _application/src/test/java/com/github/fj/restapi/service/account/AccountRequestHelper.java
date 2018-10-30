@@ -34,7 +34,7 @@ public final class AccountRequestHelper {
     public static CreateAccountRequestDto newRandomCreateAccountRequest(final LoginType loginType) {
         return new CreateAccountRequestDto(
                 /*pushToken=*/       StringUtilsKt.getRandomAlphaNumericString(63),
-                /*username=*/        null,
+                /*username=*/        StringUtilsKt.getRandomAlphaNumericString(32),
                 /*credential=*/      StringUtilsKt.getRandomAlphaNumericString(63),
                 /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(16),  // For Test
                 /*gender=*/          null,

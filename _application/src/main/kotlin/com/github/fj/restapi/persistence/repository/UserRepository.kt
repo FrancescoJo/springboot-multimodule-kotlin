@@ -32,4 +32,11 @@ interface UserRepository : CrudRepository<User, Long> {
           AND u.credential = ?1
     """)
     fun findByGuestCredential(binaryCredential: ByteArray): Optional<User>
+
+    @Query("""
+        SELECT u
+        FROM User u
+        WHERE u.idToken = ?1
+    """)
+    fun findByIdToken(idToken: String): Optional<User>
 }

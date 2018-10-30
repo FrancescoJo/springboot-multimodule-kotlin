@@ -13,7 +13,6 @@ import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.converter.entity.*
 import java.io.Serializable
 import java.net.InetAddress
-import java.sql.Blob
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -89,8 +88,6 @@ class User : Serializable {
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", nullable = false)
     var member: Member = Member.EMPTY
-
-    // TODO: [5] 1 to 1 UserAuthentication: FK id + accessToken(254) + issuedSalt(254) + issuedDate + suspendedOn + suspendedUntil
 
     companion object : EmptyObject<User> {
         override val EMPTY = User()

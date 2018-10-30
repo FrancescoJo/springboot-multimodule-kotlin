@@ -33,7 +33,6 @@ class Member : Serializable {
     @Column(length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
     var gender: Gender = Gender.UNDEFINED
 
-
     @Column(name = "last_active_timestamp", nullable = false)
     var lastActiveTimestamp: LocalDateTime = LocalDateTime.MIN
 

@@ -4,6 +4,7 @@
  */
 package com.github.fj.restapi.service.account
 
+import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.repository.UserRepository
@@ -28,12 +29,14 @@ class CreateAccountServiceTest {
     private lateinit var sut: CreateAccountService
     private lateinit var mockUserRepo: UserRepository
     private lateinit var mockServletRequest: HttpServletRequest
+    private lateinit var mockAuthBusiness: AuthenticationBusiness
 
     @BeforeEach
     fun setup() {
         this.mockUserRepo = mock(UserRepository::class.java)
         this.mockServletRequest = mock(HttpServletRequest::class.java)
-        this.sut = CreateAccountService(mockUserRepo)
+        this.mockAuthBusiness = mock(AuthenticationBusiness::class.java)
+        this.sut = CreateAccountServiceImpl(mockUserRepo, mockAuthBusiness)
     }
 
     @Test

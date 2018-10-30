@@ -7,6 +7,7 @@
 package com.github.fj.lib.text
 
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 import java.util.regex.Pattern
 
 /*
@@ -21,6 +22,10 @@ private val UNICODE_BLANK_CHARS: Set<Char> = HashSet<Char>().apply {
     add('\u000B')   // control-000B
     add('\u000C')   // control-000C
     add('\u000D')   // control-000D
+    add('\u001C')   // FILE SEPARATOR
+    add('\u001D')   // GROUP SEPARATOR
+    add('\u001E')   // RECORD SEPARATOR
+    add('\u001F')   // UNIT SEPARATOR
     add('\u0020')   // SPACE
     add('\u0085')   // control-0085
     add('\u00A0')   // NO-BREAK SPACE
@@ -43,7 +48,7 @@ private val UNICODE_BLANK_CHARS: Set<Char> = HashSet<Char>().apply {
 
 fun String.matchesIn(pattern: Pattern) = pattern.matcher(this).matches()
 
-fun String?.isUnicodeBlank(): Boolean {
+fun String?.isNullOrUnicodeBlank(): Boolean {
     if (isNullOrBlank()) {
         return true
     }
@@ -98,7 +103,7 @@ fun getRandomCapitalAlphaNumericString(length: Int) =
         getRandomAlphaNumericStringInternal(length, RANDOM_CAPITAL_CHARS)
 
 private fun getRandomAlphaNumericStringInternal(length: Int, pool: CharSequence): String {
-    val random = Random()
+    val random = ThreadLocalRandom.current()
     val sb = StringBuffer(length)
     for (loop in 0 until length) {
         val index = random.nextInt(pool.length)
