@@ -113,7 +113,7 @@ This demo shows a custom token-based authentication scheme. This demo assumes th
 information must be provided to use security protected function, therefore even with a JWT token
 we still need to find from wherever the user information is stored.
 
-Using spring security gives advantages still though, that we can allow or deny by their own roles
+Using Spring security gives advantages still though, that we can allow or deny by their own roles
 without writing `if - else` checks on every handler methods.
 
 ## How to setup a SSL
@@ -160,5 +160,6 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 ## TO-DOs
 - Spring security
 - Bugfix on FCMClient 
-- Docker integration
 - Flatten all commit history
+- Abandon JPA // Use JdbcTemplate + Migrate to embedded MariaDB(for testing)
+- Docker integration

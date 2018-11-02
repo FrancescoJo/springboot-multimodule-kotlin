@@ -106,6 +106,8 @@ dependencies {
     compile "io.springfox:springfox-swagger2:$version_swagger2"
     compile "io.springfox:springfox-swagger-ui:$version_swagger2"
 
+    compile "io.seruco.encoding:base62:0.1.2"
+
     testCompile project(path: ":_library", configuration: "testArtifacts")
 
     testCompile("org.springframework.boot:spring-boot-starter-test")

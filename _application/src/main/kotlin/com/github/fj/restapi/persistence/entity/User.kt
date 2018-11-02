@@ -14,6 +14,7 @@ import com.github.fj.restapi.persistence.converter.entity.*
 import java.io.Serializable
 import java.net.InetAddress
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.*
 
 /**
@@ -41,6 +42,7 @@ class User : Serializable {
 
     @Convert(converter = MemberStatusConverter::class)
     @Column(length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
+    @Enumerated(EnumType.STRING)
     var status: Status = Status.UNDEFINED
 
     // TODO: Change to list of roles
@@ -52,10 +54,12 @@ class User : Serializable {
 
     @Convert(converter = LoginTypeConverter::class)
     @Column(name = "login_type", length = 4, nullable = false)
-    var loginType: LoginType = LoginType.BASIC
+    @Enumerated(EnumType.STRING)
+    var loginType: LoginType = LoginType.UNDEFINED
 
     @Convert(converter = PlatformTypeConverter::class)
     @Column(name = "platform_type", length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
+    @Enumerated(EnumType.STRING)
     var platformType: PlatformType = PlatformType.UNDEFINED
 
     @Column(name = "platform_version", length = 127, nullable = false)
@@ -81,13 +85,40 @@ class User : Serializable {
     @Column(name = "invited_by", nullable = false)
     var invitedBy: Long = 0L
 
-    @Column(columnDefinition = "VARBINARY(127)")
-    var credential: ByteArray? = null
+    @Column(columnDefinition = "VARBINARY(254)", nullable = false)
+    var credential: ByteArray = ByteArray(0)
 
     // May this produce inefficient query? We have to investigate.
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", nullable = false)
     var member: Member = Member.EMPTY
+
+    // May this produce inefficient query? We have to investigate.
+    @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "id", nullable = false)
+    var authentication: MyAuthentication = MyAuthentication.EMPTY
+
+    override fun toString(): String {
+        return "User(" +
+                "id=$id," +
+                "idToken='$idToken'," +
+                "status=$status," +
+                "roles='$roles'," +
+                "name='$name'," +
+                "loginType=$loginType," +
+                "platformType=$platformType," +
+                "platformVersion='$platformVersion'," +
+                "appVersion=$appVersion," +
+                "email='$email'," +
+                "createdDate=$createdDate," +
+                "createdIp=$createdIp," +
+                "pushToken='$pushToken'," +
+                "invitedBy=$invitedBy," +
+                "credential=${Arrays.toString(credential)}," +
+                "member=$member," +
+                "authentication=$authentication" +
+                ")"
+    }
 
     companion object : EmptyObject<User> {
         override val EMPTY = User()

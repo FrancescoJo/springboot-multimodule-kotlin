@@ -8,6 +8,7 @@ import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.getRandomCapitalAlphaNumericString
 import com.github.fj.lib.text.isNullOrUnicodeBlank
+import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto
@@ -19,6 +20,7 @@ import com.github.fj.restapi.persistence.entity.Member
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
 import com.github.fj.restapi.util.extractIp
+import io.seruco.encoding.base62.Base62
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.stereotype.Service
 import java.net.InetAddress
@@ -58,7 +60,7 @@ class CreateAccountServiceImpl @Inject constructor(
             throw AccountAlreadyExistException("Account already exists.")
         }
 
-        val user = User().apply {
+        val user = userRepo.save(User().apply {
             val now = LocalDateTime.now()
             val ipAddr = InetAddress.getByName(httpReq.extractIp())
 
@@ -97,7 +99,7 @@ class CreateAccountServiceImpl @Inject constructor(
                 }
             }
             credential = when (req.loginType) {
-                LoginType.GUEST -> null
+                LoginType.GUEST -> ByteArray(0)
                 LoginType.BASIC -> authBusiness.hash(req.credential.toByteArray())
                 else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
             }
@@ -107,17 +109,24 @@ class CreateAccountServiceImpl @Inject constructor(
                 lastActiveTimestamp = now
                 lastActiveIp = ipAddr
             }
-        }
+        }.apply {
+            authentication = authBusiness.createAccessToken(this)
+        })
 
-        // TODO: [4] AuthenticationComponent: Bake token to user(various patterns) + track salt
-        //           Ciphertext creation strategy: IV + Payload -> No padding Base62
-        // TODO: [5] 1 to 1 User -> UserAuthentication: FK id + accessToken(254) + issuedSalt(254) + issuedDate + suspendedOn + suspendedUntil
+        // TODO: [6] Test all child tables are updated as well
+        println(user)
 
-        // TODO: [6] Service: repository.save()
-
-        // TODO: [7] return service.createUserFrom(request, httpServletRequest)
-
-        TODO("UNDER DEVELOPMENT") //To change body of created functions use File | Settings | File Templates.
+        return AuthenticationResponseDto(
+                id = user.idToken,
+                nickname = user.member.nickname,
+                gender = user.member.gender,
+                status = user.status,
+                lastActiveTimestamp = user.member.lastActiveTimestamp?.utcEpochSecond() ?: 0L,
+                accessToken = (Base62.createInstance().encode(
+                        user.authentication.rawAccessToken).toString(Charsets.UTF_8)),
+                suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
+                suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
+        )
     }
 
     companion object {

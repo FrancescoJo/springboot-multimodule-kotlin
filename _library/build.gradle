@@ -11,6 +11,7 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile "org.slf4j:slf4j-api:$version_slf4j"
 
+    compile "com.google.guava:guava:$version_guava"
     compile "com.google.code.findbugs:jsr305:3.0.2"
     compile "de.skuzzle:semantic-version:1.2.0"
 }
