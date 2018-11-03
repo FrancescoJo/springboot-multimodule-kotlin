@@ -17,5 +17,9 @@ interface AuthenticationBusiness {
 
     fun createAccessToken(user: User): MyAuthentication
 
-    fun parseAccessToken(base62EncodedAccessToken: String): AccessToken
+    /**
+     * @param token Base62 encoded access token.
+     * @param iv Initialisation vector that is used to cipher given [token].
+     */
+    fun parseAccessToken(token: String, iv: ByteArray): AccessToken
 }

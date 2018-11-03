@@ -12,6 +12,7 @@ import com.github.fj.restapi.dto.account.AccessToken
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.MyAuthentication
 import com.github.fj.restapi.persistence.entity.User
+import io.seruco.encoding.base62.Base62
 import org.springframework.stereotype.Component
 import java.nio.ByteBuffer
 import java.security.Key
@@ -70,27 +71,57 @@ class AuthenticationBusinessImpl(private val appProperties: AppProperties) : Aut
         }
     }
 
-    override fun parseAccessToken(base62EncodedAccessToken: String): AccessToken {
-        TODO("UNDER DEVELOPMENT")
+    override fun parseAccessToken(token: String, iv: ByteArray): AccessToken {
+        val rawToken = Base62.createInstance().decode(token.toByteArray())
+        val decodedToken = decrypt(aes256CipherKey, iv, rawToken)
+        val decodedBuf = ByteBuffer.wrap(decodedToken)
+
+        val mode = ByteArray(LENGTH_BYTES_HEADER).let {
+            decodedBuf.get(it)
+            return@let it.parseEncoded()
+        }
+
+        val userId: Long
+        val uIdTokenHash: Long
+        val loginPlatformHash: Int
+        val issuedTimestamp: Int
+        val userRegisteredTimestamp: Int
+
+        val userIdReader: (ByteBuffer) -> Any = { it.long * -1 }
+        val userTagReader: (ByteBuffer) -> Any = { it.long }
+        val loginTypeReader: (ByteBuffer) -> Any = { it.int }
+        val timestampReader: (ByteBuffer) -> Any = { it.int }
+        val registeredDateReader: (ByteBuffer) -> Any = { it.int }
+
+        when (mode) {
+            AccessToken.Encoded.FORWARD -> {
+                val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }
+                val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, ByteArray(LENGTH_PAYLOAD_HEADER)
+                        .apply { decodedBuf.get(this) }))
+
+                userId = userIdReader(payloadBuf) as Long
+                uIdTokenHash = userTagReader(payloadBuf) as Long
+                loginPlatformHash = loginTypeReader(payloadBuf) as Int
+                issuedTimestamp = timestampReader(payloadBuf) as Int
+                userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
+            }
+            AccessToken.Encoded.BACKWARD -> {
+                val encodedPayload = ByteArray(LENGTH_PAYLOAD_HEADER).apply { decodedBuf.get(this) }.reversedArray()
+                val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }.reversedArray()
+                val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, encodedPayload))
+
+                userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
+                issuedTimestamp = timestampReader(payloadBuf) as Int
+                loginPlatformHash = loginTypeReader(payloadBuf) as Int
+                uIdTokenHash = userTagReader(payloadBuf) as Long
+                userId = userIdReader(payloadBuf) as Long
+            }
+            else -> { throw UnknownAuthTokenException("$mode encoding strategy is unsupported.") }
+        }
+
+        return AccessToken(rawToken.toList(), mode, iv.toList(),
+                userId, uIdTokenHash, loginPlatformHash, issuedTimestamp, userRegisteredTimestamp)
     }
-
-    // AccessToken:
-    //   Header  << encodedDirection
-    //   IV
-    //   Payload
-    //     << userId
-    //     << is genuine? (idToken, loginType, issuedTime, login platform, registred date)
-    //     << is expired? issuedTime
-
-    // Decipher:
-    //   Header -> Direction
-    //   FORWARD: Header(8) + IV(16) + aes256Decrypt(IV, 64)
-    //   BACKWARD: Header(8) + aes256Decrypt(IV, 64).reversed  VI.reversed(16)
-
-    //           Save User.Authentication to Repository
-    // return Base62.encode(header + IV + aes256(key, rawAccessToken))
-
-    // header.parseEncoded()
 
     companion object {
         private const val CIPHER_ALG = "AES"

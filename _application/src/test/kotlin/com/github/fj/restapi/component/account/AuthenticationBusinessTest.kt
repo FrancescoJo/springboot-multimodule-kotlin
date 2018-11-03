@@ -63,17 +63,14 @@ class AuthenticationBusinessTest {
         val old = requireNotNull(myAuth.accessToken)
 
         // and:
-        val new = sut.parseAccessToken(Base62.createInstance()
-                .encode(myAuth.rawAccessToken).toString(Charsets.UTF_8))
+        val accessToken = Base62.createInstance().encode(myAuth.rawAccessToken)
+                .toString(Charsets.UTF_8)
+        val iv = myAuth.iv
+
+        // when:
+        val new = sut.parseAccessToken(accessToken, iv)
 
         // then:
-        println("" + myAuth.rawAccessToken + " vs " + new.raw)
-        assertEquals(old.mode, new.mode)
-        println("" + old.iv + " vs " + new.iv)
-        assertEquals(old.userId, new.userId)
-        assertEquals(old.uIdTokenHash, new.uIdTokenHash)
-        assertEquals(old.loginPlatformHash, new.loginPlatformHash)
-        assertEquals(old.issuedTimestamp, new.issuedTimestamp)
-        assertEquals(old.userRegisteredTimestamp, new.userRegisteredTimestamp)
+        assertEquals(old, new)
     }
 }
