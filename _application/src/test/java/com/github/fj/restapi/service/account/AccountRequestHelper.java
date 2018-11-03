@@ -34,9 +34,9 @@ public final class AccountRequestHelper {
     public static CreateAccountRequestDto newRandomCreateAccountRequest(final LoginType loginType) {
         return new CreateAccountRequestDto(
                 /*pushToken=*/       StringUtilsKt.getRandomAlphaNumericString(63),
-                /*username=*/        StringUtilsKt.getRandomAlphaNumericString(32),
+                /*username=*/        StringUtilsKt.getRandomAlphaNumericString(31),
                 /*credential=*/      StringUtilsKt.getRandomAlphaNumericString(63),
-                /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(16),  // For Test
+                /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(15),  // For Test
                 /*gender=*/          null,
                 /*loginType=*/       loginType,
                 /*platformType=*/    RandomHelper.randomEnumConst(PlatformType.class),

@@ -49,7 +49,7 @@ logging:
   level:
     # Better to raise over than INFO in production environment
     org.springframework.web: INFO
-    org.hibernate: INFO
+    org.hibernate: WARN
     com.github.fj: TRACE
 
 app:

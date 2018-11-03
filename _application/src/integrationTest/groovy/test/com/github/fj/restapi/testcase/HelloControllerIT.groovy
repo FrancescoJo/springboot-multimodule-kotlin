@@ -20,18 +20,16 @@ class HelloControllerIT extends IntegrationTestBase {
         given:
         final name = "MY_NAME"
         final request = new HelloRequestDto(name)
-
-        when:
         final responseSpec = testClient()
                 .post()
-                .uri("/hello")
+                .uri("${ApiPaths.HELLO}")
                 .body(BodyInserters.fromObject(request))
-                .exchange()
 
-        then:
-        final response = responseSpec.expectStatus().is2xxSuccessful()
+        when:
+        final response = responseSpec.exchange().expectStatus().is2xxSuccessful()
                 .expectBody(OkResponseDto).returnResult().responseBody.with extractResponseAs(HelloResponseDto)
 
+        then:
         response.message == "POST Hello, MY_NAME"
     }
 }

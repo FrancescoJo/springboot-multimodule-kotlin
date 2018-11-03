@@ -5,18 +5,7 @@
 package com.github.fj.restapi.dto.account
 
 import com.github.fj.lib.annotation.UndefinableEnum
-import com.github.fj.lib.time.utcEpochSecond
-import com.github.fj.restapi.exception.account.UnknownAuthTokenException
-import com.github.fj.restapi.persistence.entity.User
-import io.seruco.encoding.base62.Base62
-import java.nio.ByteBuffer
-import java.security.Key
-import java.security.SecureRandom
 import java.time.LocalDateTime
-import java.util.*
-import java.util.concurrent.ThreadLocalRandom
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -35,10 +24,16 @@ data class AccessToken(
 
         val loginPlatformHash: Int,
 
-        val issuedTimestamp: Int,
+        val issuedTimestamp: LocalDateTime,
 
-        val userRegisteredTimestamp: Int
+        val userRegisteredTimestamp: LocalDateTime
 ) {
+    companion object {
+        val EMPTY = AccessToken(
+                emptyList(), Encoded.UNDEFINED, emptyList(), 0L, 0L, 0,
+                LocalDateTime.MIN, LocalDateTime.MIN)
+    }
+
     @UndefinableEnum
     enum class Encoded(val key: String) {
         FORWARD("f"),

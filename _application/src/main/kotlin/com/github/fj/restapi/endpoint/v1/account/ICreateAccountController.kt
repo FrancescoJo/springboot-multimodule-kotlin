@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.endpoint.account
+package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
@@ -24,13 +24,13 @@ import javax.validation.Valid
  * @since 28 - Oct - 2018
  */
 @Api(value = "CreateAccount", description = "Creates an account for service usage.")
-@RequestMapping(path = ["/${ApiPaths.ACCOUNT}"],
+@RequestMapping(path = [ApiPaths.API_V1_ACCOUNT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         consumes = [MediaType.APPLICATION_JSON_VALUE])
 interface ICreateAccountController {
     @ApiOperation("Create account",
             notes = "Creates account for service usage with initially provided information.",
-            response = HelloResponseDto::class)
+            response = AuthenticationResponseDto::class)
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 400, message = "If request is malformed, nickname is not permitted or already exists."),
             ApiResponse(code = 403, message = "If an account with same identity is already created"))

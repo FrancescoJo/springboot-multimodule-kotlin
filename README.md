@@ -14,18 +14,19 @@ This project requires IntelliJ IDEA since the Gradle/Kotlin of Eclipse is not wo
     * [Gradle](https://gradle.org/) 4.x
   - Languages:
     * Java 1.8 - platform runtime
-    * [Kotlin](https://kotlinlang.org/) 1.2 - implementation, unit test
+    * [Kotlin](https://kotlinlang.org/) 1.3 - implementation, unit test
     * [Groovy](http://groovy-lang.org/) 2.5 - integration test
   - Frameworks and runtimes:
     * [Undertow](http://undertow.io/) - for Web application server
     * [Spring boot](http://spring.io/projects/spring-boot) 2 - application framework
-    * JPA with [Hibernate](http://hibernate.org/) - persistent data
+    * [Hibernate](http://hibernate.org/) - JPA / persistent data
     * [HicariCP](https://github.com/brettwooldridge/HikariCP) - database connection pool
     * [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - message push service
   - Code quality:
     * [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
     * [Spock framework](http://spockframework.org/) with [Groovy](http://groovy-lang.org/)
     * [detekt](https://arturbosch.github.io/detekt/index.html)
+    * [mockito-kotlin](https://github.com/nhaarman/mockito-kotlin)
   - Automatic documentation:
     * [Swagger](https://swagger.io/) - API document generator
     * [Swagger springfox](http://springfox.github.io/springfox/) - Swagger integration with Spring boot
@@ -158,8 +159,9 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
   For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
 
 ## TO-DOs
-- Spring security
-- Bugfix on FCMClient 
+- Spring security: Login / Delete account
+- Bugfix on FCMClient
+- non-JPA version implementation
+- Update Spring boot
 - Flatten all commit history
-- Abandon JPA // Use JdbcTemplate + Migrate to embedded MariaDB(for testing)
 - Docker integration

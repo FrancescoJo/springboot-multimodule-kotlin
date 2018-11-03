@@ -6,7 +6,9 @@ package com.github.fj.restapi.persistence.entity
 
 import com.github.fj.lib.net.InetAddressExtensions
 import com.github.fj.lib.text.SemanticVersion
+import com.github.fj.lib.text.indentToString
 import com.github.fj.lib.util.EmptyObject
+import com.github.fj.restapi.dto.account.AccessToken
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
 import com.github.fj.restapi.persistence.consts.account.Status
@@ -18,7 +20,7 @@ import java.util.*
 import javax.persistence.*
 
 /**
- * Stores user information which scarcely changes.
+ * Stores crucial user information for accessing service.
  *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
@@ -42,7 +44,6 @@ class User : Serializable {
 
     @Convert(converter = MemberStatusConverter::class)
     @Column(length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
-    @Enumerated(EnumType.STRING)
     var status: Status = Status.UNDEFINED
 
     // TODO: Change to list of roles
@@ -53,13 +54,11 @@ class User : Serializable {
     var name: String = ""
 
     @Convert(converter = LoginTypeConverter::class)
-    @Column(name = "login_type", length = 4, nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Column(name = "login_type", length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
     var loginType: LoginType = LoginType.UNDEFINED
 
     @Convert(converter = PlatformTypeConverter::class)
     @Column(name = "platform_type", length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
-    @Enumerated(EnumType.STRING)
     var platformType: PlatformType = PlatformType.UNDEFINED
 
     @Column(name = "platform_version", length = 127, nullable = false)
@@ -88,35 +87,44 @@ class User : Serializable {
     @Column(columnDefinition = "VARBINARY(254)", nullable = false)
     var credential: ByteArray = ByteArray(0)
 
-    // May this produce inefficient query? We have to investigate.
+    @Convert(converter = AccessTokenEncodingConverter::class)
+    @Column(name = "auth_encoding", length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
+    var authEncoding: AccessToken.Encoded = AccessToken.Encoded.UNDEFINED
+
+    @Column(name = "auth_iv", length = 16, nullable = false, columnDefinition = "VARBINARY(16)")
+    var authIv: ByteArray = ByteArray(0)
+
+    @Column(name = "access_token", length = 127, nullable = false, columnDefinition = "VARBINARY(127)")
+    var accessToken: ByteArray = ByteArray(0)
+
+    @Column(name = "token_issued_date", nullable = true)
+    var tokenIssuedDate: LocalDateTime? = null
+
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(referencedColumnName = "user_id", name = "id", nullable = false)
     var member: Membership = Membership.EMPTY
 
-    // May this produce inefficient query? We have to investigate.
-    @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", nullable = false)
-    var authentication: MyAuthentication = MyAuthentication.EMPTY
-
     override fun toString(): String {
-        return "User(" +
-                "id=$id," +
-                "idToken='$idToken'," +
-                "status=$status," +
-                "roles='$roles'," +
-                "name='$name'," +
-                "loginType=$loginType," +
-                "platformType=$platformType," +
-                "platformVersion='$platformVersion'," +
-                "appVersion=$appVersion," +
-                "email='$email'," +
-                "createdDate=$createdDate," +
-                "createdIp=$createdIp," +
-                "pushToken='$pushToken'," +
-                "invitedBy=$invitedBy," +
-                "credential=${Arrays.toString(credential)}," +
-                "member=$member," +
-                "authentication=$authentication" +
+        return "User(id=$id,\n" +
+                "  idToken='$idToken',\n" +
+                "  status=$status,\n" +
+                "  roles='$roles',\n" +
+                "  name='$name',\n" +
+                "  loginType=$loginType,\n" +
+                "  platformType=$platformType,\n" +
+                "  platformVersion='$platformVersion',\n" +
+                "  appVersion=$appVersion,\n" +
+                "  email='$email',\n" +
+                "  createdDate=$createdDate,\n" +
+                "  createdIp=$createdIp,\n" +
+                "  pushToken='$pushToken',\n" +
+                "  invitedBy=$invitedBy,\n" +
+                "  credential=${Arrays.toString(credential)},\n" +
+                "  authEncoding=$authEncoding,\n" +
+                "  authIv=${Arrays.toString(authIv)},\n" +
+                "  accessToken=${Arrays.toString(accessToken)},\n" +
+                "  tokenIssuedDate=$tokenIssuedDate,\n" +
+                "  member=${indentToString(member)}," +
                 ")"
     }
 

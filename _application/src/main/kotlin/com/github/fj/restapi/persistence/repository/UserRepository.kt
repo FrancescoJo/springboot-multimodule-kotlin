@@ -26,10 +26,10 @@ interface UserRepository : CrudRepository<User, Long> {
     fun findByBasicCredential(name: String, binaryCredential: ByteArray): Optional<User>
 
     @Query("""
-        SELECT u, a
-        FROM User u, Authentication a
+        SELECT u
+        FROM User u
         WHERE u.loginType = com.github.fj.restapi.persistence.consts.account.LoginType.GUEST
-          AND a.rawAccessToken = ?1
+          AND u.accessToken = ?1
     """)
     fun findByGuestCredential(binaryCredential: ByteArray): Optional<User>
 

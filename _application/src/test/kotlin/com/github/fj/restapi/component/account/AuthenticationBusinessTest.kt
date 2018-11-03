@@ -59,13 +59,12 @@ class AuthenticationBusinessTest {
         `when`(mockAppProperties.accessTokenAes256Key).thenReturn(aes256Key)
 
         // when:
-        val myAuth = sut.createAccessToken(user)
-        val old = requireNotNull(myAuth.accessToken)
+        val token = sut.createAccessToken(user)
+        val old = requireNotNull(token.raw).toByteArray()
 
         // and:
-        val accessToken = Base62.createInstance().encode(myAuth.rawAccessToken)
-                .toString(Charsets.UTF_8)
-        val iv = myAuth.iv
+        val accessToken = Base62.createInstance().encode(old).toString(Charsets.UTF_8)
+        val iv = token.iv.toByteArray()
 
         // when:
         val new = sut.parseAccessToken(accessToken, iv)

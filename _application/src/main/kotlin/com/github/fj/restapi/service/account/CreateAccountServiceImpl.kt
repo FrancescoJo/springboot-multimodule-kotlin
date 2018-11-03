@@ -60,7 +60,7 @@ class CreateAccountServiceImpl @Inject constructor(
             throw AccountAlreadyExistException("Account already exists.")
         }
 
-        val user = userRepo.save(User().apply {
+        val user = User().apply {
             val now = LocalDateTime.now()
             val ipAddr = InetAddress.getByName(httpReq.extractIp())
 
@@ -110,11 +110,13 @@ class CreateAccountServiceImpl @Inject constructor(
                 lastActiveIp = ipAddr
             }
         }.apply {
-            authentication = authBusiness.createAccessToken(this)
-        })
-
-        // TODO: [6] Test all child tables are updated as well
-        println(user)
+            val token = authBusiness.createAccessToken(this)
+            authEncoding = token.mode
+            authIv = token.iv.toByteArray()
+            accessToken = token.raw.toByteArray()
+            tokenIssuedDate = token.issuedTimestamp
+        }
+        userRepo.save(user)
 
         return AuthenticationResponseDto(
                 id = user.idToken,
@@ -122,8 +124,7 @@ class CreateAccountServiceImpl @Inject constructor(
                 gender = user.member.gender,
                 status = user.status,
                 lastActiveTimestamp = user.member.lastActiveTimestamp?.utcEpochSecond() ?: 0L,
-                accessToken = (Base62.createInstance().encode(
-                        user.authentication.rawAccessToken).toString(Charsets.UTF_8)),
+                accessToken = (Base62.createInstance().encode(user.accessToken).toString(Charsets.UTF_8)),
                 suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
                 suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
         )

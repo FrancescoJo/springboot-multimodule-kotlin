@@ -6,11 +6,16 @@ package com.github.fj.restapi.service.account
 
 import com.github.fj.restapi.HttpRequestHelper
 import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.dto.account.AccessToken
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
+import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
+import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.repository.UserRepository
 import com.github.fj.restapi.service.account.AccountRequestHelper.newRandomCreateAccountRequest
 import com.github.fj.restapi.service.account.AccountRequestHelper.newRandomUser
+import com.nhaarman.mockitokotlin2.any
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -87,13 +92,14 @@ class CreateAccountServiceTest {
             `when`(mockAuthBusiness.hash(it))
                     .thenReturn(com.google.common.hash.Hashing.goodFastHash(it.size * 8).hashBytes(it).asBytes())
         }
-//        `when`(mockAuthBusiness.createAccessToken(safeAnyObject<User>()))
-//                .thenReturn(newRandomUser())
+        `when`(mockAuthBusiness.createAccessToken(any())).thenReturn(AccessToken.EMPTY)
 
         // when:
-        sut.createAccount(req, httpReq)
+        val actual = sut.createAccount(req, httpReq)
 
         // then:
-        TODO("Not implemented!!")
+        assertEquals(req.nickname, actual.nickname)
+        assertEquals(Gender.UNDEFINED, actual.gender)
+        assertEquals(Status.NORMAL, actual.status)
     }
 }

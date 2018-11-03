@@ -9,15 +9,12 @@ import com.github.fj.lib.util.EmptyObject
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.converter.entity.ByteArrayInetAddressConverter
 import com.github.fj.restapi.persistence.converter.entity.GenderConverter
-import com.google.common.base.MoreObjects
 import java.io.Serializable
 import java.net.InetAddress
 import java.time.LocalDateTime
 import javax.persistence.*
 
 /**
- * Stores user information which is likely to be changed.
- *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
  */
@@ -25,6 +22,7 @@ import javax.persistence.*
 @Table(name = "members")
 class Membership : Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0L
 
     @Column(length = 63, nullable = false)
@@ -32,7 +30,6 @@ class Membership : Serializable {
 
     @Convert(converter = GenderConverter::class)
     @Column(length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
-    @Enumerated(EnumType.STRING)
     var gender: Gender = Gender.UNDEFINED
 
     @Column(name = "last_active_timestamp", nullable = true)
@@ -49,14 +46,13 @@ class Membership : Serializable {
     var suspendedUntil: LocalDateTime? = null
 
     override fun toString(): String {
-        return "Member(" +
-                "id=$id," +
-                "nickname='$nickname'," +
-                "gender=$gender," +
-                "lastActiveTimestamp=$lastActiveTimestamp," +
-                "lastActiveIp=$lastActiveIp," +
-                "suspendedOn=$suspendedOn," +
-                "suspendedUntil=$suspendedUntil" +
+        return "Member(id=$id,\n" +
+                "  nickname='$nickname',\n" +
+                "  gender=$gender,\n" +
+                "  lastActiveTimestamp=$lastActiveTimestamp,\n" +
+                "  lastActiveIp=$lastActiveIp,\n" +
+                "  suspendedOn=$suspendedOn,\n" +
+                "  suspendedUntil=$suspendedUntil\n" +
                 ")"
     }
 

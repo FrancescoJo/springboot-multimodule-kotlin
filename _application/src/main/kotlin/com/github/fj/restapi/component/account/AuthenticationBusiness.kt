@@ -5,7 +5,6 @@
 package com.github.fj.restapi.component.account
 
 import com.github.fj.restapi.dto.account.AccessToken
-import com.github.fj.restapi.persistence.entity.MyAuthentication
 import com.github.fj.restapi.persistence.entity.User
 
 /**
@@ -15,7 +14,7 @@ import com.github.fj.restapi.persistence.entity.User
 interface AuthenticationBusiness {
     fun hash(data: ByteArray): ByteArray
 
-    fun createAccessToken(user: User): MyAuthentication
+    fun createAccessToken(user: User): AccessToken
 
     /**
      * @param token Base62 encoded access token.

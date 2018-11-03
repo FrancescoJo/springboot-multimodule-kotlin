@@ -14,4 +14,5 @@ dependencies {
     compile "com.google.guava:guava:$version_guava"
     compile "com.google.code.findbugs:jsr305:3.0.2"
     compile "de.skuzzle:semantic-version:1.2.0"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0"
 }

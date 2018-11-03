@@ -2,8 +2,9 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.endpoint.account
+package com.github.fj.restapi.endpoint.v1.account
 
+import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto
 import org.springframework.web.bind.annotation.RestController
 
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController
  * @since 27 - Oct - 2018
  */
 @RestController
-class DeleteAccountController : IDeleteAccountController {
-    override fun onDelete(): HelloResponseDto {
+class LoginController : ILoginController {
+    override fun onPatch(): AuthenticationResponseDto {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

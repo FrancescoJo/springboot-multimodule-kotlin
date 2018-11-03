@@ -6,11 +6,11 @@ package com.github.fj.restapi.component.account
 
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.lib.time.utcEpochSecond
+import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
 import com.github.fj.restapi.dto.account.AccessToken
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
-import com.github.fj.restapi.persistence.entity.MyAuthentication
 import com.github.fj.restapi.persistence.entity.User
 import io.seruco.encoding.base62.Base62
 import org.springframework.stereotype.Component
@@ -51,7 +51,7 @@ class AuthenticationBusinessImpl(private val appProperties: AppProperties) : Aut
      *
      * Just consider this as AES256 and Base62 encoding usage demonstration.
      */
-    override fun createAccessToken(user: User): MyAuthentication {
+    override fun createAccessToken(user: User): AccessToken {
         val now = utcNow()
         val mode = when (accessTokenMode) {
             AccessToken.Encoded.RANDOM -> with(AccessToken.Encoded.values()) {
@@ -61,14 +61,7 @@ class AuthenticationBusinessImpl(private val appProperties: AppProperties) : Aut
         }
         val ivArray = ByteArray(LENGTH_IV_HEADER).apply { SecureRandom().nextBytes(this) }
 
-        return MyAuthentication().apply {
-            id = user.id
-            encoding = mode
-            iv = ivArray
-            accessToken = createAccessToken(user, mode, aes256CipherKey, ivArray, now)
-            rawAccessToken = requireNotNull(accessToken).raw.toByteArray()
-            issuedDate = now
-        }
+        return createAccessToken(user, mode, aes256CipherKey, ivArray, now)
     }
 
     override fun parseAccessToken(token: String, iv: ByteArray): AccessToken {
@@ -120,7 +113,8 @@ class AuthenticationBusinessImpl(private val appProperties: AppProperties) : Aut
         }
 
         return AccessToken(rawToken.toList(), mode, iv.toList(),
-                userId, uIdTokenHash, loginPlatformHash, issuedTimestamp, userRegisteredTimestamp)
+                userId, uIdTokenHash, loginPlatformHash,
+                utcLocalDateTimeOf(issuedTimestamp), utcLocalDateTimeOf(userRegisteredTimestamp))
     }
 
     companion object {
@@ -221,7 +215,8 @@ class AuthenticationBusinessImpl(private val appProperties: AppProperties) : Aut
             }
 
             return AccessToken(encrypted.toList(), mode, iv.toList(),
-                    userId, uIdTokenHash, loginPlatformHash, timestamp, createdTimestamp)
+                    userId, uIdTokenHash, loginPlatformHash,
+                    utcLocalDateTimeOf(timestamp), utcLocalDateTimeOf(createdTimestamp))
         }
 
         private fun ByteArray.parseEncoded(): AccessToken.Encoded {

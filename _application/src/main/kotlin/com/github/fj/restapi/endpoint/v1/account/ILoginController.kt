@@ -2,8 +2,9 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.endpoint.account
+package com.github.fj.restapi.endpoint.v1.account
 
+import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
 import io.swagger.annotations.Api
@@ -18,17 +19,18 @@ import org.springframework.web.bind.annotation.RequestMethod
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 28 - Oct - 2018
  */
-@Api(value = "DeleteAccount", description = "Deletes owning account and abandon all service usage history.")
-@RequestMapping(path = ["/${ApiPaths.ACCOUNT}"],
+@Api(value = "Login", description = "Asks an authentication challenge for access token.")
+@RequestMapping(path = [ApiPaths.API_V1_ACCOUNT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         consumes = [MediaType.APPLICATION_JSON_VALUE])
-interface IDeleteAccountController {
-    @ApiOperation("Delete Account",
-            notes = "Deletes all user information those are required for service usage.",
-            response = HelloResponseDto::class)
+interface ILoginController {
+    @ApiOperation("Log in",
+            notes = "Retrieve an access token for service usage by exchanging genuine credential.",
+            response = AuthenticationResponseDto::class)
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 400, message = "If request is malformed"),
-            ApiResponse(code = 401, message = "If given credential was tampered"))
-    @RequestMapping(method = [RequestMethod.DELETE])
-    fun onDelete(): HelloResponseDto
+            ApiResponse(code = 401, message = "If given credential was tampered"),
+            ApiResponse(code = 403, message = "If given credential was rejected by third party SSO providers"))
+    @RequestMapping(method = [RequestMethod.PATCH])
+    fun onPatch(): AuthenticationResponseDto
 }

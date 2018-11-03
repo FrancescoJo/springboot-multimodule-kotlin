@@ -6,6 +6,7 @@
  */
 package com.github.fj.lib.time
 
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -82,3 +83,9 @@ private fun parseZoneOffset(zoneOffset: ZoneOffset): IntArray {
         }
     }
 }
+
+fun utcLocalDateTimeOf(timestamp: Int): LocalDateTime =
+        utcLocalDateTimeOf(timestamp.toLong())
+
+fun utcLocalDateTimeOf(timestamp: Long): LocalDateTime =
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC)

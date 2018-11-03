@@ -36,20 +36,14 @@ class SwaggerConfig : WebMvcConfigurer {
     @Bean
     fun hello(): Docket =
             newDocket("Hello world",
-                    "/${ApiPaths.HELLO}", "Collection of hello world APIs.",
-                    PathSelectors.ant("/${ApiPaths.HELLO}"))
-
-    @Bean
-    fun account(): Docket =
-            newDocket("Account",
-                    "/${ApiPaths.ACCOUNT}", "Collection of account related APIs.",
-                    PathSelectors.ant("/${ApiPaths.ACCOUNT}"))
+                    ApiPaths.HELLO, "Collection of hello world APIs.",
+                    PathSelectors.ant(ApiPaths.HELLO))
 
     @Bean
     fun api(): Docket =
             newDocket("API: ${ApiPaths.V1}",
-                    "/${ApiPaths.API_V1}", "Collection of ${ApiPaths.V1} APIs.",
-                    PathSelectors.ant("/${ApiPaths.API_V1}/**"))
+                    ApiPaths.API_V1, "Collection of ${ApiPaths.V1} APIs.",
+                    PathSelectors.ant("${ApiPaths.API_V1}/**"))
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("swagger-ui.html")

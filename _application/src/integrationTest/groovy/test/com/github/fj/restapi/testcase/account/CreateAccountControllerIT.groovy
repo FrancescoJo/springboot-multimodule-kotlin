@@ -4,7 +4,11 @@
  */
 package test.com.github.fj.restapi.testcase.account
 
+import com.github.fj.restapi.dto.OkResponseDto
+import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.persistence.consts.account.Gender
+import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.service.account.AccountRequestHelper
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
@@ -32,7 +36,7 @@ class CreateAccountControllerIT extends IntegrationTestBase {
         when:
         final responseSpec = testClient()
                 .post()
-                .uri("/${ApiPaths.ACCOUNT}")
+                .uri("${ApiPaths.API_V1_ACCOUNT}")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(request))
                 .exchange()
@@ -44,18 +48,20 @@ class CreateAccountControllerIT extends IntegrationTestBase {
     def "Request should be accepted with good request"() {
         given:
         final request = AccountRequestHelper.newRandomCreateAccountRequest()
-
-        when:
         final responseSpec = testClient()
                 .post()
-                .uri("/${ApiPaths.ACCOUNT}")
+                .uri("${ApiPaths.API_V1_ACCOUNT}")
                 .body(BodyInserters.fromObject(request))
-                .exchange()
+
+        when:
+        final result = responseSpec.exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(OkResponseDto).returnResult().responseBody.with extractResponseAs(AuthenticationResponseDto)
 
         then:
-        responseSpec.expectStatus().is2xxSuccessful()
-        // TODO: Parse expected message at the end of this test
-        //                 .expectBody(OkResponseDto).returnResult().responseBody.with extractResponseAs(HelloResponseDto)
-        //        response.message == "POST Hello, MY_NAME"
+        !result.accessToken.empty
+        result.nickname == request.nickname
+        result.gender == Gender.UNDEFINED && request.gender == null
+        result.status == Status.NORMAL
     }
 }
