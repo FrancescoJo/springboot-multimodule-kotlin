@@ -4,7 +4,7 @@
  */
 package com.github.fj.restapi.persistence.repository
 
-import com.github.fj.restapi.persistence.entity.Member
+import com.github.fj.restapi.persistence.entity.Membership
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
@@ -13,4 +13,4 @@ import org.springframework.stereotype.Repository
  * @since 23 - Aug - 2018
  */
 @Repository
-interface MemberRepository : CrudRepository<Member, Long>
+interface MembershipRepository : CrudRepository<Membership, Long>

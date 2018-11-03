@@ -91,7 +91,7 @@ class User : Serializable {
     // May this produce inefficient query? We have to investigate.
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", nullable = false)
-    var member: Member = Member.EMPTY
+    var member: Membership = Membership.EMPTY
 
     // May this produce inefficient query? We have to investigate.
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)

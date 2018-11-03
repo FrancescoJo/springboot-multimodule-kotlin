@@ -16,7 +16,7 @@ import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.Status
-import com.github.fj.restapi.persistence.entity.Member
+import com.github.fj.restapi.persistence.entity.Membership
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
 import com.github.fj.restapi.util.extractIp
@@ -103,7 +103,7 @@ class CreateAccountServiceImpl @Inject constructor(
                 LoginType.BASIC -> authBusiness.hash(req.credential.toByteArray())
                 else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
             }
-            member = Member().apply {
+            member = Membership().apply {
                 nickname = req.nickname
                 gender = req.gender ?: Gender.UNDEFINED
                 lastActiveTimestamp = now

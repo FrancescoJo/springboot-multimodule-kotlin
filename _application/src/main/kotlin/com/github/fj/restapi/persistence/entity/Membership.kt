@@ -23,7 +23,7 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "members")
-class Member : Serializable {
+class Membership : Serializable {
     @Id
     var id: Long = 0L
 
@@ -60,7 +60,7 @@ class Member : Serializable {
                 ")"
     }
 
-    companion object : EmptyObject<Member> {
-        override val EMPTY = Member()
+    companion object : EmptyObject<Membership> {
+        override val EMPTY = Membership()
     }
 }

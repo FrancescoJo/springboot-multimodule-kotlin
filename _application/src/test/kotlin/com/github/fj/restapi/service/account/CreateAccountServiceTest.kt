@@ -20,7 +20,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.springframework.http.converter.HttpMessageNotReadableException
 import java.util.*
-import javax.servlet.http.HttpServletRequest
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -83,6 +82,13 @@ class CreateAccountServiceTest {
                 .thenReturn(Optional.empty())
         `when`(mockUserRepo.findByBasicCredential(req.username ?: "", credentialArray))
                 .thenReturn(Optional.empty())
+        @Suppress("UnstableApiUsage")
+        req.credential.toByteArray().let {
+            `when`(mockAuthBusiness.hash(it))
+                    .thenReturn(com.google.common.hash.Hashing.goodFastHash(it.size * 8).hashBytes(it).asBytes())
+        }
+//        `when`(mockAuthBusiness.createAccessToken(safeAnyObject<User>()))
+//                .thenReturn(newRandomUser())
 
         // when:
         sut.createAccount(req, httpReq)
