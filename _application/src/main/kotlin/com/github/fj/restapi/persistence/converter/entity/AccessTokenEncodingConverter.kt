@@ -4,7 +4,7 @@
  */
 package com.github.fj.restapi.persistence.converter.entity
 
-import com.github.fj.restapi.dto.account.AccessToken
+import com.github.fj.restapi.vo.account.AccessToken
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 

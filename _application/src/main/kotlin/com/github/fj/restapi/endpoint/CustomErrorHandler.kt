@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.core.AuthenticationException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -38,6 +39,11 @@ import javax.servlet.http.HttpServletRequest
  */
 @RestControllerAdvice
 class CustomErrorHandler {
+    @ExceptionHandler(AuthenticationException::class)
+    fun handleSpring401(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
+        return handleError(req, GeneralHttpException.create(HttpStatus.UNAUTHORIZED, req.requestURI ?: ""))
+    }
+
     @ExceptionHandler(NoHandlerFoundException::class)
     fun handleSpring404(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
         return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND, req.requestURI ?: ""))

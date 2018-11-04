@@ -9,7 +9,7 @@ import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
-import com.github.fj.restapi.dto.account.AccessToken
+import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
 import io.seruco.encoding.base62.Base62
@@ -284,3 +284,4 @@ class AuthenticationBusinessImpl(private val appProperties: AppProperties) : Aut
         }
     }
 }
+

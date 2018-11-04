@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.dto.account
+package com.github.fj.restapi.vo.account
 
 import com.github.fj.lib.annotation.UndefinableEnum
 import java.time.LocalDateTime

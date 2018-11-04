@@ -5,13 +5,18 @@
 package com.github.fj.restapi.appconfig.mvc.security
 
 import com.github.fj.lib.annotation.AllOpen
+import com.github.fj.restapi.appconfig.mvc.security.internal.*
 import com.github.fj.restapi.endpoint.ApiPaths
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import javax.inject.Inject
 
 /**
@@ -21,32 +26,36 @@ import javax.inject.Inject
 @AllOpen
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig @Inject constructor(
-        private val authEntryPoint: AuthenticationEntryPointImpl,
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+class SecurityConfig @Inject constructor(
         private val successHandler: SavedRequestAwareAuthenticationSuccessHandler,
         private val failureHandler: AuthenticationFailureHandler
 ) : WebSecurityConfigurerAdapter() {
+
     override fun configure(auth: AuthenticationManagerBuilder) {
-        // TODO: auth.authenticationProvider()
-        // TODO: constanise roles
-        auth.inMemoryAuthentication()
-                .withUser("admin").password("adminPass").roles("ADMIN")
-                .and()
-                .withUser("user").password("userPass").roles("USER")
+        auth.authenticationProvider(HttpAuthorizationTokenAuthenticationProvider(LOG))
+                .userDetailsService(UserDetailsServiceImpl())
+//
+//        auth.inMemoryAuthentication()
+//                .withUser("admin").password("adminPass").roles("ADMIN")
+//                .and()
+//                .withUser("user").password("userPass").roles("USER")
     }
 
     override fun configure(http: HttpSecurity) {
-        http.cors().disable()
+        http.addFilterBefore(HttpServletRequestAuthorizationHeaderFilter(LOG), BasicAuthenticationFilter::class.java)
+                .cors().disable()
                 .csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authEntryPoint)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling().authenticationEntryPoint(AuthenticationEntryPointImpl())
                 .and()
                 .authorizeRequests()
                 // Restrict Spring actuator access except from localhost for security
                 .antMatchers("/actuator/**").hasIpAddress("localhost")
                 .antMatchers(HttpMethod.POST, ApiPaths.API_V1_ACCOUNT).permitAll()
-                .antMatchers(HttpMethod.PATCH, ApiPaths.API_V1_ACCOUNT).hasAnyRole("USER")
-                .antMatchers(HttpMethod.DELETE, ApiPaths.API_V1_ACCOUNT).hasAnyRole("USER")
+                .antMatchers(HttpMethod.PATCH, ApiPaths.API_V1_ACCOUNT).permitAll()
+                .antMatchers("${ApiPaths.API}/**").authenticated()
                 .and()
                 .formLogin()
                 .successHandler(successHandler)
@@ -57,5 +66,7 @@ class WebSecurityConfig @Inject constructor(
                 .invalidateHttpSession(true)
     }
 
-    // TODO: disable userDetailsManager autoconf
+    companion object {
+        private val LOG = LoggerFactory.getLogger(SecurityConfig::class.java)
+    }
 }

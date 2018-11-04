@@ -4,6 +4,7 @@
  */
 package com.github.fj.restapi.endpoint.v1.account
 
+import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto
 import org.springframework.web.bind.annotation.RestController
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
  */
+@AllOpen
 @RestController
 class LoginController : ILoginController {
     override fun onPatch(): AuthenticationResponseDto {

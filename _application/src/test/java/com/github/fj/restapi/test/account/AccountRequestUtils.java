@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.service.account;
+package com.github.fj.restapi.test.account;
 
 import com.github.fj.lib.collection.ArrayUtilsKt;
 import com.github.fj.lib.text.SemanticVersion;
@@ -22,7 +22,7 @@ import java.util.Random;
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
  */
-public final class AccountRequestHelper {
+public final class AccountRequestUtils {
     private static final String DEFAULT_PLATFORM_VERSION = "Platform-1.0";
     private static final String DEFAULT_APP_VERSION = "0.0.1";
     private static final String DEFAULT_EMAIL = "tester@testcompany.com";

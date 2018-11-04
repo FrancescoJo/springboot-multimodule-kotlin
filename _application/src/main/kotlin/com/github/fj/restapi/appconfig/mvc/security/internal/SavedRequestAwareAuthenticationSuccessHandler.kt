@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.appconfig.mvc.security
+package com.github.fj.restapi.appconfig.mvc.security.internal
 
 import com.github.fj.lib.annotation.AllOpen
 import org.springframework.security.core.Authentication
@@ -43,9 +43,5 @@ class SavedRequestAwareAuthenticationSuccessHandler : SimpleUrlAuthenticationSuc
         }
 
         clearAuthenticationAttributes(request)
-    }
-
-    fun setRequestCache(requestCache: RequestCache) {
-        this.requestCache = requestCache
     }
 }

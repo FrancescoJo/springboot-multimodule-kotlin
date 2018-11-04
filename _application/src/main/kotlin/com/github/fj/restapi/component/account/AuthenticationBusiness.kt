@@ -4,7 +4,7 @@
  */
 package com.github.fj.restapi.component.account
 
-import com.github.fj.restapi.dto.account.AccessToken
+import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.entity.User
 
 /**

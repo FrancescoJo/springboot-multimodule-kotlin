@@ -84,8 +84,13 @@ private fun parseZoneOffset(zoneOffset: ZoneOffset): IntArray {
     }
 }
 
+// Do not use this method after year 2038
 fun utcLocalDateTimeOf(timestamp: Int): LocalDateTime =
         utcLocalDateTimeOf(timestamp.toLong())
 
-fun utcLocalDateTimeOf(timestamp: Long): LocalDateTime =
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC)
+fun utcLocalDateTimeOf(timestamp: Long): LocalDateTime = if (timestamp > Integer.MAX_VALUE) {
+    LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC)
+} else {
+    LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneOffset.UTC)
+}
+

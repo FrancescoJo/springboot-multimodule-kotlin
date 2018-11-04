@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id`                BIGINT         NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `id_token`          VARCHAR(31)    NOT NULL UNIQUE,
   `status`            VARCHAR(4)     NOT NULL,
-  `roles`             VARCHAR(31)    NOT NULL
+  `roles`             VARCHAR(63)    NOT NULL
   COMMENT 'Value for obscuring sequential property of primary key.',
   `name`              VARCHAR(31)    NOT NULL UNIQUE
   COMMENT 'Internal user name representation for management',

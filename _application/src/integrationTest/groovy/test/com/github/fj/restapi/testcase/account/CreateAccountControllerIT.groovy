@@ -4,15 +4,13 @@
  */
 package test.com.github.fj.restapi.testcase.account
 
-import com.github.fj.restapi.dto.OkResponseDto
-import com.github.fj.restapi.dto.account.AuthenticationResponseDto
+
 import com.github.fj.restapi.endpoint.ApiPaths
-import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.Status
-import com.github.fj.restapi.service.account.AccountRequestHelper
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import test.com.github.fj.restapi.IntegrationTestBase
+import test.com.github.fj.restapi.util.AccountUtils
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -46,22 +44,11 @@ class CreateAccountControllerIT extends IntegrationTestBase {
     }
 
     def "Request should be accepted with good request"() {
-        given:
-        final request = AccountRequestHelper.newRandomCreateAccountRequest()
-        final responseSpec = testClient()
-                .post()
-                .uri("${ApiPaths.API_V1_ACCOUNT}")
-                .body(BodyInserters.fromObject(request))
-
         when:
-        final result = responseSpec.exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(OkResponseDto).returnResult().responseBody.with extractResponseAs(AuthenticationResponseDto)
+        final result = AccountUtils.createRandomAccount(this)
 
         then:
         !result.accessToken.empty
-        result.nickname == request.nickname
-        result.gender == Gender.UNDEFINED && request.gender == null
         result.status == Status.NORMAL
     }
 }

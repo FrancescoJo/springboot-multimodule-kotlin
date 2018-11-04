@@ -6,8 +6,8 @@ package com.github.fj.restapi.component.account
 
 import com.github.fj.lib.collection.getRandomBytes
 import com.github.fj.restapi.appconfig.AppProperties
-import com.github.fj.restapi.dto.account.AccessToken
-import com.github.fj.restapi.service.account.AccountRequestHelper
+import com.github.fj.restapi.vo.account.AccessToken
+import com.github.fj.restapi.test.account.AccountRequestUtils
 import com.google.common.io.BaseEncoding
 import io.seruco.encoding.base62.Base62
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -51,7 +51,7 @@ class AuthenticationBusinessTest {
     @EnumSource(AccessToken.Encoded::class, names = ["FORWARD", "BACKWARD"])
     fun `createAccessToken demo for each modes`(mode: AccessToken.Encoded) {
         // given:
-        val user = AccountRequestHelper.newRandomUser()
+        val user = AccountRequestUtils.newRandomUser()
         val aes256Key = getRandomBytes(32)
 
         // and:

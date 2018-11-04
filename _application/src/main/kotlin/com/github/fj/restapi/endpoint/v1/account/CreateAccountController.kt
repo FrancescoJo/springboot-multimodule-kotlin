@@ -5,6 +5,7 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.fcmclient.SimpleFcmPushSender
+import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.service.account.CreateAccountService
@@ -21,13 +22,17 @@ import javax.validation.Valid
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
  */
+@AllOpen
 @RestController
 class CreateAccountController @Inject constructor(private val svc: CreateAccountService) :
         ICreateAccountController {
     override fun onPost(@Valid @RequestBody request: CreateAccountRequestDto,
                         httpServletRequest: HttpServletRequest): AuthenticationResponseDto {
         LOG.debug("Create account request: $request")
-        return svc.createAccount(request, httpServletRequest)
+        svc.createAccount(request, httpServletRequest).let {
+            LOG.debug("Create account response: $it")
+            return it
+        }
     }
 
     // On-the-fly validator application

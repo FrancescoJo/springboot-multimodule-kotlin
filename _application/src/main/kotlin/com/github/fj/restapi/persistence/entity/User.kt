@@ -8,7 +8,7 @@ import com.github.fj.lib.net.InetAddressExtensions
 import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.indentToString
 import com.github.fj.lib.util.EmptyObject
-import com.github.fj.restapi.dto.account.AccessToken
+import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
 import com.github.fj.restapi.persistence.consts.account.Status
@@ -47,7 +47,7 @@ class User : Serializable {
     var status: Status = Status.UNDEFINED
 
     // TODO: Change to list of roles
-    @Column(length = 31, nullable = false)
+    @Column(length = 63, nullable = false)
     var roles: String = ""
 
     @Column(name = "name", length = 31, unique = true, nullable = false)
