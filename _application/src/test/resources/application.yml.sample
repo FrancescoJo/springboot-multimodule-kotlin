@@ -15,12 +15,12 @@ spring:
   datasource:
     # Automatic database initialisation. Maybe conflict to hibernate.
     # https://docs.spring.io/spring-boot/docs/current/reference/html/howto-database-initialization.html
-    initialization-mode: NEVER
-    schema:
-    data:
+    initialization-mode: ALWAYS
+    schema: classpath:/sql/v1.0/schemas/*.sql
+    data: classpath:/sql/v1.0/data/*.sql
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/fj_test?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&serverTimezone=UTC&character_set_server=utf8mb4
     username:
     password:
   jpa:

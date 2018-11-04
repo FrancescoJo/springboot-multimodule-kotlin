@@ -31,4 +31,3 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY UK_Users_Credential(`name`, `login_type`, `email`, `credential`)
 )
   COMMENT 'Stores crucial user information for accessing service.';
-

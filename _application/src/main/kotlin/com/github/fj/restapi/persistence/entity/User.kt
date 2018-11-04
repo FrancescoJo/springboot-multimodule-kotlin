@@ -101,7 +101,7 @@ class User : Serializable {
     var tokenIssuedDate: LocalDateTime? = null
 
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(referencedColumnName = "user_id", name = "id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     var member: Membership = Membership.EMPTY
 
     override fun toString(): String {
