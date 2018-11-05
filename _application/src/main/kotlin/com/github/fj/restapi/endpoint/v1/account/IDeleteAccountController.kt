@@ -8,6 +8,7 @@ import com.github.fj.restapi.dto.account.DeleteAccountRequestDto
 import com.github.fj.restapi.dto.account.DeleteAccountResponseDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.persistence.entity.User
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
@@ -33,7 +34,7 @@ interface IDeleteAccountController {
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 400, message = "If request is malformed"),
             ApiResponse(code = 401, message = "If given credential was tampered"))
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = [RequestMethod.DELETE])
-    fun onDelete(@RequestBody deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto
+    fun onDelete(user: User, @RequestBody deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto
 }

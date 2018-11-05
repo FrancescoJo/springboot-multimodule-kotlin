@@ -6,6 +6,7 @@ package com.github.fj.restapi.appconfig.mvc.security
 
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.appconfig.mvc.security.internal.*
+import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.endpoint.ApiPaths
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
@@ -28,18 +29,13 @@ import javax.inject.Inject
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig @Inject constructor(
+        private val authBusiness: AuthenticationBusiness,
         private val successHandler: SavedRequestAwareAuthenticationSuccessHandler,
         private val failureHandler: AuthenticationFailureHandler
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.authenticationProvider(HttpAuthorizationTokenAuthenticationProvider(LOG))
-                .userDetailsService(UserDetailsServiceImpl())
-//
-//        auth.inMemoryAuthentication()
-//                .withUser("admin").password("adminPass").roles("ADMIN")
-//                .and()
-//                .withUser("user").password("userPass").roles("USER")
+        auth.authenticationProvider(HttpAuthorizationTokenAuthenticationProvider(LOG, authBusiness))
     }
 
     override fun configure(http: HttpSecurity) {

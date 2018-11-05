@@ -39,4 +39,11 @@ interface UserRepository : CrudRepository<User, Long> {
         WHERE u.idToken = ?1
     """)
     fun findByIdToken(idToken: String): Optional<User>
+
+    @Query("""
+        SELECT u
+        FROM User u
+        WHERE u.accessToken = ?1
+    """)
+    fun findByAccessToken(rawAccessToken: ByteArray): Optional<User>
 }

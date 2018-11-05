@@ -9,12 +9,14 @@ import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.getRandomCapitalAlphaNumericString
 import com.github.fj.lib.text.isNullOrUnicodeBlank
 import com.github.fj.lib.time.utcEpochSecond
+import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
+import com.github.fj.restapi.persistence.consts.account.Role
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.entity.Membership
 import com.github.fj.restapi.persistence.entity.User
@@ -61,19 +63,19 @@ class CreateAccountServiceImpl @Inject constructor(
         }
 
         val user = User().apply {
-            val now = LocalDateTime.now()
+            val now = utcNow()
             val ipAddr = InetAddress.getByName(httpReq.extractIp())
 
             var maybeUserWithIdToken: Optional<User>
             var newIdToken: String
             do {
-                newIdToken = getRandomCapitalAlphaNumericString(ID_TOKEN_LENGTH)
+                newIdToken = getRandomCapitalAlphaNumericString(CreateAccountService.ID_TOKEN_LENGTH)
                 maybeUserWithIdToken = userRepo.findByIdToken(newIdToken)
             } while (maybeUserWithIdToken.isPresent)
 
             idToken = newIdToken
             status = Status.NORMAL
-            // TODO: Assign role
+            role = Role.USER
             name = when (req.loginType) {
                 LoginType.GUEST -> ""
                 LoginType.BASIC -> requireNotNull(req.username)
@@ -128,9 +130,5 @@ class CreateAccountServiceImpl @Inject constructor(
                 suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
                 suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
         )
-    }
-
-    companion object {
-        private const val ID_TOKEN_LENGTH = 16
     }
 }

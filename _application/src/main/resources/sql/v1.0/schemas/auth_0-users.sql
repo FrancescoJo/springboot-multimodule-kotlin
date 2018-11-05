@@ -1,10 +1,10 @@
 /* MariaDB SQL */
 CREATE TABLE IF NOT EXISTS `users` (
   `id`                BIGINT         NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `id_token`          VARCHAR(31)    NOT NULL UNIQUE,
-  `status`            VARCHAR(4)     NOT NULL,
-  `roles`             VARCHAR(63)    NOT NULL
+  `id_token`          VARCHAR(31)    NOT NULL UNIQUE
   COMMENT 'Value for obscuring sequential property of primary key.',
+  `status`            VARCHAR(4)     NOT NULL,
+  `role`              INT            NOT NULL,
   `name`              VARCHAR(31)    NOT NULL UNIQUE
   COMMENT 'Internal user name representation for management',
   `login_type`        VARCHAR(4)     NOT NULL,
@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `access_token`      VARBINARY(127) NOT NULL,
   `token_issued_date` DATETIME       NOT NULL,
 
+  UNIQUE KEY UK_Users_AccessToken(`access_token`),
   UNIQUE KEY UK_Users_Identity(`id_token`, `name`),
   UNIQUE KEY UK_Users_Status(`id`, `status`),
   UNIQUE KEY UK_Users_Credential(`name`, `login_type`, `email`, `credential`)

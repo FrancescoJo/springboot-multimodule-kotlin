@@ -5,6 +5,7 @@
 package com.github.fj.restapi.vo.account
 
 import com.github.fj.lib.annotation.UndefinableEnum
+import com.github.fj.restapi.persistence.entity.User
 import java.time.LocalDateTime
 
 /**
@@ -18,9 +19,7 @@ data class AccessToken(
 
         val iv: List<Byte>,
 
-        val userId: Long,
-
-        val uIdTokenHash: Long,
+        val uIdToken: String,
 
         val loginPlatformHash: Int,
 
@@ -28,9 +27,12 @@ data class AccessToken(
 
         val userRegisteredTimestamp: LocalDateTime
 ) {
+    @Transient
+    var user: User? = null
+
     companion object {
         val EMPTY = AccessToken(
-                emptyList(), Encoded.UNDEFINED, emptyList(), 0L, 0L, 0,
+                emptyList(), Encoded.UNDEFINED, emptyList(), "", 0,
                 LocalDateTime.MIN, LocalDateTime.MIN)
     }
 

@@ -159,9 +159,10 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
   For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
 
 ## TO-DOs
-- Spring security: Delete / Login account
-- Handle Filter logic exceptions in CustomErrorHandler
-- User authorisation by roles
+- Spring security: Login / Delete account
+- Make Pre/Post authorise works properly
+- JWT Token support
+- Fix all tests
 - Bugfix on FCMClient
 - Update Spring boot
 - non-JPA implementation

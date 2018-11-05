@@ -15,4 +15,8 @@ import javax.servlet.http.HttpServletRequest
 interface CreateAccountService {
     fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto
+
+    companion object {
+        const val ID_TOKEN_LENGTH = 16
+    }
 }

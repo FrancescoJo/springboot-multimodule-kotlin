@@ -4,8 +4,10 @@
  */
 package com.github.fj.restapi.component.account
 
+import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.entity.User
+import org.springframework.security.core.Authentication
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -18,7 +20,10 @@ interface AuthenticationBusiness {
 
     /**
      * @param token Base62 encoded access token.
-     * @param iv Initialisation vector that is used to cipher given [token].
+     * @throws UnknownAuthTokenException if access token is malformed or not issued.
      */
-    fun parseAccessToken(token: String, iv: ByteArray): AccessToken
+    @Throws(UnknownAuthTokenException::class)
+    fun parseAccessToken(token: String): AccessToken
+
+    fun authenticate(token: AccessToken): Authentication
 }

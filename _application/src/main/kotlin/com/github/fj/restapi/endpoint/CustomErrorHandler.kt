@@ -7,17 +7,20 @@ package com.github.fj.restapi.endpoint
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.github.fj.restapi.AppProfile
 import com.github.fj.restapi.BuildConfig
-import com.github.fj.restapi.dto.ErrorResponseDto
 import com.github.fj.restapi.dto.AbstractResponseDto
+import com.github.fj.restapi.dto.ErrorResponseDto
 import com.github.fj.restapi.exception.AbstractBaseHttpException
 import com.github.fj.restapi.exception.GeneralHttpException
 import org.slf4j.LoggerFactory
+import org.springframework.boot.web.servlet.error.ErrorController
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.core.AuthenticationException
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
 import javax.servlet.http.HttpServletRequest
@@ -37,8 +40,9 @@ import javax.servlet.http.HttpServletRequest
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 15 - Jan - 2018
  */
+@Controller
 @RestControllerAdvice
-class CustomErrorHandler {
+class CustomErrorHandler : ErrorController {
     @ExceptionHandler(AuthenticationException::class)
     fun handleSpring401(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
         return handleError(req, GeneralHttpException.create(HttpStatus.UNAUTHORIZED, req.requestURI ?: ""))
@@ -49,7 +53,6 @@ class CustomErrorHandler {
         return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND, req.requestURI ?: ""))
     }
 
-    @Suppress("MemberVisibilityCanBePrivate")
     @ExceptionHandler(Exception::class)
     fun handleError(req: HttpServletRequest, ex: Exception): ResponseEntity<ErrorResponseDto> {
         val status: HttpStatus
@@ -86,6 +89,23 @@ class CustomErrorHandler {
         return ResponseEntity(response, status)
     }
 
+    /**
+     * Any errors, that happen in the outside of Spring Context - exceptions in Servlet filters
+     * for example, are redirected to this method to decorate error output as our own favour,
+     * rather than Spring's [org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController].
+     */
+    @RequestMapping(BASIC_ERROR_PATH)
+    fun handleError(request: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
+//        val statusCode = request.getAttribute("javax.servlet.error.status_code") as Int
+        val exception = request.getAttribute("javax.servlet.error.exception") as Exception
+
+        return handleError(request, exception)
+    }
+
+    override fun getErrorPath(): String {
+        return BASIC_ERROR_PATH
+    }
+
     private fun getStatus(request: HttpServletRequest): HttpStatus {
         return (request.getAttribute("javax.servlet.error.status_code") as? Int)?.let {
             HttpStatus.valueOf(it)
@@ -117,5 +137,7 @@ class CustomErrorHandler {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(CustomErrorHandler::class.java)
+
+        private const val BASIC_ERROR_PATH = "/error"
     }
 }

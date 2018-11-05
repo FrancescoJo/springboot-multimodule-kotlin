@@ -10,6 +10,7 @@ import com.github.fj.lib.text.StringUtilsKt;
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto;
 import com.github.fj.restapi.persistence.consts.account.LoginType;
 import com.github.fj.restapi.persistence.consts.account.PlatformType;
+import com.github.fj.restapi.persistence.consts.account.Role;
 import com.github.fj.restapi.persistence.consts.account.Status;
 import com.github.fj.restapi.persistence.entity.User;
 import test.com.github.fj.lib.RandomHelper;
@@ -51,7 +52,7 @@ public final class AccountRequestUtils {
         u.setId(new Random().nextInt(Short.MAX_VALUE));
         u.setIdToken(StringUtilsKt.getRandomAlphaNumericString(8));
         u.setStatus(Status.NORMAL);
-        u.setRoles("");
+        u.setRole(Role.USER);
         u.setName(StringUtilsKt.getRandomAlphaNumericString(12));
         u.setLoginType(RandomHelper.randomEnumConst(LoginType.class));
         u.setPlatformType(RandomHelper.randomEnumConst(PlatformType.class));

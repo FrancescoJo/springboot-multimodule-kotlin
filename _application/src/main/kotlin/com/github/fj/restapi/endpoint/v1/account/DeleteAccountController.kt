@@ -8,6 +8,7 @@ import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.dto.account.DeleteAccountRequestDto
 import com.github.fj.restapi.dto.account.DeleteAccountResponseDto
 import com.github.fj.restapi.dto.hello.HelloResponseDto
+import com.github.fj.restapi.persistence.entity.User
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 class DeleteAccountController : IDeleteAccountController {
 //    override fun onDelete(): DeleteAccountResponseDto = onDelete(null)
 
-    override fun onDelete(deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto {
+    override fun onDelete(user: User, deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto {
 
         println(">>>> onDelete")
 

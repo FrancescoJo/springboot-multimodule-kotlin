@@ -11,6 +11,7 @@ import com.github.fj.lib.util.EmptyObject
 import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
+import com.github.fj.restapi.persistence.consts.account.Role
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.converter.entity.*
 import java.io.Serializable
@@ -46,9 +47,8 @@ class User : Serializable {
     @Column(length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
     var status: Status = Status.UNDEFINED
 
-    // TODO: Change to list of roles
-    @Column(length = 63, nullable = false)
-    var roles: String = ""
+    @Column(nullable = false, columnDefinition = "INT")
+    var role: Role = Role.UNDEFINED
 
     @Column(name = "name", length = 31, unique = true, nullable = false)
     var name: String = ""
@@ -108,7 +108,7 @@ class User : Serializable {
         return "User(id=$id,\n" +
                 "  idToken='$idToken',\n" +
                 "  status=$status,\n" +
-                "  roles='$roles',\n" +
+                "  role='$role',\n" +
                 "  name='$name',\n" +
                 "  loginType=$loginType,\n" +
                 "  platformType=$platformType,\n" +
