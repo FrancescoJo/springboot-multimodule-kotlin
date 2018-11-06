@@ -10,6 +10,7 @@ import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
+import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
@@ -109,7 +110,7 @@ class AuthenticationBusinessImpl(
         val tokenExpiration = token.issuedTimestamp.plusSeconds(TOKEN_ALIVE_DURATION_SECS)
 
         if (now > tokenExpiration) {
-            throw UnknownAuthTokenException("This token is expired.")
+            throw AuthTokenExpiredException("This token is expired.")
         }
 
         return AuthenticationObjectImpl(tokenUser, token)

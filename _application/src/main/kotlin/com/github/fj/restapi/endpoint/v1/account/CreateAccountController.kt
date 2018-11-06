@@ -4,10 +4,9 @@
  */
 package com.github.fj.restapi.endpoint.v1.account
 
-import com.github.fj.fcmclient.SimpleFcmPushSender
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
+import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.service.account.CreateAccountService
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.WebDataBinder
@@ -42,6 +41,6 @@ class CreateAccountController @Inject constructor(private val svc: CreateAccount
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(SimpleFcmPushSender::class.java)
+        private val LOG = LoggerFactory.getLogger(CreateAccountController::class.java)
     }
 }

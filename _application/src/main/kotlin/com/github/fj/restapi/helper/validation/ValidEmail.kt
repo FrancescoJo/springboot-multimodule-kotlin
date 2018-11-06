@@ -4,6 +4,7 @@
  */
 package com.github.fj.restapi.helper.validation
 
+import com.github.fj.restapi.persistence.entity.User
 import javax.validation.Constraint
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
@@ -61,8 +62,7 @@ private class ValidEmailConstraint : ConstraintValidator<ValidEmail, String> {
 
     companion object {
         private const val EMAIL_REGEX = "^[_a-zA-Z0-9-]+([._a-zA-Z0-9-]*)@[a-zA-Z0-9]+(\\.[a-zA-Z0-9-]+)+$"
-        // Originally 254 but due to database restrictions
-        private const val EMAIL_LENGTH = 127
+        private const val EMAIL_LENGTH = User.EMAIL_LENGTH
 
         private val EMAIL_PATTERN = EMAIL_REGEX.toPattern()
 

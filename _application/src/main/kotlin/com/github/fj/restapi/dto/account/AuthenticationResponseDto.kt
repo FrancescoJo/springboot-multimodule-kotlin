@@ -7,8 +7,11 @@ package com.github.fj.restapi.dto.account
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.Status
+import com.github.fj.restapi.persistence.entity.User
+import io.seruco.encoding.base62.Base62
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
@@ -61,4 +64,17 @@ data class AuthenticationResponseDto(
                 "if your account status is good.", example = "<UNIX TIMESTAMP>")
         @JsonProperty
         val suspendedUntilTimestamp: Long
-)
+) {
+    companion object {
+        fun create(user: User) = AuthenticationResponseDto(
+                id = user.idToken,
+                nickname = user.member.nickname,
+                gender = user.member.gender,
+                status = user.status,
+                lastActiveTimestamp = user.member.lastActiveTimestamp?.utcEpochSecond() ?: 0L,
+                accessToken = (Base62.createInstance().encode(user.rawAccessToken).toString(Charsets.UTF_8)),
+                suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
+                suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
+        )
+    }
+}

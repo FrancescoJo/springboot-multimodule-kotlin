@@ -13,12 +13,14 @@ import org.springframework.validation.Errors
  */
 enum class ValidationFailures constructor(private val code: String) {
     VALUE_INSUFFICIENT("ERR_VALIDATION_VAL_INSUFFICIENT"),
+    VALUE_UNNECESSARY("ERR_VALIDATION_VAL_UNNECESSARY"),
     VALUE_INVALID_RANGE("ERR_VALIDATION_VAL_INVALID_RANGE");
 
     fun rejectWith(e: Errors, obj: Any?) {
         val message: String = when (this) {
             VALUE_INSUFFICIENT -> "Some property is/are missing for fulfill the request."
             VALUE_INVALID_RANGE -> "Value is out of range."
+            VALUE_UNNECESSARY -> "Unnecessary extra value(s) is/are found."
         }
 
         if (obj != null) {

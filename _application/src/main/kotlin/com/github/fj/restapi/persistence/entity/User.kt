@@ -68,7 +68,7 @@ class User : Serializable {
     @Column(name = "app_version", length = 4, nullable = false, columnDefinition = "VARCHAR(31)")
     var appVersion: SemanticVersion = SemanticVersion.EMPTY
 
-    @Column(length = 254, nullable = false)
+    @Column(length = EMAIL_LENGTH, nullable = false)
     var email: String = ""
 
     @Column(name = "created_date", nullable = false)
@@ -95,7 +95,7 @@ class User : Serializable {
     var authIv: ByteArray = ByteArray(0)
 
     @Column(name = "access_token", length = 127, nullable = false, columnDefinition = "VARBINARY(127)")
-    var accessToken: ByteArray = ByteArray(0)
+    var rawAccessToken: ByteArray = ByteArray(0)
 
     @Column(name = "token_issued_date", nullable = true)
     var tokenIssuedDate: LocalDateTime? = null
@@ -122,10 +122,17 @@ class User : Serializable {
                 "  credential=${Arrays.toString(credential)},\n" +
                 "  authEncoding=$authEncoding,\n" +
                 "  authIv=${Arrays.toString(authIv)},\n" +
-                "  accessToken=${Arrays.toString(accessToken)},\n" +
+                "  rawAccessToken=${Arrays.toString(rawAccessToken)},\n" +
                 "  tokenIssuedDate=$tokenIssuedDate,\n" +
                 "  member=${indentToString(member)}," +
                 ")"
+    }
+
+    fun setAccessToken(token: AccessToken) {
+        authEncoding = token.mode
+        authIv = token.iv.toByteArray()
+        rawAccessToken = token.raw.toByteArray()
+        tokenIssuedDate = token.issuedTimestamp
     }
 
     companion object : EmptyObject<User> {
@@ -133,5 +140,8 @@ class User : Serializable {
 
         const val MINIMUM_NAME_LENGTH = 6
         const val MAXIMUM_NAME_LENGTH = 16
+
+        // Originally could be maximum 254 but due to database restrictions
+        const val EMAIL_LENGTH = 127
     }
 }

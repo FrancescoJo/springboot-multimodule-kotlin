@@ -7,7 +7,9 @@ package com.github.fj.restapi.appconfig.mvc
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.component.account.AuthenticationObjectImpl
 import com.github.fj.restapi.exception.account.UnauthorisedException
+import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
+import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class ControllerParamsConfig : WebMvcConfigurer {
     override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
         argumentResolvers.add(UserArgumentResolver())
+        argumentResolvers.add(AccessTokenArgumentResolver())
     }
 
     private class UserArgumentResolver : HandlerMethodArgumentResolver {
@@ -40,5 +43,22 @@ class ControllerParamsConfig : WebMvcConfigurer {
 
         override fun supportsParameter(parameter: MethodParameter): Boolean =
                 parameter.parameterType == User::class.java
+    }
+
+    private class AccessTokenArgumentResolver : HandlerMethodArgumentResolver {
+        override fun resolveArgument(parameter: MethodParameter, mavContainer: ModelAndViewContainer?,
+                                     webRequest: NativeWebRequest, binderFactory: WebDataBinderFactory?): Any? {
+            val currentSecurityContext = SecurityContextHolder.getContext()?.authentication
+                    ?: return null
+
+            if (currentSecurityContext is AuthenticationObjectImpl) {
+                return currentSecurityContext.principal
+            } else {
+                throw UnknownAuthTokenException("Unable to detect current security context.")
+            }
+        }
+
+        override fun supportsParameter(parameter: MethodParameter): Boolean =
+                parameter.parameterType == AccessToken::class.java
     }
 }

@@ -66,7 +66,7 @@ class CreateAccountServiceTest {
         // and:
         `when`(mockUserRepo.findByGuestCredential(credentialArray))
                 .thenReturn(Optional.of(newRandomUser()))
-        `when`(mockUserRepo.findByBasicCredential(req.username ?: "", credentialArray))
+        `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.of(newRandomUser()))
 
         // expect:
@@ -85,7 +85,7 @@ class CreateAccountServiceTest {
         // and:
         `when`(mockUserRepo.findByGuestCredential(credentialArray))
                 .thenReturn(Optional.empty())
-        `when`(mockUserRepo.findByBasicCredential(req.username ?: "", credentialArray))
+        `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.empty())
         @Suppress("UnstableApiUsage")
         req.credential.toByteArray().let {

@@ -29,7 +29,7 @@ interface UserRepository : CrudRepository<User, Long> {
         SELECT u
         FROM User u
         WHERE u.loginType = com.github.fj.restapi.persistence.consts.account.LoginType.GUEST
-          AND u.accessToken = ?1
+          AND u.rawAccessToken = ?1
     """)
     fun findByGuestCredential(binaryCredential: ByteArray): Optional<User>
 
@@ -43,7 +43,7 @@ interface UserRepository : CrudRepository<User, Long> {
     @Query("""
         SELECT u
         FROM User u
-        WHERE u.accessToken = ?1
+        WHERE u.rawAccessToken = ?1
     """)
     fun findByAccessToken(rawAccessToken: ByteArray): Optional<User>
 }

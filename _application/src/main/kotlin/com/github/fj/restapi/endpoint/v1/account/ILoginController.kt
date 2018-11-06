@@ -5,21 +5,25 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.hello.HelloResponseDto
+import com.github.fj.restapi.dto.account.LoginRequestDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.vo.account.AccessToken
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import javax.validation.Valid
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 28 - Oct - 2018
  */
-@Api(value = "Login", description = "Asks an authentication challenge for access token.")
+@Api(value = "Login", description = "Asks an authentication challenge for access token. For guest " +
+        "users, last issued access token, which acts as password, is also required for re-authentication.")
 @RequestMapping(path = [ApiPaths.API_V1_ACCOUNT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         consumes = [MediaType.APPLICATION_JSON_VALUE])
@@ -32,5 +36,6 @@ interface ILoginController {
             ApiResponse(code = 401, message = "If given credential was tampered"),
             ApiResponse(code = 403, message = "If given credential was rejected by third party SSO providers"))
     @RequestMapping(method = [RequestMethod.PATCH])
-    fun onPatch(): AuthenticationResponseDto
+    fun onPatch(accessToken: AccessToken?,
+                @Valid @RequestBody request: LoginRequestDto): AuthenticationResponseDto
 }

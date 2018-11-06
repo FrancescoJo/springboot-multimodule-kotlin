@@ -97,7 +97,8 @@ class CustomErrorHandler : ErrorController {
     @RequestMapping(BASIC_ERROR_PATH)
     fun handleError(request: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
 //        val statusCode = request.getAttribute("javax.servlet.error.status_code") as Int
-        val exception = request.getAttribute("javax.servlet.error.exception") as Exception
+        val exception = request.getAttribute("javax.servlet.error.exception") as? Exception
+                ?: GeneralHttpException.create(HttpStatus.INTERNAL_SERVER_ERROR)
 
         return handleError(request, exception)
     }

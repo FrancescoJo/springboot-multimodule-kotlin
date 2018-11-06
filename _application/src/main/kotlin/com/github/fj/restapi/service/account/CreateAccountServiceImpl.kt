@@ -26,7 +26,6 @@ import io.seruco.encoding.base62.Base62
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.stereotype.Service
 import java.net.InetAddress
-import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
@@ -44,16 +43,10 @@ class CreateAccountServiceImpl @Inject constructor(
     override fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto {
         val maybeUser = when (req.loginType) {
-            LoginType.GUEST -> {
-                userRepo.findByGuestCredential(req.credential.toByteArray())
-            }
+            LoginType.GUEST -> userRepo.findByGuestCredential(req.credential.toByteArray())
             LoginType.BASIC -> {
-                val username = if (req.username.isNullOrUnicodeBlank()) {
-                    throw HttpMessageNotReadableException("User name must not be empty or blank.")
-                } else {
-                    requireNotNull(req.username)
-                }
-                userRepo.findByBasicCredential(username, req.credential.toByteArray())
+                val hashedCredential = authBusiness.hash(req.credential.toByteArray())
+                userRepo.findByBasicCredential(requireNotNull(req.username), hashedCredential)
             }
             else -> throw HttpMessageNotReadableException("${req.loginType} login is not supported.")
         }
@@ -112,23 +105,10 @@ class CreateAccountServiceImpl @Inject constructor(
                 lastActiveIp = ipAddr
             }
         }.apply {
-            val token = authBusiness.createAccessToken(this)
-            authEncoding = token.mode
-            authIv = token.iv.toByteArray()
-            accessToken = token.raw.toByteArray()
-            tokenIssuedDate = token.issuedTimestamp
+            setAccessToken(authBusiness.createAccessToken(this))
         }
         userRepo.save(user)
 
-        return AuthenticationResponseDto(
-                id = user.idToken,
-                nickname = user.member.nickname,
-                gender = user.member.gender,
-                status = user.status,
-                lastActiveTimestamp = user.member.lastActiveTimestamp?.utcEpochSecond() ?: 0L,
-                accessToken = (Base62.createInstance().encode(user.accessToken).toString(Charsets.UTF_8)),
-                suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
-                suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
-        )
+        return AuthenticationResponseDto.create(user)
     }
 }
