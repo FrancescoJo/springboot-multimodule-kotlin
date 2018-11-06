@@ -4,8 +4,10 @@
  */
 package com.github.fj.restapi.endpoint.v1.account
 
+import com.github.fj.restapi.appconfig.aop.LoggedActivity
 import com.github.fj.restapi.dto.account.ProfileResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.persistence.consts.UserActivity
 import com.github.fj.restapi.persistence.entity.User
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -32,5 +34,6 @@ interface IGetAccountController {
             ApiResponse(code = 403, message = "If user's privilege is not allowed to perform this request."))
 //    @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = [RequestMethod.GET])
+    @LoggedActivity(UserActivity.GET_PROFILE)
     fun onGet(user: User): ProfileResponseDto
 }

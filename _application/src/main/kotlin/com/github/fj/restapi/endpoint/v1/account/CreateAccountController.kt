@@ -23,13 +23,14 @@ import javax.validation.Valid
  */
 @AllOpen
 @RestController
-class CreateAccountController @Inject constructor(private val svc: CreateAccountService) :
-        ICreateAccountController {
+class CreateAccountController @Inject constructor(
+        private val svc: CreateAccountService
+) : ICreateAccountController {
     override fun onPost(@Valid @RequestBody request: CreateAccountRequestDto,
                         httpServletRequest: HttpServletRequest): AuthenticationResponseDto {
-        LOG.debug("Create account request: $request")
+        LOG.debug("Create account request: {}", request)
         svc.createAccount(request, httpServletRequest).let {
-            LOG.debug("Create account response: $it")
+            LOG.debug("Create account response: {}", it)
             return it
         }
     }

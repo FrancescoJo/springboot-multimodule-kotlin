@@ -5,6 +5,7 @@
 package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.AppProfile
 import com.github.fj.restapi.BuildConfig
 import com.github.fj.restapi.dto.AbstractResponseDto
@@ -40,6 +41,7 @@ import javax.servlet.http.HttpServletRequest
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 15 - Jan - 2018
  */
+@AllOpen
 @Controller
 @RestControllerAdvice
 class CustomErrorHandler : ErrorController {
@@ -128,9 +130,9 @@ class CustomErrorHandler : ErrorController {
             return
         } else {
             if (cause.cause == null) {
-                LOG.error("  by $cause")
+                LOG.error("  by {}", cause)
             } else {
-                LOG.error("  by ${cause::class}")
+                LOG.error("  by P{", cause::class)
                 logCauses(cause.cause)
             }
         }

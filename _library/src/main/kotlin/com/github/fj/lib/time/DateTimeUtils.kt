@@ -6,10 +6,19 @@
  */
 package com.github.fj.lib.time
 
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.*
+
+/**
+ * Any database compliant minimum LocalDateTime
+ * Use this value if [java.time.LocalDateTime.MIN] underflows in your DBMS.
+ */
+val LOCAL_DATE_TIME_MIN: LocalDateTime = LocalDateTime.of(2000, Month.JANUARY, 1, 0, 0, 0, 0)
+
+/**
+ * Any database compliant minimum LocalDateTime
+ * Use this value if [java.time.LocalDateTime.MAX] overflows in your DBMS.
+ */
+val LOCAL_DATE_TIME_MAX: LocalDateTime = LocalDateTime.of(9999, Month.DECEMBER, 31, 23, 59, 59, 0)
 
 fun utcNow(): LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
 

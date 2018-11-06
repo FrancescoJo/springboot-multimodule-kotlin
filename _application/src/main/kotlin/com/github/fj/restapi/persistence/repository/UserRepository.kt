@@ -22,6 +22,7 @@ interface UserRepository : CrudRepository<User, Long> {
         WHERE u.loginType = com.github.fj.restapi.persistence.consts.account.LoginType.BASIC
           AND u.name = ?1
           AND u.credential = ?2
+          AND u.status = com.github.fj.restapi.persistence.consts.account.Status.NORMAL
     """)
     fun findByBasicCredential(name: String, binaryCredential: ByteArray): Optional<User>
 
@@ -30,6 +31,7 @@ interface UserRepository : CrudRepository<User, Long> {
         FROM User u
         WHERE u.loginType = com.github.fj.restapi.persistence.consts.account.LoginType.GUEST
           AND u.rawAccessToken = ?1
+          AND u.status = com.github.fj.restapi.persistence.consts.account.Status.NORMAL
     """)
     fun findByGuestCredential(binaryCredential: ByteArray): Optional<User>
 
@@ -37,6 +39,7 @@ interface UserRepository : CrudRepository<User, Long> {
         SELECT u
         FROM User u
         WHERE u.idToken = ?1
+          AND u.status = com.github.fj.restapi.persistence.consts.account.Status.NORMAL
     """)
     fun findByIdToken(idToken: String): Optional<User>
 
@@ -44,6 +47,7 @@ interface UserRepository : CrudRepository<User, Long> {
         SELECT u
         FROM User u
         WHERE u.rawAccessToken = ?1
+          AND u.status = com.github.fj.restapi.persistence.consts.account.Status.NORMAL
     """)
     fun findByAccessToken(rawAccessToken: ByteArray): Optional<User>
 }

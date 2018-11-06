@@ -159,7 +159,7 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
   For your own configuration, read the official document and modify `gradle/scripts/static-analysis-detekt.gradle` file.
 
 ## TO-DOs
-- Spring security: Delete account
+- Logging with AOP
 - Make Pre/Post authorise works properly
 - Make Create - Get - Login - Delete scenario test
 - Fix all tests

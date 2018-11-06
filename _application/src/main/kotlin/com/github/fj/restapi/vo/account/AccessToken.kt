@@ -5,6 +5,7 @@
 package com.github.fj.restapi.vo.account
 
 import com.github.fj.lib.annotation.UndefinableEnum
+import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.restapi.persistence.entity.User
 import java.time.LocalDateTime
 
@@ -33,7 +34,7 @@ data class AccessToken(
     companion object {
         val EMPTY = AccessToken(
                 emptyList(), Encoded.UNDEFINED, emptyList(), "", 0,
-                LocalDateTime.MIN, LocalDateTime.MIN)
+                LOCAL_DATE_TIME_MIN, LOCAL_DATE_TIME_MIN)
     }
 
     @UndefinableEnum

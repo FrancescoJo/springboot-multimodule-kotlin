@@ -4,10 +4,11 @@
  */
 package com.github.fj.restapi.endpoint.v1.account
 
+import com.github.fj.restapi.appconfig.aop.LoggedActivity
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.hello.HelloResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.persistence.consts.UserActivity
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
@@ -35,6 +36,7 @@ interface ICreateAccountController {
             ApiResponse(code = 400, message = "If request is malformed, nickname is not permitted or already exists."),
             ApiResponse(code = 403, message = "If an account with same identity is already created"))
     @RequestMapping(method = [RequestMethod.POST])
+    @LoggedActivity(UserActivity.CREATE_ACCOUNT)
     fun onPost(@Valid @RequestBody request: CreateAccountRequestDto,
                httpServletRequest: HttpServletRequest): AuthenticationResponseDto
 }

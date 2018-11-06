@@ -7,6 +7,7 @@ package com.github.fj.restapi.persistence.entity
 import com.github.fj.lib.net.InetAddressExtensions
 import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.indentToString
+import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.lib.util.EmptyObject
 import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.consts.account.LoginType
@@ -72,7 +73,7 @@ class User : Serializable {
     var email: String = ""
 
     @Column(name = "created_date", nullable = false)
-    var createdDate: LocalDateTime = LocalDateTime.MIN
+    var createdDate: LocalDateTime = LOCAL_DATE_TIME_MIN
 
     @Convert(converter = ByteArrayInetAddressConverter::class)
     @Column(name = "created_ip", nullable = false, columnDefinition = "VARBINARY(16)")

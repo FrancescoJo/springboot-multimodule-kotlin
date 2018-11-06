@@ -31,7 +31,7 @@ class LoginController @Inject constructor(
 ) : ILoginController {
     override fun onPatch(accessToken: AccessToken?,
                          @Valid @RequestBody request: LoginRequestDto): AuthenticationResponseDto {
-        LOG.debug("Login request: $request")
+        LOG.debug("Login request: {}", request)
 
         return when (request.loginType) {
             LoginType.GUEST -> {

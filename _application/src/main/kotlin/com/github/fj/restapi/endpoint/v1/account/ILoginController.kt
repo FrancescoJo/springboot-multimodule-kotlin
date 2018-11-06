@@ -4,9 +4,11 @@
  */
 package com.github.fj.restapi.endpoint.v1.account
 
+import com.github.fj.restapi.appconfig.aop.LoggedActivity
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.account.LoginRequestDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.persistence.consts.UserActivity
 import com.github.fj.restapi.vo.account.AccessToken
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -36,6 +38,7 @@ interface ILoginController {
             ApiResponse(code = 401, message = "If given credential was tampered"),
             ApiResponse(code = 403, message = "If given credential was rejected by third party SSO providers"))
     @RequestMapping(method = [RequestMethod.PATCH])
+    @LoggedActivity(UserActivity.LOG_IN)
     fun onPatch(accessToken: AccessToken?,
                 @Valid @RequestBody request: LoginRequestDto): AuthenticationResponseDto
 }

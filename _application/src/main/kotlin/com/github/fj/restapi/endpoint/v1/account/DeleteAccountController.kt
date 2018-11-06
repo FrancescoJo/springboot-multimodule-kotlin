@@ -7,10 +7,11 @@ package com.github.fj.restapi.endpoint.v1.account
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.dto.account.DeleteAccountRequestDto
 import com.github.fj.restapi.dto.account.DeleteAccountResponseDto
-import com.github.fj.restapi.dto.hello.HelloResponseDto
 import com.github.fj.restapi.persistence.entity.User
-import org.springframework.security.access.prepost.PreAuthorize
+import com.github.fj.restapi.service.account.DeleteAccountService
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.RestController
+import javax.inject.Inject
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -18,14 +19,15 @@ import org.springframework.web.bind.annotation.RestController
  */
 @AllOpen
 @RestController
-class DeleteAccountController : IDeleteAccountController {
-//    override fun onDelete(): DeleteAccountResponseDto = onDelete(null)
-
+class DeleteAccountController @Inject constructor(
+        private val svc: DeleteAccountService
+) : IDeleteAccountController {
     override fun onDelete(user: User, deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto {
+        LOG.debug("Delete account request: {}", user)
+        return svc.deleteAccount(user, deleteReason)
+    }
 
-        println(">>>> onDelete")
-
-
-        TODO("onDelete: Under development")
+    companion object {
+        private val LOG = LoggerFactory.getLogger(DeleteAccountController::class.java)
     }
 }

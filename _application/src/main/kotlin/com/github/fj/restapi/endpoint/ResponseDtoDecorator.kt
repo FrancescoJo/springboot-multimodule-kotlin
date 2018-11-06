@@ -5,6 +5,7 @@
 package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.dto.AbstractResponseDto
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 22 - Oct - 2018
  */
+@AllOpen
 @RestControllerAdvice
 class ResponseDtoDecorator : ResponseBodyAdvice<Any> {
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {
