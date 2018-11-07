@@ -14,8 +14,11 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 /**
+ * Logs all requests in our favourite fashion.
+ *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 23 - Aug - 2018
+ * @see org.springframework.web.filter.CommonsRequestLoggingFilter
  */
 @Component
 class RequestLoggingInterceptor: HandlerInterceptorAdapter() {

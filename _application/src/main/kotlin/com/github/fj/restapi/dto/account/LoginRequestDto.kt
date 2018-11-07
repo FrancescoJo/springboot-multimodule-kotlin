@@ -7,6 +7,7 @@ package com.github.fj.restapi.dto.account
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.github.fj.lib.util.EmptyObject
+import com.github.fj.lib.util.ProtectedProperty
 import com.github.fj.restapi.helper.validation.NullsafeValidator
 import com.github.fj.restapi.helper.validation.ValidationFailures
 import com.github.fj.restapi.persistence.consts.account.LoginType
@@ -32,7 +33,7 @@ data class LoginRequestDto(
 
         @ApiModelProperty("Could be a password, 3rd party SSO access token, etc.", example = "", required = true)
         @JsonProperty
-        val credential: String = "",
+        val credential: ProtectedProperty<String> = ProtectedProperty(""),
 
         @ApiModelProperty("Login type. Read document for supported login types.", example = "b", required = true)
         @JsonProperty
@@ -60,9 +61,9 @@ data class LoginRequestDto(
             override fun validateNonNull(target: LoginRequestDto, e: Errors): ValidationFailures? =
                     with(target) {
                         return@with when {
-                            loginType == LoginType.BASIC && (username.isBlank() || credential.isBlank()) ->
+                            loginType == LoginType.BASIC && (username.isBlank() || credential.value.isBlank()) ->
                                 ValidationFailures.VALUE_INSUFFICIENT
-                            loginType == LoginType.GUEST && (!username.isBlank() || !credential.isBlank()) ->
+                            loginType == LoginType.GUEST && (!username.isBlank() || !credential.value.isBlank()) ->
                                 ValidationFailures.VALUE_UNNECESSARY
                             loginType == LoginType.UNDEFINED || platformType == PlatformType.UNDEFINED ||
                                     platformVersion.isEmpty() || appVersion.isEmpty() ->

@@ -18,6 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 import javax.validation.Valid
 
 /**
@@ -39,6 +40,7 @@ interface ILoginController {
             ApiResponse(code = 403, message = "If given credential was rejected by third party SSO providers"))
     @RequestMapping(method = [RequestMethod.PATCH])
     @LoggedActivity(UserActivity.LOG_IN)
+    @ResponseBody
     fun onPatch(accessToken: AccessToken?,
                 @Valid @RequestBody request: LoginRequestDto): AuthenticationResponseDto
 }

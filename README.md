@@ -160,11 +160,11 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 
 ## TO-DOs
 - Logging with AOP
-- Make Pre/Post authorise works properly
 - Make Create - Get - Login - Delete scenario test
 - Fix all tests
-- JWT Token support
+- Make Pre/Post authorise works properly
 - Bugfix on FCMClient
+- JWT Token support
 - Update Spring boot
 - non-JPA implementation
 - Flatten all commit history

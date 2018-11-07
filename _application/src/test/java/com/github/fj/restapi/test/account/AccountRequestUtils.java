@@ -7,6 +7,7 @@ package com.github.fj.restapi.test.account;
 import com.github.fj.lib.collection.ArrayUtilsKt;
 import com.github.fj.lib.text.SemanticVersion;
 import com.github.fj.lib.text.StringUtilsKt;
+import com.github.fj.lib.util.ProtectedProperty;
 import com.github.fj.restapi.dto.account.CreateAccountRequestDto;
 import com.github.fj.restapi.persistence.consts.account.LoginType;
 import com.github.fj.restapi.persistence.consts.account.PlatformType;
@@ -34,9 +35,9 @@ public final class AccountRequestUtils {
 
     public static CreateAccountRequestDto newRandomCreateAccountRequest(final LoginType loginType) {
         return new CreateAccountRequestDto(
-                /*pushToken=*/       StringUtilsKt.getRandomAlphaNumericString(63),
+                /*pushToken=*/       new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63)),
                 /*username=*/        StringUtilsKt.getRandomAlphaNumericString(31),
-                /*credential=*/      StringUtilsKt.getRandomAlphaNumericString(63),
+                /*credential=*/      new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63)),
                 /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(15),  // For Test
                 /*gender=*/          null,
                 /*loginType=*/       loginType,

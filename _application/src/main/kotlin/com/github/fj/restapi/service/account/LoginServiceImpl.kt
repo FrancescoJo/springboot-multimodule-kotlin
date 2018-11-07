@@ -45,7 +45,7 @@ class LoginServiceImpl @Inject constructor(
 
     override fun basicLogin(request: LoginRequestDto): AuthenticationResponseDto {
         val user = userRepo.findByBasicCredential(requireNotNull(request.username),
-                authBusiness.hash(request.credential.toByteArray())).ensure()
+                authBusiness.hash(request.credential.value.toByteArray())).ensure()
 
         /*
          * Because user is already authenticated so just issuing a new Access Token is cheaper

@@ -12,6 +12,7 @@ object ApiPaths {
     const val HELLO = "/hello"
 
     const val V1 = "v1"
+    const val CURRENT_VERSION = V1
 
     const val API = "/api"
     const val API_V1 = "$API/$V1"

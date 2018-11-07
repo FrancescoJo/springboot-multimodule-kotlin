@@ -7,14 +7,15 @@ package com.github.fj.restapi.appconfig.mvc.security.internal
 import com.github.fj.lib.text.matchesIn
 import com.github.fj.restapi.appconfig.mvc.security.HttpAuthScheme
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.util.matcher.RequestMatcher
 import org.springframework.web.filter.GenericFilterBean
 import java.util.regex.Pattern
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 /**
  * This filter attempts to locate `Authorization` header in user request and parses it via
@@ -23,14 +24,31 @@ import javax.servlet.http.HttpServletRequest
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 04 - Nov - 2018
  */
-class HttpServletRequestAuthorizationHeaderFilter(private val log: Logger) : GenericFilterBean() {
+class HttpServletRequestAuthorizationHeaderFilter(
+        private val log: Logger,
+        private val excludeMatchers: List<RequestMatcher>
+) : GenericFilterBean() {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        val token = findAuthorizationHeader(log, request)
+        val req = request as? HttpServletRequest
+        val resp = response as? HttpServletResponse
+        if (req == null || resp == null) {
+            log.w("Cannot accept requests other than HttpServletRequest.")
+            chain.doFilter(request, response)
+            return
+        }
+
+        if (excludeMatchers.any { it.matches(request) }) {
+            log.t("This request does not seems requiring any authentication.")
+            chain.doFilter(req, resp)
+            return
+        }
+
+        val token = findAuthorizationHeader(log, req)
         if (token != null) {
             SecurityContextHolder.getContext().authentication = token
         }
 
-        chain.doFilter(request, response)
+        chain.doFilter(req, resp)
     }
 
     companion object {
@@ -39,20 +57,18 @@ class HttpServletRequestAuthorizationHeaderFilter(private val log: Logger) : Gen
 
         private val AUTHORIZATION_SYNTAX = Pattern.compile("[A-Za-z]+ [A-Za-z0-9]+")
 
-        fun findAuthorizationHeader(log: Logger, request: ServletRequest): HttpAuthorizationToken? {
-            if (request !is HttpServletRequest) {
-                log.t("Not a HTTP request: {}", request)
-                return null
-            }
+        fun findAuthorizationHeader(request: HttpServletRequest): HttpAuthorizationToken? =
+                findAuthorizationHeader(null, request)
 
+        fun findAuthorizationHeader(log: Logger? = null, request: HttpServletRequest): HttpAuthorizationToken? {
             return request.getHeader(HEADER_AUTHORIZATION).let { h ->
                 if (h.isNullOrEmpty()) {
-                    log.t("No {} header in the request.", HEADER_AUTHORIZATION)
+                    log?.t("No {} header in the request.", HEADER_AUTHORIZATION)
                     return null
                 }
 
                 if (!h.matchesIn(AUTHORIZATION_SYNTAX)) {
-                    log.t("{} header does not match the syntax: '{}'", HEADER_AUTHORIZATION, h)
+                    log?.t("{} header does not match the syntax: '{}'", HEADER_AUTHORIZATION, h)
                     return null
                 }
 
@@ -64,6 +80,10 @@ class HttpServletRequestAuthorizationHeaderFilter(private val log: Logger) : Gen
 
         private fun Logger.t(message: String, vararg arguments: Any) {
             trace(String.format("[RequestFilter] %s", message), arguments)
+        }
+
+        private fun Logger.w(message: String, vararg arguments: Any) {
+            warn(String.format("[RequestFilter] %s", message), arguments)
         }
     }
 }

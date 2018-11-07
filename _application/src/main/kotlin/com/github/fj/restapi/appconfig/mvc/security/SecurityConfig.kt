@@ -18,6 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.util.matcher.RequestMatcher
 import javax.inject.Inject
 
 /**
@@ -39,7 +41,8 @@ class SecurityConfig @Inject constructor(
     }
 
     override fun configure(http: HttpSecurity) {
-        http.addFilterBefore(HttpServletRequestAuthorizationHeaderFilter(LOG), BasicAuthenticationFilter::class.java)
+        http.addFilterBefore(HttpServletRequestAuthorizationHeaderFilter(LOG, FILTER_EXCLUDE_REQUESTS.toList()),
+                BasicAuthenticationFilter::class.java)
                 .cors().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -49,8 +52,7 @@ class SecurityConfig @Inject constructor(
                 .authorizeRequests()
                 // Restrict Spring actuator access except from localhost for security
                 .antMatchers("/actuator/**").hasIpAddress("localhost")
-                .antMatchers(HttpMethod.POST, ApiPaths.API_V1_ACCOUNT).permitAll()
-                .antMatchers(HttpMethod.PATCH, ApiPaths.API_V1_ACCOUNT).permitAll()
+                .requestMatchers(*FILTER_EXCLUDE_REQUESTS).permitAll()
                 .antMatchers("${ApiPaths.API}/**").authenticated()
                 .and()
                 .formLogin()
@@ -63,6 +65,11 @@ class SecurityConfig @Inject constructor(
     }
 
     companion object {
+        private val FILTER_EXCLUDE_REQUESTS = arrayOf(
+                AntPathRequestMatcher(ApiPaths.API_V1_ACCOUNT, HttpMethod.POST.toString()),
+                AntPathRequestMatcher(ApiPaths.API_V1_ACCOUNT, HttpMethod.PATCH.toString())
+        )
+
         private val LOG = LoggerFactory.getLogger(SecurityConfig::class.java)
     }
 }

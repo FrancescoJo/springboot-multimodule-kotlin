@@ -61,7 +61,7 @@ class CreateAccountServiceTest {
     fun `CreateAccountService fails for already existing user`(loginType: LoginType) {
         // given:
         val req = newRandomCreateAccountRequest(loginType)
-        val credentialArray = req.credential.toByteArray()
+        val credentialArray = req.credential.value.toByteArray()
 
         // and:
         `when`(mockUserRepo.findByGuestCredential(credentialArray))
@@ -80,7 +80,7 @@ class CreateAccountServiceTest {
         // given:
         val req = newRandomCreateAccountRequest()
         val httpReq = HttpRequestUtils.newMockHttpServletRequestByLocalhost()
-        val credentialArray = req.credential.toByteArray()
+        val credentialArray = req.credential.value.toByteArray()
 
         // and:
         `when`(mockUserRepo.findByGuestCredential(credentialArray))
@@ -88,7 +88,7 @@ class CreateAccountServiceTest {
         `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.empty())
         @Suppress("UnstableApiUsage")
-        req.credential.toByteArray().let {
+        req.credential.value.toByteArray().let {
             `when`(mockAuthBusiness.hash(it))
                     .thenReturn(com.google.common.hash.Hashing.goodFastHash(it.size * 8).hashBytes(it).asBytes())
         }

@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiResponses
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -35,5 +36,6 @@ interface IGetAccountController {
 //    @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = [RequestMethod.GET])
     @LoggedActivity(UserActivity.GET_PROFILE)
+    @ResponseBody
     fun onGet(user: User): ProfileResponseDto
 }

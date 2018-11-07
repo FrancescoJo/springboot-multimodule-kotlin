@@ -82,9 +82,14 @@ class CustomErrorHandler : ErrorController {
                 AbstractResponseDto.error("Cannot process given request.", reason)
             }
             else -> {
-                logError("Unhandled exception:", ex)
-                status = getStatus(req)
-                AbstractResponseDto.error("Unhandled internal server error")
+                if (ex.cause is Exception) {
+                    return handleError(req, ex.cause as Exception)
+                } else {
+                    // is Exception is wrapped?
+                    logError("Unhandled exception:", ex)
+                    status = getStatus(req)
+                    AbstractResponseDto.error("Unhandled internal server error")
+                }
             }
         }
 

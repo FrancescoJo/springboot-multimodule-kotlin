@@ -17,6 +17,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
@@ -37,6 +38,7 @@ interface ICreateAccountController {
             ApiResponse(code = 403, message = "If an account with same identity is already created"))
     @RequestMapping(method = [RequestMethod.POST])
     @LoggedActivity(UserActivity.CREATE_ACCOUNT)
+    @ResponseBody
     fun onPost(@Valid @RequestBody request: CreateAccountRequestDto,
                httpServletRequest: HttpServletRequest): AuthenticationResponseDto
 }

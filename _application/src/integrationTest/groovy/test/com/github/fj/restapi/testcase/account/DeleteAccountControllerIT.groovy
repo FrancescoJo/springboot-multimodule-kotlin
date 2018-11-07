@@ -25,7 +25,7 @@ class DeleteAccountControllerIT extends IntegrationTestBase {
         final request = new DeleteAccountRequestDto("Test deletion")
 
         when:
-        final responseSpec = testClient(accountInfo.accessToken)
+        final responseSpec = testClient(accountInfo.accessToken.value)
                 .method(HttpMethod.DELETE)
                 .uri("${ApiPaths.API_V1_ACCOUNT}")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)

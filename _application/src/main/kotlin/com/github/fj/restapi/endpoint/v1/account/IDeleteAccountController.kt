@@ -18,6 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -37,5 +38,6 @@ interface IDeleteAccountController {
 //    @PreAuthorize("hasRole('USER')")
     @RequestMapping(method = [RequestMethod.DELETE])
     @LoggedActivity(UserActivity.DELETE_ACCOUNT)
+    @ResponseBody
     fun onDelete(user: User, @RequestBody deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto
 }

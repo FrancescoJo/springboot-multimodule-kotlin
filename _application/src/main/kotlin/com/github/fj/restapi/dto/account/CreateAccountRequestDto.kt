@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.github.fj.lib.text.isNullOrUnicodeBlank
 import com.github.fj.lib.util.EmptyObject
+import com.github.fj.lib.util.ProtectedProperty
 import com.github.fj.restapi.helper.validation.NullsafeValidator
 import com.github.fj.restapi.helper.validation.ValidEmail
 import com.github.fj.restapi.helper.validation.ValidationFailures
@@ -28,7 +29,7 @@ import org.springframework.validation.Errors
 data class CreateAccountRequestDto @JvmOverloads constructor(
         @ApiModelProperty("Firebase Cloud Messaging push token.", example = "<FCM PUSH TOKEN>", required = true)
         @JsonProperty
-        val pushToken: String = "",
+        val pushToken: ProtectedProperty<String> = ProtectedProperty(""),
 
         @ApiModelProperty("A user name, must not be empty and must be ${User.MINIMUM_NAME_LENGTH} - " +
                 "${User.MAXIMUM_NAME_LENGTH} alphanumeric letters long if the the loginType is " +
@@ -39,7 +40,7 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
 
         @ApiModelProperty("Could be a password, 3rd party SSO access token, etc.", example = "", required = true)
         @JsonProperty
-        val credential: String = "",
+        val credential: ProtectedProperty<String> = ProtectedProperty(""),
 
         @ApiModelProperty("A nickname, must be 2 to 16 letters.", example = "Good nickname", required = true)
         @JsonProperty
@@ -78,7 +79,7 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
         val invitedBy: String? = ""
 ) {
     companion object : EmptyObject<CreateAccountRequestDto> {
-        override val EMPTY = CreateAccountRequestDto("")
+        override val EMPTY = CreateAccountRequestDto()
 
         val VALIDATOR = object : NullsafeValidator<CreateAccountRequestDto> {
             override fun supports(klass: Class<*>) =
@@ -87,13 +88,13 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
             override fun validateNonNull(target: CreateAccountRequestDto, e: Errors): ValidationFailures? =
                     with(target) {
                         return@with when {
-                            loginType == LoginType.BASIC && (username.isBlank() || credential.isBlank()) ->
+                            loginType == LoginType.BASIC && (username.isBlank() || credential.value.isBlank()) ->
                                 ValidationFailures.VALUE_INSUFFICIENT
                             loginType == LoginType.BASIC && (
                                     requireNotNull(username).length < User.MINIMUM_NAME_LENGTH ||
                                             requireNotNull(username).length > User.MAXIMUM_NAME_LENGTH) ->
                                 ValidationFailures.VALUE_INSUFFICIENT
-                            loginType == LoginType.GUEST && (!username.isBlank() || !credential.isBlank()) ->
+                            loginType == LoginType.GUEST && (!username.isBlank() || !credential.value.isBlank()) ->
                                 ValidationFailures.VALUE_UNNECESSARY
                             loginType == LoginType.UNDEFINED || platformType == PlatformType.UNDEFINED ||
                                     platformVersion.isEmpty() || appVersion.isEmpty() ->

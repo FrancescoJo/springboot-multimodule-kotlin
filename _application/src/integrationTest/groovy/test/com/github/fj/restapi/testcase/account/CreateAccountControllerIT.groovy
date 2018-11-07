@@ -48,7 +48,7 @@ class CreateAccountControllerIT extends IntegrationTestBase {
         final result = AccountUtils.createRandomAccount(this)
 
         then:
-        !result.accessToken.empty
+        !result.accessToken.value.empty
         result.status == Status.NORMAL
     }
 }

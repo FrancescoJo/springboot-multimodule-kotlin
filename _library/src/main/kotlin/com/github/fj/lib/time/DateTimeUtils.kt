@@ -20,18 +20,6 @@ val LOCAL_DATE_TIME_MIN: LocalDateTime = LocalDateTime.of(2000, Month.JANUARY, 1
  */
 val LOCAL_DATE_TIME_MAX: LocalDateTime = LocalDateTime.of(9999, Month.DECEMBER, 31, 23, 59, 59, 0)
 
-/**
- * Any database compliant minimum LocalDateTime
- * Use this value if [java.time.LocalDateTime.MIN] underflows in your DBMS.
- */
-val MIN_LOCAL_DATE_TIME: LocalDateTime = LocalDateTime.of(2000, Month.JANUARY, 1, 0, 0, 0, 0)
-
-/**
- * Any database compliant minimum LocalDateTime
- * Use this value if [java.time.LocalDateTime.MAX] overflows in your DBMS.
- */
-val MAX_LOCAL_DATE_TIME: LocalDateTime = LocalDateTime.of(9999, Month.DECEMBER, 31, 23, 59, 59, 0)
-
 fun utcNow(): LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
 
 fun LocalDateTime.utcEpochSecond(): Long = this.toEpochSecond(ZoneOffset.UTC)

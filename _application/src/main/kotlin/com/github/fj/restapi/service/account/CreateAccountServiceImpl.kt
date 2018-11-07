@@ -43,9 +43,9 @@ class CreateAccountServiceImpl @Inject constructor(
     override fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto {
         val maybeUser = when (req.loginType) {
-            LoginType.GUEST -> userRepo.findByGuestCredential(req.credential.toByteArray())
+            LoginType.GUEST -> userRepo.findByGuestCredential(req.credential.value.toByteArray())
             LoginType.BASIC -> {
-                val hashedCredential = authBusiness.hash(req.credential.toByteArray())
+                val hashedCredential = authBusiness.hash(req.credential.value.toByteArray())
                 userRepo.findByBasicCredential(requireNotNull(req.username), hashedCredential)
             }
             else -> throw HttpMessageNotReadableException("${req.loginType} login is not supported.")
@@ -81,7 +81,7 @@ class CreateAccountServiceImpl @Inject constructor(
             email = req.email ?: ""
             createdDate = now
             createdIp = ipAddr
-            pushToken = req.pushToken
+            pushToken = req.pushToken.value
             invitedBy = if (req.invitedBy.isNullOrUnicodeBlank()) {
                 Optional.empty()
             } else {
@@ -95,7 +95,7 @@ class CreateAccountServiceImpl @Inject constructor(
             }
             credential = when (req.loginType) {
                 LoginType.GUEST -> ByteArray(0)
-                LoginType.BASIC -> authBusiness.hash(req.credential.toByteArray())
+                LoginType.BASIC -> authBusiness.hash(req.credential.value.toByteArray())
                 else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
             }
             member = Membership().apply {

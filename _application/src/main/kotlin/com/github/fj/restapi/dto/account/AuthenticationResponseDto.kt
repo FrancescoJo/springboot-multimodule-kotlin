@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.github.fj.lib.time.utcEpochSecond
+import com.github.fj.lib.util.ProtectedProperty
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.entity.User
@@ -51,7 +52,7 @@ data class AuthenticationResponseDto(
                 "Clients must store this information in a secure storage and keep it secret" +
                 "as best as possible.", example = "<ENCODED TEXT>", required = true)
         @JsonProperty
-        val accessToken: String,
+        val accessToken: ProtectedProperty<String>,
 
         @ApiModelProperty("An UNIX timestamp that will appear if a user account is " +
                 "banned or suspended in certain timespan. Field may not found or the value will be 0" +
@@ -72,7 +73,8 @@ data class AuthenticationResponseDto(
                 gender = user.member.gender,
                 status = user.status,
                 lastActiveTimestamp = user.member.lastActiveTimestamp?.utcEpochSecond() ?: 0L,
-                accessToken = (Base62.createInstance().encode(user.rawAccessToken).toString(Charsets.UTF_8)),
+                accessToken = ProtectedProperty(Base62.createInstance().encode(user.rawAccessToken)
+                        .toString(Charsets.UTF_8)),
                 suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
                 suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
         )
