@@ -13,7 +13,7 @@ jar {
 }
 
 dependencies {
-    compile project(":_library")
+    compile project(":app_lib")
 
     compile "com.google.api-client:google-api-client:$version_google_api_client"
     compile "com.google.code.gson:gson:$version_gson"
