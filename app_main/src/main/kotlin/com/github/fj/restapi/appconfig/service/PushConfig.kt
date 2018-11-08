@@ -4,8 +4,8 @@
  */
 package com.github.fj.restapi.appconfig.service
 
-import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.fcmclient.SimpleFcmPushSender
+import com.github.fj.lib.annotation.AllOpen
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean

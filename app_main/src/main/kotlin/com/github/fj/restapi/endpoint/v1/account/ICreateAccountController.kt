@@ -5,8 +5,8 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.restapi.appconfig.aop.LoggedActivity
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
+import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.UserActivity
 import io.swagger.annotations.Api

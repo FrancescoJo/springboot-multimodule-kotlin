@@ -15,4 +15,7 @@ dependencies {
     compile "com.google.code.findbugs:jsr305:3.0.2"
     compile "de.skuzzle:semantic-version:1.2.0"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0"
+
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$version_jackson"
+    compile "com.fasterxml.jackson.core:jackson-core:$version_jackson"
 }

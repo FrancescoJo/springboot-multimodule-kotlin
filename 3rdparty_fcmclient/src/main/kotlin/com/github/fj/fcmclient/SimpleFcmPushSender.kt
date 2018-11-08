@@ -4,10 +4,10 @@
  */
 package com.github.fj.fcmclient
 
-import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.HTTP_V1
-import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.LEGACY
 import com.github.fj.fcmclient.PushPlatform.ANDROID
 import com.github.fj.fcmclient.PushPlatform.IOS
+import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.HTTP_V1
+import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.LEGACY
 import com.github.fj.fcmclient.httpv1.FcmHttpV1Client
 import com.github.fj.fcmclient.legacy.FcmLegacyClient
 import com.github.fj.fcmclient.legacy.ValidateKeyResponse

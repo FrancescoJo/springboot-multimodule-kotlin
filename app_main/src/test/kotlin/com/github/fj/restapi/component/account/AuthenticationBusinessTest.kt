@@ -4,21 +4,6 @@
  */
 package com.github.fj.restapi.component.account
 
-import com.github.fj.lib.collection.getRandomBytes
-import com.github.fj.restapi.appconfig.AppProperties
-import com.github.fj.restapi.vo.account.AccessToken
-import com.github.fj.restapi.test.account.AccountRequestUtils
-import com.google.common.io.BaseEncoding
-import io.seruco.encoding.base62.Base62
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import javax.servlet.http.HttpServletRequest
-
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 31 - Oct - 2018

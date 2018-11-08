@@ -6,8 +6,6 @@
  */
 package com.github.fj.lib.annotation
 
-import kotlin.annotation.Target
-
 /**
  * Annotates a type is designed only for unit tests.
  *

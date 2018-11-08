@@ -4,7 +4,6 @@
  */
 package test.com.github.fj.restapi.testcase.account
 
-
 import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.account.Status
 import org.springframework.http.MediaType

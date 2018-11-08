@@ -7,6 +7,7 @@ sourceCompatibility = jvmSrcVersion
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version_kotlin"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$version_kotlin"
 }
 
 compileKotlin {

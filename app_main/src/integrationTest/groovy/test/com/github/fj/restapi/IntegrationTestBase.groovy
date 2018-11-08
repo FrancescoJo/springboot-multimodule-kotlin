@@ -4,20 +4,24 @@
  */
 package test.com.github.fj.restapi
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect
-import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.fj.restapi.Application
 import com.github.fj.restapi.appconfig.mvc.security.HttpAuthScheme
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.dto.AbstractResponseDto
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
+import org.springframework.http.codec.json.Jackson2JsonDecoder
+import org.springframework.http.codec.json.Jackson2JsonEncoder
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.client.ExchangeStrategies
 import spock.lang.Specification
 import test.com.github.fj.restapi.appconfig.IntegrationTestConfigurations
+
+import javax.annotation.Nonnull
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT
 
@@ -34,20 +38,39 @@ abstract class IntegrationTestBase extends Specification {
     @Value("\${server.port}")
     private int portValue
 
+    @Autowired
+    private ObjectMapper objMapper
+
     WebTestClient testClient() {
-        return WebTestClient
-                .bindToServer()
-                .baseUrl("http://localhost:$portValue")
-                .build()
+        return testClient("")
     }
 
-    WebTestClient testClient(final String accessToken) {
+    WebTestClient testClient(final @Nonnull String accessToken) {
+        return newBasicWebTestClient().with {
+            if (!accessToken.isEmpty()) {
+                defaultHeader(HttpServletRequestAuthorizationHeaderFilter.HEADER_AUTHORIZATION,
+                        "${HttpAuthScheme.TOKEN.typeValue} $accessToken")
+                defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                // filter(logTransport())
+            }
+            return build()
+        }
+    }
+
+    private WebTestClient.Builder newBasicWebTestClient() {
+        // There'll be groovyc error without this explicit local reference declaration
+        final mapper = objMapper
+
+        // https://github.com/spring-projects/spring-boot/issues/8630
+        // Yet WebTestClient does not honour default application configuration [08 - Nov - 2018]
         return WebTestClient
                 .bindToServer()
                 .baseUrl("http://localhost:$portValue")
-                .defaultHeader(HttpServletRequestAuthorizationHeaderFilter.HEADER_AUTHORIZATION,
-                "${HttpAuthScheme.TOKEN.typeValue} $accessToken")
-                .build()
+                .exchangeStrategies(ExchangeStrategies.builder().codecs({ configurer ->
+                    configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(mapper))
+                    configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(mapper))
+                })
+                .build())
     }
 
     static <T> Closure<T> extractResponseAs(final Class<T> resultType) {
@@ -55,14 +78,11 @@ abstract class IntegrationTestBase extends Specification {
             assert (response instanceof AbstractResponseDto), response
             final body = (response as AbstractResponseDto).body
 
-            final newMapper = new ObjectMapper().with {
-                registerModule(new KotlinModule())
-                // To tell Jackson ObjectMapper not to serialise/deserialse inherited getter/setter methods
-                setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
-                setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-            }
+            // mappe
 
-            return newMapper.convertValue(body, resultType) as T
+            return null
+
+//            return newMapper.convertValue(body, resultType) as T
         }
     }
 }

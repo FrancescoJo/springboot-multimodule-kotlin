@@ -5,14 +5,9 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.account.DeleteAccountRequestDto
-import com.github.fj.restapi.dto.account.DeleteAccountResponseDto
 import com.github.fj.restapi.dto.account.ProfileResponseDto
-import com.github.fj.restapi.dto.hello.HelloResponseDto
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.entity.User
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 /**

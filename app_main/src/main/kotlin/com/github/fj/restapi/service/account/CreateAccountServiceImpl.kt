@@ -8,7 +8,6 @@ import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.getRandomCapitalAlphaNumericString
 import com.github.fj.lib.text.isNullOrUnicodeBlank
-import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
@@ -22,8 +21,8 @@ import com.github.fj.restapi.persistence.entity.Membership
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
 import com.github.fj.restapi.util.extractIp
-import io.seruco.encoding.base62.Base62
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.stereotype.Service
 import java.net.InetAddress
 import java.util.*
@@ -48,7 +47,8 @@ class CreateAccountServiceImpl @Inject constructor(
                 val hashedCredential = authBusiness.hash(req.credential.value.toByteArray())
                 userRepo.findByBasicCredential(requireNotNull(req.username), hashedCredential)
             }
-            else -> throw HttpMessageNotReadableException("${req.loginType} login is not supported.")
+            else -> throw HttpMessageNotReadableException("${req.loginType} login is not supported.",
+                    ServletServerHttpRequest(httpReq))
         }
 
         if (maybeUser.isPresent) {

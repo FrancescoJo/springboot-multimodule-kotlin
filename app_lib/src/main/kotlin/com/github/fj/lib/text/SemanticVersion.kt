@@ -5,7 +5,6 @@
 package com.github.fj.lib.text
 
 import de.skuzzle.semantic.Version
-import java.lang.IllegalArgumentException
 import java.util.*
 
 /**

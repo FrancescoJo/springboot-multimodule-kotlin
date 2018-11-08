@@ -14,13 +14,17 @@ import org.aspectj.lang.annotation.AfterThrowing
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.aspectj.lang.reflect.MethodSignature
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 
 /**
  * Determines given [org.aspectj.lang.JoinPoint] has [com.github.fj.restapi.appconfig.aop.LoggedActivity]
  * as its annotation. If the annotation is found, logs all inputs annotated with
- * [org.springframework.web.bind.annotation.RequestBody] and all outputs annotated with
- * [org.springframework.web.bind.annotation.ResponseBody] for tracking every user activity.
+ * [org.springframework.web.bind.annotation.RequestBody], [org.springframework.web.bind.annotation.RequestParam]
+ * and all outputs annotated with [org.springframework.web.bind.annotation.ResponseBody]
+ * for tracking every user activity.
  *
  * Further customisations could be applied if this method logs everything out too much,
  * prints sensitive information, considered as a performance bottleneck, and/or causes operational
@@ -40,9 +44,31 @@ class EndpointAccessLogAspect {
     @Before("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)")
     fun logBeforeEndpoint(p: JoinPoint) {
         val activity = p.findLoggedActivity() ?: return
-        println("LOGGING ACTIVITY: " + activity)
 
-        // 2. is method has @RequestBody?
+        val method = (p.signature as MethodSignature).method
+
+        println("LOGGING ACTIVITY: " + activity + " COUNT ${method.parameters.size}")
+        p.args.forEach { v ->
+            println("arg: " + v)
+        }
+
+        val annotatedParams = ArrayList<Parameter>()
+        // extract all @RequestBody, @RequestParam annotated params
+        method.parameters.forEach { param ->
+            param.annotations.forEach {
+                // RequestParam
+                if (RequestBody::class.qualifiedName == it.annotationClass.qualifiedName) {
+                    // Store how?
+                    println("body  $param : $it")
+                } else if (RequestParam::class.qualifiedName == it.annotationClass.qualifiedName) {
+                    // Store how?
+                    println("param $param : $it")
+                } else {
+                    // find same method in super / interfaces and do smae again
+                }
+            }
+        }
+
 
         // 3. is method has @ResponseBody?
 
@@ -53,11 +79,15 @@ class EndpointAccessLogAspect {
 
     @AfterReturning("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)", returning = "returned")
     fun logAfterEndpoint(p: JoinPoint, returned: Any?) {
+        val activity = p.findLoggedActivity() ?: return
+
         println("AFTER ENDPOINT: " + p)
     }
 
     @AfterThrowing("within(your.package.where.is.endpoint.${ApiPaths.CURRENT_VERSION}..*)", throwing = "e")
     fun logAfterException(p: JoinPoint, e: Exception?) {
+        val activity = p.findLoggedActivity() ?: return
+
         println("AFTER THROWING: " + p)
     }
 

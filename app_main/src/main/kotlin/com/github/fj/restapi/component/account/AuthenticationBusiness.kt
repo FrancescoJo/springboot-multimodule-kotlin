@@ -5,8 +5,8 @@
 package com.github.fj.restapi.component.account
 
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
-import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.entity.User
+import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.security.core.Authentication
 
 /**

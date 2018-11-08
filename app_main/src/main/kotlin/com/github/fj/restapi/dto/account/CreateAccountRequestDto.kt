@@ -6,7 +6,6 @@ package com.github.fj.restapi.dto.account
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.github.fj.lib.text.isNullOrUnicodeBlank
 import com.github.fj.lib.util.EmptyObject
 import com.github.fj.lib.util.ProtectedProperty
 import com.github.fj.restapi.helper.validation.NullsafeValidator

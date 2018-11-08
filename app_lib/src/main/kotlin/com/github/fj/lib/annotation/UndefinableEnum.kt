@@ -6,8 +6,6 @@
  */
 package com.github.fj.lib.annotation
 
-import kotlin.annotation.Target
-
 /**
  * Annotates an enum type must have a constant named as 'UNDEFINED'.
  *

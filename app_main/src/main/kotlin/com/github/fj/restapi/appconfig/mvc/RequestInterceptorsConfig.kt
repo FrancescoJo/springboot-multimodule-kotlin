@@ -6,7 +6,6 @@ package com.github.fj.restapi.appconfig.mvc
 
 import com.github.fj.lib.annotation.AllOpen
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.DependsOn
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry

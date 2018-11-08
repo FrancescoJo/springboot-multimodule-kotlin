@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.test.account;
+package test.com.github.fj.restapi.account;
 
 import com.github.fj.lib.collection.ArrayUtilsKt;
 import com.github.fj.lib.text.SemanticVersion;
@@ -34,10 +34,20 @@ public final class AccountRequestUtils {
     }
 
     public static CreateAccountRequestDto newRandomCreateAccountRequest(final LoginType loginType) {
+        final String username;
+        final ProtectedProperty<String> credential;
+        if (loginType == LoginType.GUEST) {
+            username = "";
+            credential = new ProtectedProperty<>("");
+        } else {
+            username = StringUtilsKt.getRandomAlphaNumericString(User.MAXIMUM_NAME_LENGTH);
+            credential = new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63));
+        }
+
         return new CreateAccountRequestDto(
                 /*pushToken=*/       new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63)),
-                /*username=*/        StringUtilsKt.getRandomAlphaNumericString(31),
-                /*credential=*/      new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63)),
+                /*username=*/        username,
+                /*credential=*/      credential,
                 /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(15),  // For Test
                 /*gender=*/          null,
                 /*loginType=*/       loginType,

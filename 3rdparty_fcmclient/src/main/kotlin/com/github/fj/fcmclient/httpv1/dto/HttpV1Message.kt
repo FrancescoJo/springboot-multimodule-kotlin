@@ -7,9 +7,9 @@
 package com.github.fj.fcmclient.httpv1.dto
 
 import com.github.fj.fcmclient.PushMessage
-import com.google.gson.Gson
 import com.github.fj.fcmclient.httpv1.dto.config.Config
 import com.github.fj.fcmclient.httpv1.dto.target.Target
+import com.google.gson.Gson
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)

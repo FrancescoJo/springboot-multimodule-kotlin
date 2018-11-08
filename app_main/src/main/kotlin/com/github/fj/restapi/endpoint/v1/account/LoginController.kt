@@ -5,7 +5,6 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.dto.account.AuthenticationResponseDto
 import com.github.fj.restapi.dto.account.LoginRequestDto
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException

@@ -4,16 +4,16 @@
  */
 package com.github.fj.restapi.service.account
 
-import com.github.fj.restapi.test.HttpRequestUtils
 import com.github.fj.restapi.component.account.AuthenticationBusiness
-import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.repository.UserRepository
-import com.github.fj.restapi.test.account.AccountRequestUtils.newRandomCreateAccountRequest
-import com.github.fj.restapi.test.account.AccountRequestUtils.newRandomUser
+import test.com.github.fj.restapi.HttpTransportUtils
+import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomCreateAccountRequest
+import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomUser
+import com.github.fj.restapi.vo.account.AccessToken
 import com.nhaarman.mockitokotlin2.any
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -49,7 +49,7 @@ class CreateAccountServiceTest {
 
         // expect:
         assertThrows<HttpMessageNotReadableException> {
-            sut.createAccount(request, HttpRequestUtils.newMockHttpServletRequestByLocalhost())
+            sut.createAccount(request, HttpTransportUtils.newMockHttpServletRequestByLocalhost())
         }
     }
 
@@ -71,7 +71,7 @@ class CreateAccountServiceTest {
 
         // expect:
         assertThrows<AccountAlreadyExistException> {
-            sut.createAccount(req, HttpRequestUtils.newMockHttpServletRequestByLocalhost())
+            sut.createAccount(req, HttpTransportUtils.newMockHttpServletRequestByLocalhost())
         }
     }
 
@@ -79,7 +79,7 @@ class CreateAccountServiceTest {
     fun `CreateAccountService passes if request represents a new user`() {
         // given:
         val req = newRandomCreateAccountRequest()
-        val httpReq = HttpRequestUtils.newMockHttpServletRequestByLocalhost()
+        val httpReq = HttpTransportUtils.newMockHttpServletRequestByLocalhost()
         val credentialArray = req.credential.value.toByteArray()
 
         // and:

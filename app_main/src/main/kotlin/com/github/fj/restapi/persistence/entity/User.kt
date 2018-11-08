@@ -9,12 +9,12 @@ import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.indentToString
 import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.lib.util.EmptyObject
-import com.github.fj.restapi.vo.account.AccessToken
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
 import com.github.fj.restapi.persistence.consts.account.Role
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.converter.entity.*
+import com.github.fj.restapi.vo.account.AccessToken
 import java.io.Serializable
 import java.net.InetAddress
 import java.time.LocalDateTime
