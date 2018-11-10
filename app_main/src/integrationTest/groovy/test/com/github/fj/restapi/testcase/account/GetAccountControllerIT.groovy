@@ -4,7 +4,7 @@
  */
 package test.com.github.fj.restapi.testcase.account
 
-import com.github.fj.restapi.dto.OkResponseDto
+import com.github.fj.restapi.endpoint.OkResponseDto
 import com.github.fj.restapi.dto.account.ProfileResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
 import org.springframework.http.HttpMethod

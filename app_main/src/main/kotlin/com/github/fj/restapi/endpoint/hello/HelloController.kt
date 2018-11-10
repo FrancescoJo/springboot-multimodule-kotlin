@@ -4,8 +4,8 @@
  */
 package com.github.fj.restapi.endpoint.hello
 
-import com.github.fj.restapi.dto.hello.HelloRequestDto
-import com.github.fj.restapi.dto.hello.HelloResponseDto
+import com.github.fj.restapi.endpoint.hello.dto.HelloRequestDto
+import com.github.fj.restapi.endpoint.hello.dto.HelloResponseDto
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.InitBinder
 import org.springframework.web.bind.annotation.RequestBody

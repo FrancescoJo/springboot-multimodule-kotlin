@@ -6,10 +6,10 @@ package com.github.fj.restapi.appconfig
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fj.lib.annotation.AllOpen
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import javax.inject.Inject
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -17,11 +17,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  */
 @AllOpen
 @Configuration
-class ContextConfig : WebMvcConfigurer {
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
+class ContextConfig @Inject constructor(
+        private val defaultObjMapper: ObjectMapper
+) : WebMvcConfigurer {
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>?) {
-        objectMapper.registerModule(JacksonDeserialisationModule())
+        defaultObjMapper.registerModule(JacksonDeserialisationModule())
     }
 }

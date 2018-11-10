@@ -4,9 +4,9 @@
  */
 package test.com.github.fj.restapi.testcase
 
-import com.github.fj.restapi.dto.OkResponseDto
-import com.github.fj.restapi.dto.hello.HelloRequestDto
-import com.github.fj.restapi.dto.hello.HelloResponseDto
+import com.github.fj.restapi.endpoint.OkResponseDto
+import com.github.fj.restapi.endpoint.hello.dto.HelloRequestDto
+import com.github.fj.restapi.endpoint.hello.dto.HelloResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
 import org.springframework.web.reactive.function.BodyInserters
 import test.com.github.fj.restapi.IntegrationTestBase

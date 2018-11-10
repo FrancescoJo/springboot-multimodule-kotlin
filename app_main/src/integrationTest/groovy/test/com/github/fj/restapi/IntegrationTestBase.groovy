@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fj.restapi.Application
 import com.github.fj.restapi.appconfig.mvc.security.HttpAuthScheme
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
-import com.github.fj.restapi.dto.AbstractResponseDto
+import com.github.fj.restapi.endpoint.AbstractResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient

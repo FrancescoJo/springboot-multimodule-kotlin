@@ -1,11 +1,9 @@
-apply plugin: "com.adarshr.test-logger"
-
 dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:$version_junit5"
     testCompile "org.junit.jupiter:junit-jupiter-params:$version_junit5"
-    testCompile "org.mockito:mockito-core:$version_mockito"
-
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$version_junit5"
+
+    testCompile "org.mockito:mockito-core:$version_mockito"
 }
 
 check.dependsOn test
@@ -21,4 +19,11 @@ task testJar(type: Jar) {
 
 artifacts {
     testArtifacts testJar
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }

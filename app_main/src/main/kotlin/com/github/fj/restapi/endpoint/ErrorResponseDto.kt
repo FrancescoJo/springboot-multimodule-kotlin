@@ -2,9 +2,9 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.dto
+package com.github.fj.restapi.endpoint
 
-import com.github.fj.restapi.dto.ErrorResponseDto.Body
+import com.github.fj.restapi.endpoint.ErrorResponseDto.Body
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)

@@ -9,7 +9,7 @@ import com.github.fj.lib.annotation.VisibleForTesting
 import com.github.fj.lib.net.InetAddressExtensions
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.aop.LoggedActivity
-import com.github.fj.restapi.component.account.AuthenticationObjectImpl
+import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
 import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.UserActivity
 import com.github.fj.restapi.persistence.entity.AccessLog

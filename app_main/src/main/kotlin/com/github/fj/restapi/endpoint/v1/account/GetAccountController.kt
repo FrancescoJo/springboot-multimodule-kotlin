@@ -5,7 +5,7 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.dto.account.ProfileResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.ProfileResponseDto
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.entity.User
 import org.springframework.web.bind.annotation.RestController

@@ -4,8 +4,8 @@
  */
 package com.github.fj.restapi.service.account
 
-import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.account.LoginRequestDto
+import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto
 import com.github.fj.restapi.vo.account.AccessToken
 
 /**

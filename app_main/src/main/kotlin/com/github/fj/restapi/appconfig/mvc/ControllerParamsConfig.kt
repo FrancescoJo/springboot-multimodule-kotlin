@@ -7,7 +7,7 @@ package com.github.fj.restapi.appconfig.mvc
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.component.account.AuthenticationBusiness
-import com.github.fj.restapi.component.account.AuthenticationObjectImpl
+import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
 import com.github.fj.restapi.exception.account.UnauthorisedException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User

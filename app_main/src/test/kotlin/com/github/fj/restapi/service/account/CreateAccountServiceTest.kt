@@ -9,17 +9,23 @@ import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.Status
+import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
 import com.github.fj.restapi.vo.account.AccessToken
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
+import org.mockito.MockitoAnnotations
 import org.springframework.http.converter.HttpMessageNotReadableException
 import test.com.github.fj.restapi.HttpTransportUtils
 import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomCreateAccountRequest
@@ -32,13 +38,14 @@ import java.util.*
  */
 class CreateAccountServiceTest {
     private lateinit var sut: CreateAccountService
+    @Mock
     private lateinit var mockUserRepo: UserRepository
+    @Mock
     private lateinit var mockAuthBusiness: AuthenticationBusiness
 
     @BeforeEach
     fun setup() {
-        this.mockUserRepo = mock(UserRepository::class.java)
-        this.mockAuthBusiness = mock(AuthenticationBusiness::class.java)
+        MockitoAnnotations.initMocks(this)
         this.sut = CreateAccountServiceImpl(mockUserRepo, mockAuthBusiness)
     }
 
@@ -54,19 +61,15 @@ class CreateAccountServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(LoginType::class,
-            mode = EnumSource.Mode.EXCLUDE,
-            names = ["UNDEFINED"]
-    )
+    @EnumSource(LoginType::class, names = ["BASIC"])
     fun `CreateAccountService fails for already existing user`(loginType: LoginType) {
         // given:
         val req = newRandomCreateAccountRequest(loginType)
         val credentialArray = req.credential.value.toByteArray()
 
         // and:
-        `when`(mockUserRepo.findByGuestCredential(credentialArray))
-                .thenReturn(Optional.of(newRandomUser()))
-        `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
+        `when`(mockAuthBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
+        `when`(mockUserRepo.findByBasicCredential(eq(req.username), any()))
                 .thenReturn(Optional.of(newRandomUser()))
 
         // expect:
@@ -75,24 +78,21 @@ class CreateAccountServiceTest {
         }
     }
 
-    @Test
-    fun `CreateAccountService passes if request represents a new user`() {
+    @ParameterizedTest
+    @EnumSource(LoginType::class, names = ["BASIC", "GUEST"])
+    fun `CreateAccountService passes if request represents a new user`(loginType: LoginType) {
         // given:
-        val req = newRandomCreateAccountRequest()
+        val req = newRandomCreateAccountRequest(loginType)
         val httpReq = HttpTransportUtils.newMockHttpServletRequestByLocalhost()
         val credentialArray = req.credential.value.toByteArray()
 
         // and:
-        `when`(mockUserRepo.findByGuestCredential(credentialArray))
-                .thenReturn(Optional.empty())
         `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.empty())
-        @Suppress("UnstableApiUsage")
-        req.credential.value.toByteArray().let {
-            `when`(mockAuthBusiness.hash(it))
-                    .thenReturn(com.google.common.hash.Hashing.goodFastHash(it.size * 8).hashBytes(it).asBytes())
-        }
+        `when`(mockAuthBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
         `when`(mockAuthBusiness.createAccessToken(any())).thenReturn(AccessToken.EMPTY)
+        `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
+                .thenReturn(Optional.empty())
 
         // when:
         val actual = sut.createAccount(req, httpReq)
@@ -101,5 +101,27 @@ class CreateAccountServiceTest {
         assertEquals(req.nickname, actual.nickname)
         assertEquals(Gender.UNDEFINED, actual.gender)
         assertEquals(Status.NORMAL, actual.status)
+    }
+
+    @Test
+    fun `invitedBy value is correctly saved if it points an existing user`() {
+        // given:
+        val req = newRandomCreateAccountRequest()
+        val httpReq = HttpTransportUtils.newMockHttpServletRequestByLocalhost()
+        val credentialArray = req.credential.value.toByteArray()
+
+        // and:
+        `when`(mockAuthBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
+        val existingUser = newRandomUser()
+        `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
+                .thenReturn(Optional.of(existingUser))
+        `when`(mockAuthBusiness.createAccessToken(any())).thenReturn(AccessToken.EMPTY)
+
+        // when:
+        val actual = sut.createAccount(req, httpReq)
+
+        // then:
+        assertNotNull(actual)
+        verify(mockUserRepo).save<User>(argThat { invitedBy == existingUser.id })
     }
 }

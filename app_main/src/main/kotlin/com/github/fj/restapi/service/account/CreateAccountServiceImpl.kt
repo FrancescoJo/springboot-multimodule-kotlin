@@ -10,8 +10,8 @@ import com.github.fj.lib.text.getRandomCapitalAlphaNumericString
 import com.github.fj.lib.text.isNullOrUnicodeBlank
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.component.account.AuthenticationBusiness
-import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto
+import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
@@ -40,10 +40,11 @@ class CreateAccountServiceImpl @Inject constructor(
 ) : CreateAccountService {
     override fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto {
+        val credentialBytes = req.credential.value.toByteArray()
         val maybeUser = when (req.loginType) {
-            LoginType.GUEST -> userRepo.findByGuestCredential(req.credential.value.toByteArray())
+            LoginType.GUEST -> Optional.empty()
             LoginType.BASIC -> {
-                val hashedCredential = authBusiness.hash(req.credential.value.toByteArray())
+                val hashedCredential = authBusiness.hash(credentialBytes)
                 userRepo.findByBasicCredential(requireNotNull(req.username), hashedCredential)
             }
             else -> throw HttpMessageNotReadableException("${req.loginType} login is not supported.",
@@ -92,9 +93,10 @@ class CreateAccountServiceImpl @Inject constructor(
                     0
                 }
             }
+
             credential = when (req.loginType) {
                 LoginType.GUEST -> ByteArray(0)
-                LoginType.BASIC -> authBusiness.hash(req.credential.value.toByteArray())
+                LoginType.BASIC -> authBusiness.hash(credentialBytes)
                 else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
             }
             member = Membership().apply {

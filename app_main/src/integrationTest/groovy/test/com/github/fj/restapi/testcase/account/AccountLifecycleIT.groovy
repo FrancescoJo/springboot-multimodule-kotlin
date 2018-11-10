@@ -27,7 +27,4 @@ class AccountLifecycleIT extends IntegrationTestBase {
     }
 
     // account create - login - get - delete
-
-    // TODO: "GET Request must be rejected with unreliable access token"
-
 }

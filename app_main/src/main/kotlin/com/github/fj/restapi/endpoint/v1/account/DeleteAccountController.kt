@@ -5,8 +5,8 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.dto.account.DeleteAccountRequestDto
-import com.github.fj.restapi.dto.account.DeleteAccountResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.DeleteAccountRequestDto
+import com.github.fj.restapi.endpoint.v1.account.dto.DeleteAccountResponseDto
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.service.account.DeleteAccountService
 import org.slf4j.LoggerFactory

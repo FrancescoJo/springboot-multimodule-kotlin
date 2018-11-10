@@ -8,8 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.AppProfile
 import com.github.fj.restapi.BuildConfig
-import com.github.fj.restapi.dto.AbstractResponseDto
-import com.github.fj.restapi.dto.ErrorResponseDto
 import com.github.fj.restapi.exception.AbstractBaseHttpException
 import com.github.fj.restapi.exception.GeneralHttpException
 import org.slf4j.LoggerFactory

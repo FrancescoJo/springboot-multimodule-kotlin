@@ -6,7 +6,6 @@ package com.github.fj.restapi.endpoint
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.dto.AbstractResponseDto
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 /**
- * This class wraps all [com.fasterxml.jackson.databind.annotation.JsonSerialize] annotated values within [com.github.fj.restapi.dto.OkResponseDto].
+ * This class wraps all [com.fasterxml.jackson.databind.annotation.JsonSerialize] annotated values within [com.github.fj.restapi.endpoint.OkResponseDto].
  *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 22 - Oct - 2018

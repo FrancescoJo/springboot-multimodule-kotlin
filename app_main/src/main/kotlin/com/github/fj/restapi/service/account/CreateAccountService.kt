@@ -4,8 +4,8 @@
  */
 package com.github.fj.restapi.service.account
 
-import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto
+import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto
 import javax.servlet.http.HttpServletRequest
 
 /**

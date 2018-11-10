@@ -8,7 +8,7 @@ import com.github.fj.lib.collection.ArrayUtilsKt;
 import com.github.fj.lib.text.SemanticVersion;
 import com.github.fj.lib.text.StringUtilsKt;
 import com.github.fj.lib.util.ProtectedProperty;
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto;
+import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto;
 import com.github.fj.restapi.persistence.consts.account.LoginType;
 import com.github.fj.restapi.persistence.consts.account.PlatformType;
 import com.github.fj.restapi.persistence.consts.account.Role;
@@ -48,13 +48,14 @@ public final class AccountRequestUtils {
                 /*pushToken=*/       new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63)),
                 /*username=*/        username,
                 /*credential=*/      credential,
-                /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(15),  // For Test
+                /*nickname=*/        StringUtilsKt.getRandomAlphaNumericString(15),
                 /*gender=*/          null,
                 /*loginType=*/       loginType,
                 /*platformType=*/    RandomHelper.randomEnumConst(PlatformType.class),
                 /*platformVersion=*/ DEFAULT_PLATFORM_VERSION,
                 /*appVersion=*/      DEFAULT_APP_VERSION,
-                /*email*/            DEFAULT_EMAIL
+                /*email*/            DEFAULT_EMAIL,
+                /*invitedBy*/        StringUtilsKt.getRandomAlphaNumericString(15)
         );
     }
 

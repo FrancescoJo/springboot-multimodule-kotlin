@@ -5,7 +5,7 @@
 package test.com.github.fj.restapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fj.restapi.dto.OkResponseDto;
+import com.github.fj.restapi.endpoint.OkResponseDto;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import test.com.github.fj.restapi.appconfig.ApplicationContextHolder;
 
