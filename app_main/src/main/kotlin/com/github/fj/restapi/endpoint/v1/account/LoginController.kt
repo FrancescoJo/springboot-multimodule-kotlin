@@ -14,10 +14,8 @@ import com.github.fj.restapi.vo.account.AccessToken
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.InitBinder
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import javax.inject.Inject
-import javax.validation.Valid
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -28,8 +26,7 @@ import javax.validation.Valid
 class LoginController @Inject constructor(
         private val loginService: LoginService
 ) : ILoginController {
-    override fun onPatch(accessToken: AccessToken?,
-                         @Valid @RequestBody request: LoginRequestDto): AuthenticationResponseDto {
+    override fun onPatch(accessToken: AccessToken?, request: LoginRequestDto): AuthenticationResponseDto {
         LOG.debug("Login request: {}", request)
 
         return when (request.loginType) {

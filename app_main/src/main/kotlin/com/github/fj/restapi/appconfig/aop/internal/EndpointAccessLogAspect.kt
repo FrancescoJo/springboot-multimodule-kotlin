@@ -5,19 +5,31 @@
 package com.github.fj.restapi.appconfig.aop.internal
 
 import com.github.fj.lib.annotation.AllOpen
+import com.github.fj.lib.annotation.VisibleForTesting
+import com.github.fj.lib.net.InetAddressExtensions
+import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.aop.LoggedActivity
+import com.github.fj.restapi.component.account.AuthenticationObjectImpl
 import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.UserActivity
+import com.github.fj.restapi.persistence.entity.AccessLog
+import com.github.fj.restapi.persistence.repository.AccessLogRepository
+import com.github.fj.restapi.util.extractIp
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.AfterReturning
 import org.aspectj.lang.annotation.AfterThrowing
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.aspectj.lang.reflect.MethodSignature
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
+import java.net.InetAddress
 
 /**
  * Determines given [org.aspectj.lang.JoinPoint] has [com.github.fj.restapi.appconfig.aop.LoggedActivity]
@@ -33,6 +45,8 @@ import java.lang.reflect.Parameter
  * For example, considering introduction of log level parameters in
  * [com.github.fj.restapi.appconfig.aop.LoggedActivity] could be a quick and naïve fix.
  *
+ * Or, simply remove bean creation of this class.
+ *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 06 - Nov - 2018
  * @see org.springframework.web.filter.CommonsRequestLoggingFilter
@@ -40,56 +54,119 @@ import java.lang.reflect.Parameter
  */
 @AllOpen
 @Aspect
-class EndpointAccessLogAspect {
+class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
     @Before("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)")
     fun logBeforeEndpoint(p: JoinPoint) {
         val activity = p.findLoggedActivity() ?: return
-
-        val method = (p.signature as MethodSignature).method
-
-        println("LOGGING ACTIVITY: " + activity + " COUNT ${method.parameters.size}")
-        p.args.forEach { v ->
-            println("arg: " + v)
+        val logObject = CURRENT_LOGGING_VALUE.get().apply {
+            this.activity = activity
         }
-
-        val annotatedParams = ArrayList<Parameter>()
-        // extract all @RequestBody, @RequestParam annotated params
-        method.parameters.forEach { param ->
-            param.annotations.forEach {
-                // RequestParam
-                if (RequestBody::class.qualifiedName == it.annotationClass.qualifiedName) {
-                    // Store how?
-                    println("body  $param : $it")
-                } else if (RequestParam::class.qualifiedName == it.annotationClass.qualifiedName) {
-                    // Store how?
-                    println("param $param : $it")
-                } else {
-                    // find same method in super / interfaces and do smae again
-                }
+        val method = (p.signature as MethodSignature).method
+        val paramTypes = method.parameterTypes
+        val noAnnotationParams = ArrayList<Parameter>()
+        method.parameters.forEachIndexed { i, param ->
+            if (param.hasLoggableAnnotation()) {
+                logObject.inputs.add(p.args[i])
+            } else {
+                noAnnotationParams.add(param)
             }
         }
 
+        var enclosingClass = with(method.declaringClass) {
+            interfaces.forEach { ifce ->
+                addLogAnnotatedParams(p, logObject, ifce, method.name, paramTypes)
+            }
+            return@with superclass
+        }
 
-        // 3. is method has @ResponseBody?
+        while (enclosingClass != null) {
+            addLogAnnotatedParams(p, logObject, enclosingClass, method.name, paramTypes)
+            enclosingClass = enclosingClass.superclass
+        }
+    }
 
-        // p.getAllInputs() // Annotated as @RequestBody : just call toString
+    private fun addLogAnnotatedParams(p: JoinPoint, logObject: AccessLog,
+                                      encasing: Class<*>, name: String, paramTypes: Array<Class<*>>) {
+        try {
+            val m = encasing.getMethod(name, *paramTypes)
+            m.parameters.forEachIndexed { i, param ->
+                if (param.hasLoggableAnnotation()) {
+                    logObject.inputs.add(p.args[i])
+                }
+            }
+        } catch (ignore: ReflectiveOperationException) {
+        }
+    }
 
-        // p.getAllOutputs() // Annotated as @ResponseBody : just call toString
+    private fun Parameter.hasLoggableAnnotation(): Boolean {
+        return annotations.any {
+            val name = it.annotationClass.qualifiedName
+            return@any RequestBody::class.qualifiedName == name || RequestParam::class.qualifiedName == name
+        }
     }
 
     @AfterReturning("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)", returning = "returned")
-    fun logAfterEndpoint(p: JoinPoint, returned: Any?) {
-        val activity = p.findLoggedActivity() ?: return
-
-        println("AFTER ENDPOINT: " + p)
-    }
+    fun logAfterEndpoint(p: JoinPoint, returned: Any?) =
+            logAfterInternal((p.signature as? MethodSignature)?.method, returned)
 
     @AfterThrowing("within(your.package.where.is.endpoint.${ApiPaths.CURRENT_VERSION}..*)", throwing = "e")
-    fun logAfterException(p: JoinPoint, e: Exception?) {
-        val activity = p.findLoggedActivity() ?: return
+    fun logAfterException(p: JoinPoint, e: Exception) =
+            logAfterInternal((p.signature as? MethodSignature)?.method, e)
 
-        println("AFTER THROWING: " + p)
+    private fun logAfterInternal(m: Method?, logTarget: Any?) {
+        val logObject = CURRENT_LOGGING_VALUE.get().takeIf {
+            it.activity != UserActivity.UNDEFINED
+        }
+
+        if (m == null || logObject == null) {
+            return
+        }
+
+        val myParams = m.parameters.map { it.type }.toTypedArray()
+        val isResponseBody = if (findAnnotatedMethod(m, myParams, ResponseBody::class.java) != null) {
+            true
+        } else {
+            m.returnType.annotations.any {
+                ResponseBody::class.qualifiedName == it.annotationClass.qualifiedName
+            }
+        }
+
+        logObject.run {
+            timestamp = utcNow()
+            userId = getCurrentUserId()
+            ipAddr = currentUserKnownIP()
+
+            input = inputs.joinToString("\n")
+            output = if (isResponseBody) {
+                if (logTarget is Exception) {
+                    logTarget.message ?: logTarget.toString()
+                } else {
+                    logTarget.toString()
+                }
+            } else {
+                ""
+            }
+            inputs.clear()
+        }
+
+        logRepo.save(logObject)
     }
+
+    @VisibleForTesting
+    protected fun getCurrentUserId(): Long =
+            (SecurityContextHolder.getContext().authentication)?.let {
+                return@let if (it is AuthenticationObjectImpl) {
+                    it.details.id
+                } else {
+                    0L
+                }
+            } ?: 0L
+
+    @VisibleForTesting
+    protected fun currentUserKnownIP(): InetAddress =
+            (RequestContextHolder.currentRequestAttributes() as? ServletRequestAttributes)?.let {
+                InetAddress.getByName(it.request.extractIp())
+            } ?: InetAddressExtensions.EMPTY_INET_ADDRESS
 
     private fun JoinPoint.findLoggedActivity(): UserActivity? {
         val method = (signature as? MethodSignature)?.method ?: return null
@@ -130,4 +207,10 @@ class EndpointAccessLogAspect {
             }?.let {
                 findAnnotatedMethod(it, myArgTypes, target)
             }
+
+    companion object {
+        private val CURRENT_LOGGING_VALUE = object : ThreadLocal<AccessLog>() {
+            override fun initialValue() = AccessLog()
+        }
+    }
 }

@@ -5,8 +5,8 @@
 package com.github.fj.restapi.persistence.repository
 
 import com.github.fj.restapi.persistence.entity.User
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import java.util.*
 
@@ -15,7 +15,7 @@ import java.util.*
  * @since 23 - Aug - 2018
  */
 @Repository
-interface UserRepository : CrudRepository<User, Long> {
+interface UserRepository : JpaRepository<User, Long> {
     @Query("""
         SELECT u
         FROM User u

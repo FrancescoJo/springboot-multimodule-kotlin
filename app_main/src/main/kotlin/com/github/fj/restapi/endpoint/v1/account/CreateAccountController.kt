@@ -11,11 +11,9 @@ import com.github.fj.restapi.service.account.CreateAccountService
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.InitBinder
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -26,8 +24,7 @@ import javax.validation.Valid
 class CreateAccountController @Inject constructor(
         private val svc: CreateAccountService
 ) : ICreateAccountController {
-    override fun onPost(@Valid @RequestBody request: CreateAccountRequestDto,
-                        httpServletRequest: HttpServletRequest): AuthenticationResponseDto {
+    override fun onPost(request: CreateAccountRequestDto, httpServletRequest: HttpServletRequest): AuthenticationResponseDto {
         LOG.debug("Create account request: {}", request)
         svc.createAccount(request, httpServletRequest).let {
             LOG.debug("Create account response: {}", it)
