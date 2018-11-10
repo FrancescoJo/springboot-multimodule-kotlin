@@ -5,6 +5,7 @@
 package com.github.fj.restapi.util
 
 import com.github.fj.lib.text.isNullOrUnicodeBlank
+import java.net.InetAddress
 import javax.servlet.http.HttpServletRequest
 
 /**
@@ -16,20 +17,20 @@ import javax.servlet.http.HttpServletRequest
  * Note that this approach is not accurate on various web containers and additional logic may be
  * needed to fulfill your business requirement.
  */
-fun HttpServletRequest.extractIp(): String {
-    with (getHeader("X-Real-IP")) {
+fun HttpServletRequest.extractIpStr(): String {
+    with(getHeader("X-Real-IP")) {
         if (!isNullOrUnicodeBlank() && !isUnknown()) {
             return this
         }
     }
 
-    with (getHeader("Proxy-Client-IP")) {
+    with(getHeader("Proxy-Client-IP")) {
         if (!isNullOrUnicodeBlank() && !isUnknown()) {
             return this
         }
     }
 
-    with (getHeader("X-forwarded-for")) {
+    with(getHeader("X-forwarded-for")) {
         if (!isNullOrUnicodeBlank()) {
             split(",").let {
                 if (!it[0].isUnknown()) {
@@ -41,5 +42,8 @@ fun HttpServletRequest.extractIp(): String {
 
     return remoteAddr
 }
+
+fun HttpServletRequest.extractInetAddress(): InetAddress =
+        InetAddress.getByName(this.extractIpStr())
 
 private fun String.isUnknown() = "unknown".equals(this, true)

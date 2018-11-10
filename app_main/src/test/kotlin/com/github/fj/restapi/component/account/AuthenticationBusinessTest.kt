@@ -9,6 +9,7 @@ package com.github.fj.restapi.component.account
  * @since 31 - Oct - 2018
  */
 class AuthenticationBusinessTest {
+    // TODO: Fix bug in backward + BASIC login case
     /*
     private lateinit var sut: AuthenticationBusiness
     private lateinit var mockAppProperties: AppProperties

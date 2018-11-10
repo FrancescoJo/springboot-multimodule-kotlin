@@ -4,7 +4,7 @@
  */
 package com.github.fj.restapi.appconfig.mvc
 
-import com.github.fj.restapi.util.extractIp
+import com.github.fj.restapi.util.extractIpStr
 import com.google.common.base.Strings
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletResponse
  * @see org.springframework.web.filter.CommonsRequestLoggingFilter
  */
 @Component
-class RequestLoggingInterceptor: HandlerInterceptorAdapter() {
+class RequestLoggingInterceptor : HandlerInterceptorAdapter() {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val ip     = request.run { "${extractIp()} ($remoteAddr:$remotePort)" }
+        val ip     = request.run { "${extractIpStr()} ($remoteAddr:$remotePort)" }
         val method = Strings.padEnd(request.method, 6, ' ')
         val path   = request.servletPath
         val handlerInfo = if (handler is HandlerMethod) {

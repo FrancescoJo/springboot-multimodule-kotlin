@@ -14,7 +14,7 @@ import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.UserActivity
 import com.github.fj.restapi.persistence.entity.AccessLog
 import com.github.fj.restapi.persistence.repository.AccessLogRepository
-import com.github.fj.restapi.util.extractIp
+import com.github.fj.restapi.util.extractInetAddress
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.AfterReturning
 import org.aspectj.lang.annotation.AfterThrowing
@@ -164,9 +164,8 @@ class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
 
     @VisibleForTesting
     protected fun currentUserKnownIP(): InetAddress =
-            (RequestContextHolder.currentRequestAttributes() as? ServletRequestAttributes)?.let {
-                InetAddress.getByName(it.request.extractIp())
-            } ?: InetAddressExtensions.EMPTY_INET_ADDRESS
+            (RequestContextHolder.currentRequestAttributes() as? ServletRequestAttributes)
+                    ?.request?.extractInetAddress() ?: InetAddressExtensions.EMPTY_INET_ADDRESS
 
     private fun JoinPoint.findLoggedActivity(): UserActivity? {
         val method = (signature as? MethodSignature)?.method ?: return null

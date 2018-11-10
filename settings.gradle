@@ -1,2 +1,2 @@
 rootProject.name = "fj-springboot-multimodule-kotlin"
-include ":app_main", ":app_admin", ":app_common", ":app_lib", ":3rdparty_fcmclient"
+include ":app_main", ":app_lib", ":3rdparty_fcmclient"

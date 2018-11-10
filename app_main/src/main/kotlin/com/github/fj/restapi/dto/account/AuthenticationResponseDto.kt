@@ -7,7 +7,7 @@ package com.github.fj.restapi.dto.account
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.github.fj.lib.time.utcEpochSecond
+import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.lib.util.ProtectedProperty
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.Status
@@ -15,6 +15,7 @@ import com.github.fj.restapi.persistence.entity.User
 import io.seruco.encoding.base62.Base62
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDateTime
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -44,9 +45,9 @@ data class AuthenticationResponseDto(
         @JsonProperty
         val status: Status,
 
-        @ApiModelProperty("An UNIX timestamp that indicates user's last activity.", example = "1540735180000", required = true)
+        @ApiModelProperty("An UNIX timestamp that indicates user's last activity.", example = "2018-10-27T00:00:01", required = true)
         @JsonProperty
-        val lastActiveTimestamp: Long,
+        val lastActiveTimestamp: LocalDateTime,
 
         @ApiModelProperty("Access token to authorise user identity. " +
                 "Clients must store this information in a secure storage and keep it secret" +
@@ -56,15 +57,15 @@ data class AuthenticationResponseDto(
 
         @ApiModelProperty("An UNIX timestamp that will appear if a user account is " +
                 "banned or suspended in certain timespan. Field may not found or the value will be 0" +
-                "if your account status is good.", example = "<UNIX TIMESTAMP>")
+                "if your account status is good.", example = "<UNIX TIMESTAMP>", required = false)
         @JsonProperty
-        val suspendedOnTimestamp: Long,
+        val suspendedOnTimestamp: LocalDateTime?,
 
         @ApiModelProperty("An UNIX timestamp that will appear if a user account is " +
                 "banned or suspended in certain timespan. Field may not found or the value will be 0" +
-                "if your account status is good.", example = "<UNIX TIMESTAMP>")
+                "if your account status is good.", example = "<UNIX TIMESTAMP>", required = false)
         @JsonProperty
-        val suspendedUntilTimestamp: Long
+        val suspendedUntilTimestamp: LocalDateTime?
 ) {
     companion object {
         fun create(user: User) = AuthenticationResponseDto(
@@ -72,11 +73,11 @@ data class AuthenticationResponseDto(
                 nickname = user.member.nickname,
                 gender = user.member.gender,
                 status = user.status,
-                lastActiveTimestamp = user.member.lastActiveTimestamp?.utcEpochSecond() ?: 0L,
+                lastActiveTimestamp = user.member.lastActiveTimestamp ?: LOCAL_DATE_TIME_MIN,
                 accessToken = ProtectedProperty(Base62.createInstance().encode(user.rawAccessToken)
                         .toString(Charsets.UTF_8)),
-                suspendedOnTimestamp = user.member.suspendedOn?.utcEpochSecond() ?: 0L,
-                suspendedUntilTimestamp = user.member.suspendedUntil?.utcEpochSecond() ?: 0L
+                suspendedOnTimestamp = user.member.suspendedOn,
+                suspendedUntilTimestamp = user.member.suspendedUntil
         )
     }
 }

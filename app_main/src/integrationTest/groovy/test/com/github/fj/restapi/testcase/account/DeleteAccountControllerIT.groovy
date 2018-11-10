@@ -17,7 +17,7 @@ import test.com.github.fj.restapi.util.AccountUtils
  * @since 04 - Nov - 2018
  */
 class DeleteAccountControllerIT extends IntegrationTestBase {
-    // TODO: "Request must be rejected with unreliable access token"
+    // TODO: "DELETE Request must be rejected with unreliable access token"
 
     def "Account is deleted by genuine access Token"() {
         given:
@@ -33,6 +33,7 @@ class DeleteAccountControllerIT extends IntegrationTestBase {
                 .exchange()
 
         then:
+        // TODO: assert user is deleted
         println(responseSpec)
     }
 }

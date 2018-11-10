@@ -4,13 +4,6 @@
  */
 package com.github.fj.fcmclient
 
-import com.google.api.client.http.GenericUrl
-import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
-import com.google.api.client.http.HttpResponseException
-import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.util.ExponentialBackOff
-import com.google.gson.Gson
-import com.google.gson.JsonParseException
 import com.github.fj.fcmclient.httpv1.FcmHttpV1Client
 import com.github.fj.fcmclient.httpv1.dto.HttpV1Message
 import com.github.fj.fcmclient.httpv1.dto.config.apns.ApnsConfig
@@ -20,6 +13,13 @@ import com.github.fj.fcmclient.legacy.FcmLegacyClient
 import com.github.fj.fcmclient.legacy.ValidateKeyResponse
 import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
 import com.github.fj.fcmclient.legacy.dto.notification.IosNotification
+import com.google.api.client.http.GenericUrl
+import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
+import com.google.api.client.http.HttpResponseException
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.util.ExponentialBackOff
+import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -37,13 +37,14 @@ class SimpleFcmPushSender(privateKeyLocation: String,
                           projectId: String,
                           private val applicationNameProvider: ApplicationNameProvider,
                           private val serverKey: String,
-                          private val mode: Mode = Mode.HTTP_V1) {
+                          private var mode: Mode = Mode.HTTP_V1) {
     private val fcmCredential = try {
         File(privateKeyLocation).inputStream().asString()
     } catch (t: IOException) {
-        LOG.warn("Error while accessing Firebase credential file. Cannot continue.")
-        LOG.warn("{}", t.message)
-        throw t
+        LOG.warn("Error while accessing Firebase credential file. Switching to ${Mode.LEGACY}.")
+        LOG.warn("Caused by: ({})", t.toString())
+        mode = Mode.LEGACY
+        ""
     }
 
     private val legacyClient = FcmLegacyClient(serverKey, LOG)

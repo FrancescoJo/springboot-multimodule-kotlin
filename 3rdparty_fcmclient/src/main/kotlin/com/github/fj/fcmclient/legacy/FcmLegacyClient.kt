@@ -6,14 +6,14 @@
  */
 package com.github.fj.fcmclient.legacy
 
+import com.github.fj.fcmclient.PushMessage
+import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.util.ExponentialBackOff
 import com.google.gson.Gson
-import com.github.fj.fcmclient.PushMessage
-import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
 import org.slf4j.Logger
 import java.io.IOException
 

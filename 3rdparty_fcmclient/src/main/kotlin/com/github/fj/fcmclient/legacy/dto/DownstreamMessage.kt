@@ -6,9 +6,9 @@
  */
 package com.github.fj.fcmclient.legacy.dto
 
-import com.google.gson.Gson
 import com.github.fj.fcmclient.PushMessage
 import com.github.fj.fcmclient.legacy.dto.notification.Notification
+import com.google.gson.Gson
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)

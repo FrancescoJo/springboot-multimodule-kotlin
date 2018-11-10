@@ -1,3 +1,5 @@
+apply plugin: "com.adarshr.test-logger"
+
 dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:$version_junit5"
     testCompile "org.junit.jupiter:junit-jupiter-params:$version_junit5"

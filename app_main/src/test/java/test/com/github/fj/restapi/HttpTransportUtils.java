@@ -35,8 +35,7 @@ public final class HttpTransportUtils {
             throw new AssertionError("Response contains no content body!");
         }
 
-        final ObjectMapper defaultMapper = ApplicationContextHolder
-                .getInstance().getApplicationContext().getBean(ObjectMapper.class);
+        final ObjectMapper defaultMapper = ApplicationContextHolder.getBean(ObjectMapper.class);
 
         return defaultMapper.convertValue(okResponse.getBody(), expectedType);
     }

@@ -57,6 +57,9 @@ app:
     fcm-private-key-location:
     fcm-server-key:
     fcm-project-id:
+    fcm-android-app-name:
+    fcm-ios-app-name:
+    fcm-web-app-name:
 
   cipher:
     access-token-aes256-key: C4 9B 24 54 5F 6C 74 FF 0C C7 62 EA 4B 3D 75 1C

@@ -16,9 +16,13 @@ import javax.annotation.Nonnull;
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 09 - Nov - 2018
  */
-public class ApplicationContextHolder /*implements ApplicationContextAware*/ {
+public class ApplicationContextHolder {
     public static ApplicationContextHolder getInstance() {
         return LazyHolder.INSTANCE;
+    }
+
+    public static <T> T getBean(final Class<T> type) {
+        return getInstance().getApplicationContext().getBean(type);
     }
 
     private ApplicationContext applicationContext = null;

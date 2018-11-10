@@ -19,6 +19,7 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import spock.lang.Specification
+import test.com.github.fj.restapi.appconfig.ApplicationContextHolder
 import test.com.github.fj.restapi.appconfig.IntegrationTestConfigurations
 
 import javax.annotation.Nonnull
@@ -78,11 +79,8 @@ abstract class IntegrationTestBase extends Specification {
             assert (response instanceof AbstractResponseDto), response
             final body = (response as AbstractResponseDto).body
 
-            // mappe
-
-            return null
-
-//            return newMapper.convertValue(body, resultType) as T
+            final ObjectMapper mapper = ApplicationContextHolder.getBean(ObjectMapper.class)
+            return mapper.convertValue(body, resultType) as T
         }
     }
 }

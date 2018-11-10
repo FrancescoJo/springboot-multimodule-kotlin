@@ -20,11 +20,10 @@ import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.entity.Membership
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
-import com.github.fj.restapi.util.extractIp
+import com.github.fj.restapi.util.extractInetAddress
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.stereotype.Service
-import java.net.InetAddress
 import java.util.*
 import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
@@ -57,7 +56,7 @@ class CreateAccountServiceImpl @Inject constructor(
 
         val user = User().apply {
             val now = utcNow()
-            val ipAddr = InetAddress.getByName(httpReq.extractIp())
+            val ipAddr = httpReq.extractInetAddress()
 
             var maybeUserWithIdToken: Optional<User>
             var newIdToken: String

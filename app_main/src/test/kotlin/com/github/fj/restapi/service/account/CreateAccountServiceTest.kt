@@ -10,9 +10,6 @@ import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.repository.UserRepository
-import test.com.github.fj.restapi.HttpTransportUtils
-import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomCreateAccountRequest
-import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomUser
 import com.github.fj.restapi.vo.account.AccessToken
 import com.nhaarman.mockitokotlin2.any
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -24,6 +21,9 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.springframework.http.converter.HttpMessageNotReadableException
+import test.com.github.fj.restapi.HttpTransportUtils
+import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomCreateAccountRequest
+import test.com.github.fj.restapi.account.AccountRequestUtils.newRandomUser
 import java.util.*
 
 /**

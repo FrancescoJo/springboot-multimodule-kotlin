@@ -14,6 +14,7 @@ buildscript {
     ext.version_junit5 = "5.1.1"
     ext.version_mockito = "2.20.0"
     ext.version_detekt = "1.0.0.RC8"
+    ext.version_test_logger = "1.5.0"
 
     repositories {
         jcenter()
@@ -29,8 +30,8 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-allopen:$version_kotlin"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$version_springBoot"
         classpath "io.spring.gradle:propdeps-plugin:$version_springPropDeps"
-        classpath "com.adarshr:gradle-test-logger-plugin:1.1.2"
         classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$version_detekt"
+        classpath "com.adarshr:gradle-test-logger-plugin:$version_test_logger"
     }
 }
 
@@ -52,6 +53,6 @@ allprojects {
     }
 
     dependencies {
-        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+        annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$version_springBoot")
     }
 }
