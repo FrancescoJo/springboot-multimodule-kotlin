@@ -113,8 +113,4 @@ class Alert {
             launchImage.takeIf { it.isNotEmpty() }?.let { put("launch-image", it) }
         }
     }
-
-    companion object {
-        val EMPTY = Alert()
-    }
 }

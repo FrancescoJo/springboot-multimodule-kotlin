@@ -10,8 +10,8 @@ import java.util.*
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 22 - Aug - 2018
  */
-data class PushContent(val title: String,
-                       val receiverDeviceToken: String,
+data class PushContent(val receiverDeviceToken: String,
                        val receiverPlatform: PushPlatform,
+                       val title: String,
                        val text: CharSequence = "",
                        val customData: Map<String, Any> = Collections.emptyMap())

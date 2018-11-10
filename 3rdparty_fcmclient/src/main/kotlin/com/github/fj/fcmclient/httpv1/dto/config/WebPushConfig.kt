@@ -42,7 +42,7 @@ class WebPushConfig : Config {
     /**
      * A [web notification](https://www.w3.org/TR/notifications/#notification) to send.
      */
-    var notification = WebPushNotification.EMPTY
+    var notification: WebPushNotification? = null
 
     override val name = CONFIG_NAME
 
@@ -52,8 +52,7 @@ class WebPushConfig : Config {
                 clear()
                 headers.takeIf { it.isNotEmpty() }?.let { put("headers", it) }
                 data.takeIf { it.isNotEmpty() }?.let { put("headers", it) }
-                val notiContent = notification.valueMap
-                notiContent.takeIf { it.isNotEmpty() }?.let { put("notification", it) }
+                notification?.valueMap?.takeIf { it.isNotEmpty() }?.let { put("notification", it) }
             }
         }
 

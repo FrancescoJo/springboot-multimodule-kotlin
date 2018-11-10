@@ -15,12 +15,4 @@ interface Config {
     val name: String
 
     val valueMap: Map<String, Any>
-
-    companion object {
-        val EMPTY = object: Config {
-            override val name = ""
-
-            override val valueMap by lazy { HashMap<String, Any>() }
-        }
-    }
 }

@@ -4,15 +4,6 @@
  */
 package com.github.fj.fcmclient
 
-import com.github.fj.fcmclient.PushPlatform.ANDROID
-import com.github.fj.fcmclient.PushPlatform.IOS
-import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.HTTP_V1
-import com.github.fj.fcmclient.SimpleFcmPushSender.Mode.LEGACY
-import com.github.fj.fcmclient.httpv1.FcmHttpV1Client
-import com.github.fj.fcmclient.legacy.FcmLegacyClient
-import com.github.fj.fcmclient.legacy.ValidateKeyResponse
-import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
-import com.github.fj.fcmclient.legacy.dto.notification.IosNotification
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.http.HttpBackOffUnsuccessfulResponseHandler
 import com.google.api.client.http.HttpResponseException
@@ -20,6 +11,15 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.util.ExponentialBackOff
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
+import com.github.fj.fcmclient.httpv1.FcmHttpV1Client
+import com.github.fj.fcmclient.httpv1.dto.HttpV1Message
+import com.github.fj.fcmclient.httpv1.dto.config.apns.ApnsConfig
+import com.github.fj.fcmclient.httpv1.dto.notification.BasicNotification
+import com.github.fj.fcmclient.httpv1.dto.target.TokenTarget
+import com.github.fj.fcmclient.legacy.FcmLegacyClient
+import com.github.fj.fcmclient.legacy.ValidateKeyResponse
+import com.github.fj.fcmclient.legacy.dto.DownstreamMessage
+import com.github.fj.fcmclient.legacy.dto.notification.IosNotification
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -33,36 +33,25 @@ import java.nio.charset.Charset
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 21 - Aug - 2018
  */
-open class SimpleFcmPushSender(privateKeyLocation: String,
-                               protected val serverKey: String,
-                               protected val projectId: String,
-                               clientMode: Mode = HTTP_V1) {
-    protected val mode: Mode
-    protected val fcmCredential: String
-
-    init {
-        @Suppress("LocalVariableName")
-        var _mode = clientMode
-
-        fcmCredential = try {
-            File(privateKeyLocation).inputStream().asString()
-        } catch (t: IOException) {
-            LOG.warn("Error while accessing Firebase credential file. Operating in legacy mode.")
-            LOG.warn("Key location: {}", privateKeyLocation)
-            _mode = Mode.LEGACY
-            ""
-        }
-
-        mode = _mode
+class SimpleFcmPushSender(privateKeyLocation: String,
+                          projectId: String,
+                          private val applicationNameProvider: ApplicationNameProvider,
+                          private val serverKey: String,
+                          private val mode: Mode = Mode.HTTP_V1) {
+    private val fcmCredential = try {
+        File(privateKeyLocation).inputStream().asString()
+    } catch (t: IOException) {
+        LOG.warn("Error while accessing Firebase credential file. Cannot continue.")
+        LOG.warn("{}", t.message)
+        throw t
     }
 
-    protected val legacyClient = FcmLegacyClient(serverKey, LOG)
-    protected val httpV1Client = FcmHttpV1Client(projectId, fcmCredential, LOG)
-
+    private val legacyClient = FcmLegacyClient(serverKey, LOG)
+    private val httpV1Client = FcmHttpV1Client(projectId, fcmCredential, LOG)
     private val gson = Gson()
 
-    open fun validatePushToken(applicationName: String, pushToken: String): Boolean {
-        val url = "https://iid.googleapis.com/iid/info/$pushToken"
+    fun validatePushToken(platform: PushPlatform, token: String): Boolean {
+        val url = "https://iid.googleapis.com/iid/info/$token"
 
         val response = try {
             NetHttpTransport().createRequestFactory().buildGetRequest(GenericUrl(url)).apply {
@@ -108,21 +97,23 @@ open class SimpleFcmPushSender(privateKeyLocation: String,
             return false
         }
 
+        val applicationName = applicationNameProvider.nameForPlatform(platform)
+
         LOG.debug("Expected application name: {}, FCM registered application name: {}",
                 applicationName, result.application)
 
         return result.application == applicationName
     }
 
-    open fun sendPush(pushContent: PushContent) {
+    fun sendPush(pushContent: PushContent) {
         val pushMessage = when (mode) {
-            LEGACY -> createLegacyPushMessage(pushContent)
-            HTTP_V1 -> TODO("Replace to better implementation")
+            Mode.LEGACY -> createLegacyPushMessage(pushContent)
+            Mode.HTTP_V1 -> createHttpV1PushMessage(pushContent)
         }
 
         return when (mode) {
-            LEGACY -> legacyClient.sendPush(pushMessage)
-            HTTP_V1 -> httpV1Client.sendPush(pushMessage)
+            Mode.LEGACY -> legacyClient.sendPush(pushMessage)
+            Mode.HTTP_V1 -> httpV1Client.sendPush(pushMessage)
         }
     }
 
@@ -131,14 +122,14 @@ open class SimpleFcmPushSender(privateKeyLocation: String,
 
         return DownstreamMessage().apply {
             when (targetPlatform) {
-                IOS -> {
+                PushPlatform.IOS -> {
                     recipients.add(pushContent.receiverDeviceToken)
                     notification = IosNotification().apply {
                         title = pushContent.title
                         body = pushContent.text.toString()
                     }
                     // https://github.com/firebase/quickstart-ios/issues/246
-                    isContentAvailable = targetPlatform == IOS
+                    isContentAvailable = targetPlatform == PushPlatform.IOS
                     // https://github.com/firebase/firebase-ios-sdk/issues/149
                     pushContent.customData.takeIf { it.isNotEmpty() }?.let { customData ->
                         customData.entries.forEach { data[it.key] = it.value }
@@ -156,20 +147,18 @@ open class SimpleFcmPushSender(privateKeyLocation: String,
                  * Read [Firebase message concept](https://firebase.google.com/docs/cloud-messaging/concept-options)
                  * for more information.
                  */
-                ANDROID -> {
+                PushPlatform.ANDROID -> {
                     recipients.add(pushContent.receiverDeviceToken)
 
                     val payloadData = HashMap<String, Any>().apply {
-                        pushContent.customData.takeIf { it.isNotEmpty() }?.let { customData ->
-                            customData.entries.forEach { put(it.key, it.value) }
-                        }
+                        putAll(pushContent.customData)
                     }
 
                     /*
                      * These key names must be known to client developers
                      * to handle the push message correctly.
                      */
-                    data.apply {
+                    with(data) {
                         // May diverge to support multiple business requirements
                         put(KEY_TYPE, "push")
                         put(KEY_DATA, HashMap<String, Any>().apply {
@@ -181,6 +170,30 @@ open class SimpleFcmPushSender(privateKeyLocation: String,
                 }
                 else -> throw UnsupportedOperationException("Not supported: $targetPlatform")
             }
+        }
+    }
+
+    private fun createHttpV1PushMessage(pushContent: PushContent): PushMessage {
+        val targetPlatform = pushContent.receiverPlatform
+        val receiver = TokenTarget(pushContent.receiverDeviceToken)
+
+        return HttpV1Message(receiver).apply {
+            when (targetPlatform) {
+                PushPlatform.IOS -> {
+                    config = ApnsConfig().apply {
+                        headers["title"] = pushContent.title
+                        headers["body"] = pushContent.text.toString()
+                    }
+                }
+                PushPlatform.ANDROID -> {
+                    notification = BasicNotification().apply {
+                        title = pushContent.title
+                        body = pushContent.text.toString()
+                    }
+                }
+                else -> throw UnsupportedOperationException("Not supported: $targetPlatform")
+            }
+            data.putAll(pushContent.customData)
         }
     }
 

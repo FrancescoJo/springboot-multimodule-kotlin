@@ -10,6 +10,6 @@ package com.github.fj.fcmclient.httpv1.dto.target
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 5 - Feb - 2018
  */
-class TopicTarget(value: String): Target {
-    override val valuePair = Pair("topic", value)
+class TopicTarget(override val value: String): Target {
+    override val key = "topic"
 }

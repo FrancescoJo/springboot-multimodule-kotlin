@@ -26,7 +26,7 @@ class Aps {
      * a banner. The notification settings for your app on the user's device
      * determine whether an alert or banner is displayed.
      */
-    var alert = Alert.EMPTY
+    var alert: Alert? = null
 
     /**
      * Include this key when you want the system to modify the badge of your
@@ -83,8 +83,7 @@ class Aps {
     fun toStruct(): Map<String, Any> {
         return _valueMap.apply {
             clear()
-            val alertContents = alert.toStruct()
-            alertContents.takeIf { it.isNotEmpty() }?.let { put("alert", it) }
+            alert?.toStruct()?.takeIf { it.isNotEmpty() }?.let { put("alert", it) }
             badge.takeIf { it >= 0 }?.let { put("badge", badge) }
             sound.takeIf { it.isNotEmpty() }?.let { put("sound", it) }
             contentAvailable.takeIf { it == 1 }?.let { put("content-available", it) }

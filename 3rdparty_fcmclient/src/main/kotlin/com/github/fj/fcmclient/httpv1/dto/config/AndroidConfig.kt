@@ -65,7 +65,7 @@ class AndroidConfig : Config {
     val data: MutableMap<String, String> = HashMap()
 
     /** Notification to send to android devices. */
-    var notification = AndroidNotification.EMPTY
+    var notification : AndroidNotification? = null
 
     override val name = CONFIG_NAME
 
@@ -78,8 +78,7 @@ class AndroidConfig : Config {
                 ttl.takeIf { it.isNotEmpty() }?.let { put("ttl", it) }
                 restrictedPackageName.takeIf { it.isNotEmpty() }?.let { put("restricted_package_name", it) }
                 data.takeIf { it.isNotEmpty() }?.let { put("data", it) }
-                val notiContent = notification.valueMap
-                notiContent.takeIf { it.isNotEmpty() }?.let { put("notification", it) }
+                notification?.valueMap?.takeIf { it.isNotEmpty() }?.let { put("notification", it) }
             }
         }
 

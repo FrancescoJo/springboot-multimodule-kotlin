@@ -108,8 +108,4 @@ class AndroidNotification: Notification {
                 titleLocaleArgs.takeIf { it.isNotEmpty() }?.let { put("title_loc_args", it) }
             }
         }
-
-    companion object {
-        val EMPTY = AndroidNotification()
-    }
 }

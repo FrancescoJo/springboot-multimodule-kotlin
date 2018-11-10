@@ -12,11 +12,7 @@ package com.github.fj.fcmclient.httpv1.dto.target
  * @see <a href="https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#resource-message">Firebase HTTP v1 API - HttpV1Message</a>
  */
 interface Target {
-    val valuePair: Pair<String, String>
+    val key: String
 
-    companion object {
-        val EMPTY = object: Target {
-            override val valuePair = Pair("", "")
-        }
-    }
+    val value: String
 }

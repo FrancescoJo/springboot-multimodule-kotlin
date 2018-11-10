@@ -39,8 +39,4 @@ class WebPushNotification: Notification {
                 icon.takeIf { it.isNotEmpty() }?.let { put("icon", it) }
             }
         }
-
-    companion object {
-        val EMPTY = WebPushNotification()
-    }
 }

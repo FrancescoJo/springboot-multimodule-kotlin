@@ -6,9 +6,9 @@
  */
 package com.github.fj.fcmclient.legacy.dto
 
+import com.google.gson.Gson
 import com.github.fj.fcmclient.PushMessage
 import com.github.fj.fcmclient.legacy.dto.notification.Notification
-import com.google.gson.Gson
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -135,7 +135,7 @@ class DownstreamMessage : PushMessage {
      * is set to `true` for a message to an iOS device, the message is *sent
      * through APNs*, otherwise it is sent through the FCM connection server.
      */
-    var notification = Notification.EMPTY
+    var notification: Notification? = null
 
     override fun toJsonString(): String = Gson().toJson(HashMap<String, Any>().apply {
         when (recipients.size) {
@@ -150,6 +150,6 @@ class DownstreamMessage : PushMessage {
         restrictedPackageName.takeIf { it.isNotEmpty() }?.let { put("restricted_package_name", it) }
         isDryRun.takeIf { it }?.let { put("dry_run", it) }
         data.takeIf { it.isNotEmpty() }?.let { put("data", it) }
-        notification.valueMap.takeIf { it.isNotEmpty() }?.let { put("notification", it) }
+        notification?.valueMap?.takeIf { it.isNotEmpty() }?.let { put("notification", it) }
     })
 }

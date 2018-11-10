@@ -4,12 +4,15 @@
  */
 package com.github.fj.restapi.appconfig.service
 
+import com.github.fj.fcmclient.ApplicationNameProvider
+import com.github.fj.fcmclient.PushPlatform
 import com.github.fj.fcmclient.SimpleFcmPushSender
 import com.github.fj.lib.annotation.AllOpen
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.lang.UnsupportedOperationException
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -28,7 +31,23 @@ class PushConfig {
     @Value("\${app.push.fcm-project-id}")
     private var fcmProjectId = ""
 
+    @Value("\${app.push.fcm-android-app-name}")
+    private var fcmAndroidAppName = ""
+
+    @Value("\${app.push.fcm-ios-app-name}")
+    private var fcmIosAppName = ""
+
+    @Value("\${app.push.fcm-web-app-name}")
+    private var fcmWebAppName = ""
+
     @Bean
-    fun fcmPushSenderService() = SimpleFcmPushSender(fcmPrivateKeyLocation,
-            fcmServerKey, fcmProjectId)
+    fun fcmPushSenderService() = SimpleFcmPushSender(fcmPrivateKeyLocation, fcmProjectId,
+            object : ApplicationNameProvider {
+                override fun nameForPlatform(platform: PushPlatform): String = when (platform) {
+                    PushPlatform.ANDROID -> fcmAndroidAppName
+                    PushPlatform.IOS -> fcmIosAppName
+                    PushPlatform.WEB -> fcmWebAppName
+                    else -> throw UnsupportedOperationException("Push to $platform is not supported.")
+                }
+            }, fcmServerKey)
 }

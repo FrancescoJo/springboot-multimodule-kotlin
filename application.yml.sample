@@ -66,6 +66,9 @@ app:
     fcm-private-key-location:
     fcm-server-key:
     fcm-project-id:
+    fcm-android-app-name:
+    fcm-ios-app-name:
+    fcm-web-app-name:
 
   cipher:
     # Please provide 32 digit HEX presented your encryption key, for example:

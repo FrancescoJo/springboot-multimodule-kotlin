@@ -17,10 +17,4 @@ interface Notification {
      * inside, or fcmClient will not perform its operations correctly.
      */
     val valueMap: Map<String, Any>
-
-    companion object {
-        val EMPTY = object: Notification {
-            override val valueMap by lazy { HashMap<String, Any>() }
-        }
-    }
 }

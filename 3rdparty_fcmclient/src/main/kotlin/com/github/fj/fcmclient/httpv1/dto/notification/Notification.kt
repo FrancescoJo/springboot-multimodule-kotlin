@@ -13,10 +13,4 @@ package com.github.fj.fcmclient.httpv1.dto.notification
  */
 interface Notification {
     val valueMap: Map<String, Any>
-
-    companion object {
-        val EMPTY = object: Notification {
-            override val valueMap by lazy { HashMap<String, Any>() }
-        }
-    }
 }
