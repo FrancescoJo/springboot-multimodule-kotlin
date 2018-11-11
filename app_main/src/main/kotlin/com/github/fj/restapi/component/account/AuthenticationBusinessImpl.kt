@@ -6,11 +6,13 @@ package com.github.fj.restapi.component.account
 
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.lib.annotation.VisibleForTesting
+import com.github.fj.lib.collection.getSecureRandomBytes
 import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
 import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
+import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
@@ -21,8 +23,8 @@ import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.nio.ByteBuffer
 import java.security.Key
-import java.security.SecureRandom
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import javax.crypto.Cipher
@@ -59,17 +61,16 @@ class AuthenticationBusinessImpl(
      *
      * Just consider this as AES256 and Base62 encoding usage demonstration.
      */
-    override fun createAccessToken(user: User): AccessToken {
-        val now = utcNow()
+    override fun createAccessToken(user: User, timestamp: LocalDateTime): AccessToken {
         val mode = when (accessTokenMode) {
             AccessToken.Encoded.RANDOM -> with(AccessToken.Encoded.values()) {
                 get(Random().nextInt(size - 1))
             }
             else -> accessTokenMode
         }
-        val ivArray = ByteArray(LENGTH_IV_HEADER).apply { SecureRandom().nextBytes(this) }
+        val ivArray = getSecureRandomBytes(LENGTH_IV_HEADER)
 
-        return createAccessToken(user, mode, aes256CipherKey, ivArray, now).apply {
+        return createAccessToken(user, mode, aes256CipherKey, ivArray, timestamp).apply {
             this.user = user
         }
     }
@@ -92,6 +93,7 @@ class AuthenticationBusinessImpl(
         }
     }
 
+    @Throws(AuthTokenException::class)
     override fun authenticate(token: AccessToken): Authentication {
         val tokenUser = token.user ?: throw UnknownAuthTokenException("This token is tampered.")
 
@@ -103,11 +105,15 @@ class AuthenticationBusinessImpl(
             throw UnknownAuthTokenException("This token is tampered.")
         }
 
-        if (tokenUser.createdDate != token.userRegisteredTimestamp) {
+        if (tokenUser.createdDate.truncatedTo(ChronoUnit.SECONDS) != token.userRegisteredTimestamp) {
             throw UnknownAuthTokenException("This token is tampered.")
         }
 
         val now = utcNow()
+        if (token.issuedTimestamp > now) {
+            throw UnknownAuthTokenException("This token is tampered.")
+        }
+
         val tokenExpiration = token.issuedTimestamp.plusSeconds(TOKEN_ALIVE_DURATION_SECS)
 
         if (now > tokenExpiration) {
@@ -189,11 +195,7 @@ class AuthenticationBusinessImpl(
         private fun createAccessToken(user: User, mode: AccessToken.Encoded,
                                       key: Key, iv: ByteArray, now: LocalDateTime): AccessToken {
             val garbageFiller: (ByteBuffer) -> Unit = { buf ->
-                ByteArray(buf.remaining()) { 0 }.apply {
-                    SecureRandom().nextBytes(this)
-                }.let {
-                    buf.put(it, 0, it.size)
-                }
+                getSecureRandomBytes(buf.remaining()).let { buf.put(it, 0, it.size) }
             }
 
             val header = ByteBuffer.allocate(LENGTH_BYTES_HEADER).apply {
@@ -261,7 +263,7 @@ class AuthenticationBusinessImpl(
                     LENGTH_IV_HEADER).apply {
                 put(header)
 
-                val innerIv = ByteArray(LENGTH_IV_HEADER).apply { SecureRandom().nextBytes(this) }
+                val innerIv = getSecureRandomBytes(LENGTH_IV_HEADER)
                 @Suppress("NON_EXHAUSTIVE_WHEN")
                 when (mode) {
                     AccessToken.Encoded.FORWARD -> {

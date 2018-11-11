@@ -125,7 +125,7 @@ class User : Serializable {
                 "  authIv=${Arrays.toString(authIv)},\n" +
                 "  rawAccessToken=${Arrays.toString(rawAccessToken)},\n" +
                 "  tokenIssuedDate=$tokenIssuedDate,\n" +
-                "  member=${indentToString(member)}," +
+                "  member=${indentToString(member)}" +
                 ")"
     }
 

@@ -161,8 +161,11 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 ## TO-DOs
 - Fix all tests && Make Create - Get - Login - Delete scenario test
 - Make Pre/Post authorise works properly
-- JWT Token support
+- Spring RESTDoc support
+- Fix all code warnings
+- Docker integration
 - Flatten all commit history
+
 - non-JPA implementation
 - More complex project model on another branch
-- Docker integration
+- JWT Token support

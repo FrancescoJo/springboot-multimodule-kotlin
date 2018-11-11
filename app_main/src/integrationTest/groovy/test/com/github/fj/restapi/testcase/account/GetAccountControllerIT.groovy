@@ -4,9 +4,9 @@
  */
 package test.com.github.fj.restapi.testcase.account
 
-import com.github.fj.restapi.endpoint.OkResponseDto
-import com.github.fj.restapi.dto.account.ProfileResponseDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.endpoint.OkResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.ProfileResponseDto
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import test.com.github.fj.restapi.IntegrationTestBase

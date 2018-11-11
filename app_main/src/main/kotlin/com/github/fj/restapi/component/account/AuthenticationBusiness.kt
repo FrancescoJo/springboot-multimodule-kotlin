@@ -4,10 +4,13 @@
  */
 package com.github.fj.restapi.component.account
 
+import com.github.fj.lib.time.utcNow
+import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.security.core.Authentication
+import java.time.LocalDateTime
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -16,7 +19,7 @@ import org.springframework.security.core.Authentication
 interface AuthenticationBusiness {
     fun hash(data: ByteArray): ByteArray
 
-    fun createAccessToken(user: User): AccessToken
+    fun createAccessToken(user: User, timestamp: LocalDateTime = utcNow()): AccessToken
 
     /**
      * @param token Base62 encoded access token.
@@ -25,5 +28,6 @@ interface AuthenticationBusiness {
     @Throws(UnknownAuthTokenException::class)
     fun parseAccessToken(token: String): AccessToken
 
+    @Throws(AuthTokenException::class)
     fun authenticate(token: AccessToken): Authentication
 }

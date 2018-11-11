@@ -52,8 +52,8 @@ class LoginServiceImpl @Inject constructor(
          * than checking its expected life.
          */
         val newToken = authBusiness.createAccessToken(user)
-            user.setAccessToken(newToken)
-            userRepo.save(user)
+        user.setAccessToken(newToken)
+        userRepo.save(user)
 
         return AuthenticationResponseDto.create(user)
     }

@@ -4,9 +4,9 @@
  */
 package test.com.github.fj.restapi.util
 
-import com.github.fj.restapi.dto.account.AuthenticationResponseDto
-import com.github.fj.restapi.dto.account.CreateAccountRequestDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
+import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import test.com.github.fj.restapi.HttpTransportUtils

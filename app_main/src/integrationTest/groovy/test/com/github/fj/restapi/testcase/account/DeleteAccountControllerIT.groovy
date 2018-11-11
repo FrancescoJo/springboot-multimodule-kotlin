@@ -4,8 +4,8 @@
  */
 package test.com.github.fj.restapi.testcase.account
 
-import com.github.fj.restapi.dto.account.DeleteAccountRequestDto
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.endpoint.v1.account.dto.DeleteAccountRequestDto
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters

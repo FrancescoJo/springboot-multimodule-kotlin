@@ -7,18 +7,29 @@ package test.com.github.fj.restapi.account;
 import com.github.fj.lib.collection.ArrayUtilsKt;
 import com.github.fj.lib.text.SemanticVersion;
 import com.github.fj.lib.text.StringUtilsKt;
+import com.github.fj.lib.time.DateTimeUtilsKt;
 import com.github.fj.lib.util.ProtectedProperty;
+import com.github.fj.restapi.appconfig.AppProperties;
+import com.github.fj.restapi.component.account.AuthenticationBusiness;
+import com.github.fj.restapi.component.account.AuthenticationBusinessImpl;
 import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto;
+import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto;
 import com.github.fj.restapi.persistence.consts.account.LoginType;
 import com.github.fj.restapi.persistence.consts.account.PlatformType;
 import com.github.fj.restapi.persistence.consts.account.Role;
 import com.github.fj.restapi.persistence.consts.account.Status;
 import com.github.fj.restapi.persistence.entity.User;
+import com.github.fj.restapi.persistence.repository.UserRepository;
+import com.github.fj.restapi.vo.account.AccessToken;
+import org.springframework.data.util.Pair;
 import test.com.github.fj.lib.RandomHelper;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.Random;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -34,15 +45,9 @@ public final class AccountRequestUtils {
     }
 
     public static CreateAccountRequestDto newRandomCreateAccountRequest(final LoginType loginType) {
-        final String username;
-        final ProtectedProperty<String> credential;
-        if (loginType == LoginType.GUEST) {
-            username = "";
-            credential = new ProtectedProperty<>("");
-        } else {
-            username = StringUtilsKt.getRandomAlphaNumericString(User.MAXIMUM_NAME_LENGTH);
-            credential = new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63));
-        }
+        final Pair<String, ProtectedProperty<String>> identity = userIdentityByLoginType(loginType);
+        final String username = identity.getFirst();
+        final ProtectedProperty<String> credential = identity.getSecond();
 
         return new CreateAccountRequestDto(
                 /*pushToken=*/       new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63)),
@@ -77,5 +82,56 @@ public final class AccountRequestUtils {
         u.setCredential(ArrayUtilsKt.getRandomBytes(56));
 
         return u;
+    }
+
+    public static AccessToken newRandomAccessToken(final User user) {
+        return newRandomAccessToken(user, DateTimeUtilsKt.utcNow());
+    }
+
+    public static AccessToken newRandomAccessToken(final User user,
+                                                   final LocalDateTime timestamp) {
+        final AppProperties appProperties = mock(AppProperties.class);
+        final UserRepository userRepository = mock(UserRepository.class);
+        // AES256 is assumed
+        final byte[] keyPass = ArrayUtilsKt.getRandomBytes(32);
+        when(appProperties.getAccessTokenAes256Key()).thenReturn(keyPass);
+
+        final AuthenticationBusiness tokenCreator
+                = new AuthenticationBusinessImpl(appProperties, userRepository);
+
+        return tokenCreator.createAccessToken(user, timestamp);
+    }
+
+    public static LoginRequestDto newRandomLoginRequest() {
+        return newRandomLoginRequest(RandomHelper.randomEnumConst(LoginType.class));
+    }
+
+    public static LoginRequestDto newRandomLoginRequest(final LoginType loginType) {
+        final Pair<String, ProtectedProperty<String>> identity = userIdentityByLoginType(loginType);
+        final String username = identity.getFirst();
+        final ProtectedProperty<String> credential = identity.getSecond();
+
+        return new LoginRequestDto(
+                /*username=*/        username,
+                /*credential=*/      credential,
+                /*loginType=*/       loginType,
+                /*platformType=*/    RandomHelper.randomEnumConst(PlatformType.class),
+                /*platformVersion=*/ DEFAULT_PLATFORM_VERSION,
+                /*appVersion=*/      DEFAULT_APP_VERSION
+        );
+    }
+
+    private static Pair<String, ProtectedProperty<String>> userIdentityByLoginType(final LoginType loginType) {
+        final String username;
+        final ProtectedProperty<String> credential;
+        if (loginType == LoginType.GUEST) {
+            username = "";
+            credential = new ProtectedProperty<>("");
+        } else {
+            username = StringUtilsKt.getRandomAlphaNumericString(User.MAXIMUM_NAME_LENGTH);
+            credential = new ProtectedProperty<>(StringUtilsKt.getRandomAlphaNumericString(63));
+        }
+
+        return Pair.of(username, credential);
     }
 }

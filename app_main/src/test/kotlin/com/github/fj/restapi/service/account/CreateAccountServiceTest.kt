@@ -90,7 +90,7 @@ class CreateAccountServiceTest {
         `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.empty())
         `when`(mockAuthBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
-        `when`(mockAuthBusiness.createAccessToken(any())).thenReturn(AccessToken.EMPTY)
+        `when`(mockAuthBusiness.createAccessToken(any(), any())).thenReturn(AccessToken.EMPTY)
         `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
                 .thenReturn(Optional.empty())
 
@@ -115,7 +115,7 @@ class CreateAccountServiceTest {
         val existingUser = newRandomUser()
         `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
                 .thenReturn(Optional.of(existingUser))
-        `when`(mockAuthBusiness.createAccessToken(any())).thenReturn(AccessToken.EMPTY)
+        `when`(mockAuthBusiness.createAccessToken(any(), any())).thenReturn(AccessToken.EMPTY)
 
         // when:
         val actual = sut.createAccount(req, httpReq)

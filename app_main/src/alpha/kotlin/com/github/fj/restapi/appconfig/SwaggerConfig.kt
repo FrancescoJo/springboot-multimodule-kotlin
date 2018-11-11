@@ -1,0 +1,1 @@
+../../../../../../../dev/kotlin/com/github/fj/restapi/appconfig/SwaggerConfig.kt

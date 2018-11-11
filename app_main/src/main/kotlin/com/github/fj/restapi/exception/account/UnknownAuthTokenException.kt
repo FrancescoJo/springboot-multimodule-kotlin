@@ -4,13 +4,11 @@
  */
 package com.github.fj.restapi.exception.account
 
-import com.github.fj.restapi.exception.AbstractBaseHttpException
-import org.springframework.http.HttpStatus
+import com.github.fj.restapi.exception.AuthTokenException
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 01 - Nov - 2018
  */
-class UnknownAuthTokenException(override val message: String = "", cause: Throwable? = null,
-                                override val httpStatus: HttpStatus = HttpStatus.BAD_REQUEST)
-    : AbstractBaseHttpException(message, cause)
+class UnknownAuthTokenException(override val message: String = "", cause: Throwable? = null) :
+        AuthTokenException(message, cause)
