@@ -41,10 +41,14 @@ class AuthenticationBusinessImpl(
         private val appProperties: AppProperties,
         private val userRepository: UserRepository
 ) : AuthenticationBusiness {
-    var accessTokenMode = AccessToken.Encoded.RANDOM
+    // TODO: solve BACKWARD data save problem on integration tests
+    var accessTokenMode = AccessToken.Encoded.FORWARD
 
     private val aes256CipherKey: Key
         get() = SecretKeySpec(appProperties.accessTokenAes256Key, CIPHER_ALG)
+
+    private val accessTokenLifeSeconds: Long
+        get() = appProperties.accessTokenAliveSecs.toLong()
 
     @Suppress("UnstableApiUsage")
     override fun hash(data: ByteArray): ByteArray =
@@ -114,7 +118,7 @@ class AuthenticationBusinessImpl(
             throw UnknownAuthTokenException("This token is tampered.")
         }
 
-        val tokenExpiration = token.issuedTimestamp.plusSeconds(TOKEN_ALIVE_DURATION_SECS)
+        val tokenExpiration = token.issuedTimestamp.plusSeconds(accessTokenLifeSeconds)
 
         if (now > tokenExpiration) {
             throw AuthTokenExpiredException("This token is expired.")
@@ -186,11 +190,6 @@ class AuthenticationBusinessImpl(
         private const val LENGTH_BYTES_HEADER = 16
         private const val LENGTH_PAYLOAD_HEADER = 32
         private const val LENGTH_IV_HEADER = 16
-
-        /**
-         * 24 hours
-         */
-        private const val TOKEN_ALIVE_DURATION_SECS = 60 * 60 * 24L
 
         private fun createAccessToken(user: User, mode: AccessToken.Encoded,
                                       key: Key, iv: ByteArray, now: LocalDateTime): AccessToken {

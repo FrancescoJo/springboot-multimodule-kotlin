@@ -101,9 +101,8 @@ class CustomErrorHandler : ErrorController {
      */
     @RequestMapping(BASIC_ERROR_PATH)
     fun handleError(request: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
-//        val statusCode = request.getAttribute("javax.servlet.error.status_code") as Int
         val exception = request.getAttribute("javax.servlet.error.exception") as? Exception
-                ?: GeneralHttpException.create(HttpStatus.INTERNAL_SERVER_ERROR)
+                ?: GeneralHttpException.create(HttpStatus.BAD_REQUEST)
 
         return handleError(request, exception)
     }
@@ -115,7 +114,7 @@ class CustomErrorHandler : ErrorController {
     private fun getStatus(request: HttpServletRequest): HttpStatus {
         return (request.getAttribute("javax.servlet.error.status_code") as? Int)?.let {
             HttpStatus.valueOf(it)
-        } ?: HttpStatus.INTERNAL_SERVER_ERROR
+        } ?: HttpStatus.BAD_REQUEST
     }
 
     private fun logError(message: String, ex: Exception) {

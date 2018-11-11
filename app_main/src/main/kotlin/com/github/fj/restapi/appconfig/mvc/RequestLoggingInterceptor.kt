@@ -35,7 +35,15 @@ class RequestLoggingInterceptor : HandlerInterceptorAdapter() {
             handler.javaClass.toString()
         }
 
-        LOG.info(String.format("%s %s from %s << %s", method, path, ip, handlerInfo))
+        LOG.info("{} {} from {} << {}", method, path, ip, handlerInfo)
+        val headers = request.headerNames
+
+        while(headers.hasMoreElements()) {
+            val header = headers.nextElement()
+            val value = request.getHeader(header)
+            LOG.debug("{} : {}", header, value)
+        }
+
         return super.preHandle(request, response, handler)
     }
 

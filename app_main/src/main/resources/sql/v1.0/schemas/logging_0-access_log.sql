@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `access_log` (
   `input`     TEXT,
   `output`    TEXT,
 
-  UNIQUE KEY UK_Access_Log_History(`timestamp`, `user_id`)
+  UNIQUE KEY UK_Access_Log_History(`seq`, `timestamp`, `user_id`, `activity`)
 )
   COMMENT 'Stores user activity for management purpose.'
   DEFAULT CHARACTER SET = utf8mb4;

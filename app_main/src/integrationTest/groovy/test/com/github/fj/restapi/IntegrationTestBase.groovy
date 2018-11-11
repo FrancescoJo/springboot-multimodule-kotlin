@@ -50,7 +50,7 @@ abstract class IntegrationTestBase extends Specification {
         return newBasicWebTestClient().with {
             if (!accessToken.isEmpty()) {
                 defaultHeader(HttpServletRequestAuthorizationHeaderFilter.HEADER_AUTHORIZATION,
-                        "${HttpAuthScheme.TOKEN.typeValue} $accessToken")
+                        "${HttpAuthScheme.TOKEN.typeValue} ${accessToken}")
                 defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 // filter(logTransport())
             }

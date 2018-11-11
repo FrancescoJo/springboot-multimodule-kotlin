@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.lib.util.ProtectedProperty
 import com.github.fj.restapi.persistence.consts.account.Gender
+import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.entity.User
 import io.seruco.encoding.base62.Base62
@@ -25,6 +26,10 @@ import java.time.LocalDateTime
 @JsonSerialize
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AuthenticationResponseDto(
+        @ApiModelProperty("Your login method. b: BASIC, g: GUEST", example = "b", required = true)
+        @JsonProperty
+        val loginType: LoginType,
+
         /**
          * This value must be [com.github.fj.restapi.persistence.entity.User.idToken].
          * It is strongly discouraged to expose numeric primary key to the outside world.
@@ -47,7 +52,7 @@ data class AuthenticationResponseDto(
 
         @ApiModelProperty("An UNIX timestamp that indicates user's last activity.", example = "2018-10-27T00:00:01", required = true)
         @JsonProperty
-        val lastActiveTimestamp: LocalDateTime,
+        val lastActive: LocalDateTime,
 
         @ApiModelProperty("Access token to authorise user identity. " +
                 "Clients must store this information in a secure storage and keep it secret" +
@@ -59,25 +64,26 @@ data class AuthenticationResponseDto(
                 "banned or suspended in certain timespan. Field may not found or the value will be 0" +
                 "if your account status is good.", example = "<UNIX TIMESTAMP>", required = false)
         @JsonProperty
-        val suspendedOnTimestamp: LocalDateTime?,
+        val suspendedOn: LocalDateTime?,
 
         @ApiModelProperty("An UNIX timestamp that will appear if a user account is " +
                 "banned or suspended in certain timespan. Field may not found or the value will be 0" +
                 "if your account status is good.", example = "<UNIX TIMESTAMP>", required = false)
         @JsonProperty
-        val suspendedUntilTimestamp: LocalDateTime?
+        val suspendedUntil: LocalDateTime?
 ) {
     companion object {
         fun create(user: User) = AuthenticationResponseDto(
+                loginType = user.loginType,
                 id = user.idToken,
                 nickname = user.member.nickname,
                 gender = user.member.gender,
                 status = user.status,
-                lastActiveTimestamp = user.member.lastActiveTimestamp ?: LOCAL_DATE_TIME_MIN,
+                lastActive = user.member.lastActiveTimestamp ?: LOCAL_DATE_TIME_MIN,
                 accessToken = ProtectedProperty(Base62.createInstance().encode(user.rawAccessToken)
                         .toString(Charsets.UTF_8)),
-                suspendedOnTimestamp = user.member.suspendedOn,
-                suspendedUntilTimestamp = user.member.suspendedUntil
+                suspendedOn = user.member.suspendedOn,
+                suspendedUntil = user.member.suspendedUntil
         )
     }
 }

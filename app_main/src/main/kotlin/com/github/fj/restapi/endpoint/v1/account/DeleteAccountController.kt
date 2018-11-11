@@ -23,7 +23,7 @@ class DeleteAccountController @Inject constructor(
         private val svc: DeleteAccountService
 ) : IDeleteAccountController {
     override fun onDelete(user: User, deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto {
-        LOG.debug("Delete account request: {}", user)
+        LOG.debug("Delete account request: UserId {}", user.id)
         return svc.deleteAccount(user, deleteReason)
     }
 

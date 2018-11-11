@@ -102,10 +102,6 @@ public final class AccountRequestUtils {
         return tokenCreator.createAccessToken(user, timestamp);
     }
 
-    public static LoginRequestDto newRandomLoginRequest() {
-        return newRandomLoginRequest(RandomHelper.randomEnumConst(LoginType.class));
-    }
-
     public static LoginRequestDto newRandomLoginRequest(final LoginType loginType) {
         final Pair<String, ProtectedProperty<String>> identity = userIdentityByLoginType(loginType);
         final String username = identity.getFirst();

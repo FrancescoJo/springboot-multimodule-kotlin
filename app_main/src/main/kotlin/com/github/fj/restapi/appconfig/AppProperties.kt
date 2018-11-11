@@ -10,4 +10,13 @@ package com.github.fj.restapi.appconfig
  */
 interface AppProperties {
     val accessTokenAes256Key: ByteArray
+
+    /**
+     * Default: 24h
+     */
+    val accessTokenAliveSecs: Int
+
+    companion object {
+        const val TOKEN_ALIVE_DURATION_SECS = 60 * 60 * 24
+    }
 }

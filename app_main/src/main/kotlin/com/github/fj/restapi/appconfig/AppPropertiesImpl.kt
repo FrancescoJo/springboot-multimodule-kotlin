@@ -5,6 +5,7 @@
 package com.github.fj.restapi.appconfig
 
 import com.github.fj.lib.annotation.AllOpen
+import com.github.fj.restapi.appconfig.AppProperties.Companion.TOKEN_ALIVE_DURATION_SECS
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -26,8 +27,14 @@ import javax.xml.bind.DatatypeConverter
 class AppPropertiesImpl : AppProperties, InitializingBean {
     override lateinit var accessTokenAes256Key: ByteArray
 
+    override val accessTokenAliveSecs: Int
+        get() = _accessTokenAliveSecs
+
     @Value("\${app.cipher.access-token-aes256-key}")
     private lateinit var _accessTokenAes256Key: String
+
+    @Value("\${app.cipher.access-token-alive-seconds}")
+    private var _accessTokenAliveSecs: Int = TOKEN_ALIVE_DURATION_SECS
 
     override fun afterPropertiesSet() {
         val joinedAes256Key = _accessTokenAes256Key.let {
