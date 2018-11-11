@@ -12,6 +12,7 @@ import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
 import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
+import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
@@ -30,6 +31,7 @@ import java.util.concurrent.ThreadLocalRandom
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import javax.servlet.http.HttpServletRequest
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -41,8 +43,7 @@ class AuthenticationBusinessImpl(
         private val appProperties: AppProperties,
         private val userRepository: UserRepository
 ) : AuthenticationBusiness {
-    // TODO: solve BACKWARD data save problem on integration tests
-    var accessTokenMode = AccessToken.Encoded.FORWARD
+    var accessTokenMode = AccessToken.Encoded.RANDOM
 
     private val aes256CipherKey: Key
         get() = SecretKeySpec(appProperties.accessTokenAes256Key, CIPHER_ALG)
@@ -53,6 +54,13 @@ class AuthenticationBusinessImpl(
     @Suppress("UnstableApiUsage")
     override fun hash(data: ByteArray): ByteArray =
             com.google.common.hash.Hashing.goodFastHash(data.size * 8).hashBytes(data).asBytes()
+
+    override fun findAccessTokenFrom(httpRequest: HttpServletRequest): AccessToken? {
+        val httpAuthToken = HttpServletRequestAuthorizationHeaderFilter
+                .findAuthorizationHeader(httpRequest) ?: return null
+
+        return parseAccessToken(httpAuthToken.token)
+    }
 
     /**
      * This access token creation is implemented in a naïve way. It just focuses on "randomness"
@@ -67,8 +75,12 @@ class AuthenticationBusinessImpl(
      */
     override fun createAccessToken(user: User, timestamp: LocalDateTime): AccessToken {
         val mode = when (accessTokenMode) {
-            AccessToken.Encoded.RANDOM -> with(AccessToken.Encoded.values()) {
-                get(Random().nextInt(size - 1))
+            AccessToken.Encoded.RANDOM -> {
+                if (ThreadLocalRandom.current().nextInt(0, 2) == 0) {
+                    AccessToken.Encoded.FORWARD
+                } else {
+                    AccessToken.Encoded.BACKWARD
+                }
             }
             else -> accessTokenMode
         }
@@ -145,7 +157,7 @@ class AuthenticationBusinessImpl(
         val uIdTokenLengthReader: (ByteBuffer) -> Any = { it.get().toInt() }
         val uIdTokenReader: (Int, ByteBuffer) -> Any = { length, buf ->
             val uIdTokenArray = ByteArray(length)
-            for(i in 0 until length) {
+            for (i in 0 until length) {
                 uIdTokenArray[i] = buf.get()
             }
 
@@ -178,7 +190,7 @@ class AuthenticationBusinessImpl(
                 loginPlatformHash = loginTypeReader(payloadBuf) as Int
                 uIdToken = uIdTokenReader(length, payloadBuf) as String
             }
-            else -> { throw UnknownAuthTokenException("$mode encoding strategy is unsupported.") }
+            else -> throw UnknownAuthTokenException("$mode encoding strategy is unsupported.")
         }
 
         return AccessToken(rawToken.toList(), mode, iv.toList(), uIdToken, loginPlatformHash,
@@ -263,7 +275,6 @@ class AuthenticationBusinessImpl(
                 put(header)
 
                 val innerIv = getSecureRandomBytes(LENGTH_IV_HEADER)
-                @Suppress("NON_EXHAUSTIVE_WHEN")
                 when (mode) {
                     AccessToken.Encoded.FORWARD -> {
                         put(innerIv)
@@ -273,6 +284,7 @@ class AuthenticationBusinessImpl(
                         put(encrypt(key, innerIv, payload).reversedArray())
                         put(innerIv.reversedArray())
                     }
+                    else -> throw UnknownAuthTokenException("$mode encoding strategy is unsupported.")
                 }
             }.array().let {
                 return@let encrypt(key, iv, it)

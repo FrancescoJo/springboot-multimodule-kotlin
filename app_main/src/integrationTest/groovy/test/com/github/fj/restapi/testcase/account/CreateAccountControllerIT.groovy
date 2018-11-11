@@ -50,4 +50,8 @@ class CreateAccountControllerIT extends IntegrationTestBase {
         !result.accessToken.value.empty
         result.status == Status.NORMAL
     }
+
+    def cleanup() {
+        AccountUtils.deleteAllAccounts()
+    }
 }

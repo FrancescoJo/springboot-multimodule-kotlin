@@ -43,7 +43,7 @@ class HttpServletRequestAuthorizationHeaderFilter(
             return
         }
 
-        val token = findAuthorizationHeader(log, req)
+        val token = findAuthorizationHeader(req, log)
         if (token != null) {
             SecurityContextHolder.getContext().authentication = token
         }
@@ -57,10 +57,7 @@ class HttpServletRequestAuthorizationHeaderFilter(
 
         private val AUTHORIZATION_SYNTAX = Pattern.compile("[A-Za-z]+ [A-Za-z0-9]+")
 
-        fun findAuthorizationHeader(request: HttpServletRequest): HttpAuthorizationToken? =
-                findAuthorizationHeader(null, request)
-
-        fun findAuthorizationHeader(log: Logger? = null, request: HttpServletRequest): HttpAuthorizationToken? {
+        fun findAuthorizationHeader(request: HttpServletRequest, log: Logger? = null): HttpAuthorizationToken? {
             return request.getHeader(HEADER_AUTHORIZATION).let { h ->
                 if (h.isNullOrEmpty()) {
                     log?.t("No {} header in the request.", HEADER_AUTHORIZATION)

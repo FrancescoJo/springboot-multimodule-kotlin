@@ -47,4 +47,8 @@ class GetAccountControllerIT extends IntegrationTestBase {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
     }
+
+    def cleanup() {
+        AccountUtils.deleteAllAccounts()
+    }
 }

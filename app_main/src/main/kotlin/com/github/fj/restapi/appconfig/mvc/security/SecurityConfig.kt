@@ -66,7 +66,8 @@ class SecurityConfig @Inject constructor(
     companion object {
         private val FILTER_EXCLUDE_REQUESTS = arrayOf(
                 AntPathRequestMatcher(ApiPaths.API_V1_ACCOUNT, HttpMethod.POST.toString()),
-                AntPathRequestMatcher(ApiPaths.API_V1_ACCOUNT, HttpMethod.PATCH.toString())
+                AntPathRequestMatcher(ApiPaths.API_V1_ACCOUNT, HttpMethod.PATCH.toString()),
+                AntPathRequestMatcher(ApiPaths.ERROR)
         )
 
         private val LOG = LoggerFactory.getLogger(SecurityConfig::class.java)

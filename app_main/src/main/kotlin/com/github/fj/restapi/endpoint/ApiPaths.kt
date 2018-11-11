@@ -10,6 +10,8 @@ package com.github.fj.restapi.endpoint
  */
 object ApiPaths {
     const val HELLO = "/hello"
+    /** Used by Spring default */
+    const val ERROR = "/error"
 
     const val V1 = "v1"
     const val CURRENT_VERSION = V1

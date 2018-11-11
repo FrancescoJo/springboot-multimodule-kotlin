@@ -23,11 +23,10 @@ CREATE TABLE IF NOT EXISTS `users` (
   COMMENT 'Security credential, usually a password, 3rdparty access token, etc.',
   `auth_encoding`     VARCHAR(4)     NOT NULL,
   `auth_iv`           VARBINARY(16)  NOT NULL,
-  `access_token`      VARBINARY(127) NOT NULL,
+  `access_token`      VARBINARY(127) NOT NULL UNIQUE,
   `token_issued_date` DATETIME       NOT NULL,
 
-  UNIQUE KEY UK_Users_AccessToken(`access_token`),
-  UNIQUE KEY UK_Users_Identity(`id_token`, `name`),
+  UNIQUE KEY UK_Users_Identity(`id`, `id_token`),
   UNIQUE KEY UK_Users_Status(`id`, `status`),
   UNIQUE KEY UK_Users_Credential(`name`, `login_type`, `email`, `credential`)
 )

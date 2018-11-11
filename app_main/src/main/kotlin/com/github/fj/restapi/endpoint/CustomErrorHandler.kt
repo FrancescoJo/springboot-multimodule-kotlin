@@ -99,7 +99,7 @@ class CustomErrorHandler : ErrorController {
      * for example, are redirected to this method to decorate error output as our own favour,
      * rather than Spring's [org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController].
      */
-    @RequestMapping(BASIC_ERROR_PATH)
+    @RequestMapping(ApiPaths.ERROR)
     fun handleError(request: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
         val exception = request.getAttribute("javax.servlet.error.exception") as? Exception
                 ?: GeneralHttpException.create(HttpStatus.BAD_REQUEST)
@@ -108,7 +108,7 @@ class CustomErrorHandler : ErrorController {
     }
 
     override fun getErrorPath(): String {
-        return BASIC_ERROR_PATH
+        return ApiPaths.ERROR
     }
 
     private fun getStatus(request: HttpServletRequest): HttpStatus {
@@ -142,7 +142,5 @@ class CustomErrorHandler : ErrorController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(CustomErrorHandler::class.java)
-
-        private const val BASIC_ERROR_PATH = "/error"
     }
 }

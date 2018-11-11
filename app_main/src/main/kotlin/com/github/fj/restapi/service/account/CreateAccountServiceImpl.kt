@@ -70,7 +70,7 @@ class CreateAccountServiceImpl @Inject constructor(
             status = Status.NORMAL
             role = Role.USER
             name = when (req.loginType) {
-                LoginType.GUEST -> ""
+                LoginType.GUEST -> "$idToken@GUEST"
                 LoginType.BASIC -> requireNotNull(req.username)
                 else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
             }

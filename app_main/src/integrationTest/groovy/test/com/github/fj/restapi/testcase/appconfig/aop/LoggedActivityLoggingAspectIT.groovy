@@ -25,4 +25,8 @@ class LoggedActivityLoggingAspectIT extends IntegrationTestBase {
         then:
         logRepo.count() == 1
     }
+
+    def cleanup() {
+        AccountUtils.deleteAllAccounts()
+    }
 }

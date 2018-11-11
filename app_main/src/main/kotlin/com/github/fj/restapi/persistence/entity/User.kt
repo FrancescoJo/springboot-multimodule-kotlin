@@ -95,7 +95,7 @@ class User : Serializable {
     @Column(name = "auth_iv", length = 16, nullable = false, columnDefinition = "VARBINARY(16)")
     var authIv: ByteArray = ByteArray(0)
 
-    @Column(name = "access_token", length = 127, nullable = false, columnDefinition = "VARBINARY(127)")
+    @Column(name = "access_token", length = 127, unique = true, nullable = false, columnDefinition = "VARBINARY(127)")
     var rawAccessToken: ByteArray = ByteArray(0)
 
     @Column(name = "token_issued_date", nullable = true)

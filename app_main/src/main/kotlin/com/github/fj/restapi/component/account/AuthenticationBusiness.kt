@@ -11,6 +11,7 @@ import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.security.core.Authentication
 import java.time.LocalDateTime
+import javax.servlet.http.HttpServletRequest
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -18,6 +19,8 @@ import java.time.LocalDateTime
  */
 interface AuthenticationBusiness {
     fun hash(data: ByteArray): ByteArray
+
+    fun findAccessTokenFrom(httpRequest: HttpServletRequest): AccessToken?
 
     fun createAccessToken(user: User, timestamp: LocalDateTime = utcNow()): AccessToken
 

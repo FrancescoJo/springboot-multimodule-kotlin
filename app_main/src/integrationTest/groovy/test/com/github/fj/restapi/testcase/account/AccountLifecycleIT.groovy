@@ -15,6 +15,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.BodyInserters
 import test.com.github.fj.restapi.HttpTransportUtils
 import test.com.github.fj.restapi.IntegrationTestBase
+import test.com.github.fj.restapi.util.AccountUtils
 
 import static test.com.github.fj.restapi.account.AccountRequestUtils.newRandomCreateAccountRequest
 
@@ -25,8 +26,8 @@ import static test.com.github.fj.restapi.account.AccountRequestUtils.newRandomCr
 class AccountLifecycleIT extends IntegrationTestBase {
     def "All the account lifecycle activities should be done and logged flawlessly"() {
         given:
-        final AuthenticationResponseDto authentication
-        final String accessToken
+        AuthenticationResponseDto authentication
+        String accessToken
 
         // region Account creation
         when:
@@ -62,12 +63,22 @@ class AccountLifecycleIT extends IntegrationTestBase {
                 .body(BodyInserters.fromObject(loginRequest))
                 .exchange()
 
+        // Authentication must be updated for some login methods
+        authentication = HttpTransportUtils.expect2xxBody(loginResult, AuthenticationResponseDto.class)
+        final newAccessToken = authentication.accessToken.value
+
         then: "Login must be done successfully, with last known authentication"
-        loginResult.expectStatus().is2xxSuccessful()
+        switch (loginType) {
+            case LoginType.BASIC:
+                accessToken != newAccessToken
+                break
+            /* don't care for other cases */
+        }
         // endregion
 
         // region Get profile
         when:
+        accessToken = newAccessToken
         final myProfileResult = testClient(accessToken)
                 .method(HttpMethod.GET)
                 .uri("${ApiPaths.API_V1_ACCOUNT}")
@@ -97,5 +108,9 @@ class AccountLifecycleIT extends IntegrationTestBase {
         loginType       | _
         LoginType.GUEST | _
         LoginType.BASIC | _
+    }
+
+    def cleanup() {
+        AccountUtils.deleteAllAccounts()
     }
 }

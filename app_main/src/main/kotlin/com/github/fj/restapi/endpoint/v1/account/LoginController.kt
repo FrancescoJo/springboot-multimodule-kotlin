@@ -5,17 +5,18 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.lib.annotation.AllOpen
+import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
 import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.service.account.LoginService
-import com.github.fj.restapi.vo.account.AccessToken
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.InitBinder
 import org.springframework.web.bind.annotation.RestController
 import javax.inject.Inject
+import javax.servlet.http.HttpServletRequest
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -24,13 +25,15 @@ import javax.inject.Inject
 @AllOpen
 @RestController
 class LoginController @Inject constructor(
+        private val authBusiness: AuthenticationBusiness,
         private val loginService: LoginService
 ) : ILoginController {
-    override fun onPatch(accessToken: AccessToken?, request: LoginRequestDto): AuthenticationResponseDto {
+    override fun onPatch(request: LoginRequestDto, httpRequest: HttpServletRequest): AuthenticationResponseDto {
         LOG.debug("Login request: {}", request)
 
         return when (request.loginType) {
             LoginType.GUEST -> {
+                val accessToken = authBusiness.findAccessTokenFrom(httpRequest)
                 if (accessToken == null) {
                     throw UnknownAuthTokenException("No access token was found for GUEST login.")
                 } else {
