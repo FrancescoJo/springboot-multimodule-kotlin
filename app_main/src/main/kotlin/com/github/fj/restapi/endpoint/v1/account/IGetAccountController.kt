@@ -34,7 +34,7 @@ interface IGetAccountController {
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 401, message = "If given credential was tampered"),
             ApiResponse(code = 403, message = "If user's privilege is not allowed to perform this request."))
-    // @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @RequestMapping(method = [RequestMethod.GET])
     @LoggedActivity(UserActivity.GET_PROFILE)
     @ResponseBody

@@ -7,6 +7,7 @@ package com.github.fj.restapi.appconfig.mvc.security.internal
 import com.github.fj.restapi.appconfig.mvc.security.HttpAuthScheme
 import com.github.fj.restapi.component.account.AuthenticationBusiness
 import org.slf4j.Logger
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 
@@ -30,7 +31,15 @@ class HttpAuthorizationTokenAuthenticationProvider(
             else -> throw UnsupportedOperationException("$authToken type of authentication is not supported.")
         }
 
-        return authBusiness.authenticate(accessToken)
+        val ourAuthentication = try {
+            authBusiness.authenticate(accessToken)
+        } catch (e: Exception) {
+            throw AuthenticationCredentialsNotFoundException(e.message, e)
+        }
+
+        log.trace("Authentication object was found: {}", ourAuthentication::class.qualifiedName)
+        // We don't need to set this object into SecurityContextHolder, because Spring will do it for us.
+        return ourAuthentication
     }
 
     override fun supports(authentication: Class<*>?): Boolean =

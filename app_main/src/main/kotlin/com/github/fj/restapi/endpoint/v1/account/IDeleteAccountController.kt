@@ -36,7 +36,7 @@ interface IDeleteAccountController {
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 400, message = "If request is malformed"),
             ApiResponse(code = 401, message = "If given credential was tampered"))
-    // @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER')")
     @RequestMapping(method = [RequestMethod.DELETE])
     @LoggedActivity(UserActivity.DELETE_ACCOUNT)
     @ResponseBody

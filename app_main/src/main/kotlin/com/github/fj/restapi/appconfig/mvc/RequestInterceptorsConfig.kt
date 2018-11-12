@@ -5,6 +5,7 @@
 package com.github.fj.restapi.appconfig.mvc
 
 import com.github.fj.lib.annotation.AllOpen
+import com.github.fj.restapi.endpoint.ApiPaths
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -18,10 +19,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @AllOpen
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
-class RequestInterceptorsConfig(private val requestLoggingInterceptor: RequestLoggingInterceptor) :
-        WebMvcConfigurer {
+class RequestInterceptorsConfig : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(requestLoggingInterceptor)
-                .addPathPatterns("/**")
+        registry.addInterceptor(RequestLoggingInterceptor())
+                .addPathPatterns("${ApiPaths.API}/**")
     }
 }
