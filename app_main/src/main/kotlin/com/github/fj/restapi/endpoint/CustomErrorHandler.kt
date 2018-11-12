@@ -101,10 +101,11 @@ class CustomErrorHandler : ErrorController {
      */
     @RequestMapping(ApiPaths.ERROR)
     fun handleError(request: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
-        val exception = request.getAttribute("javax.servlet.error.exception") as? Exception
-                ?: GeneralHttpException.create(HttpStatus.BAD_REQUEST)
+        (request.getAttribute("javax.servlet.error.exception") as? Exception)?.let {
+            return handleError(request, it)
+        }
 
-        return handleError(request, exception)
+        return handleError(request, GeneralHttpException.create(getStatus(request)))
     }
 
     override fun getErrorPath(): String {
@@ -112,9 +113,11 @@ class CustomErrorHandler : ErrorController {
     }
 
     private fun getStatus(request: HttpServletRequest): HttpStatus {
-        return (request.getAttribute("javax.servlet.error.status_code") as? Int)?.let {
-            HttpStatus.valueOf(it)
-        } ?: HttpStatus.BAD_REQUEST
+        (request.getAttribute("javax.servlet.error.status_code") as? Int)?.let {
+            return HttpStatus.valueOf(it)
+        }
+
+        return HttpStatus.SERVICE_UNAVAILABLE
     }
 
     private fun logError(message: String, ex: Exception) {
@@ -131,11 +134,12 @@ class CustomErrorHandler : ErrorController {
         if (cause == null) {
             return
         } else {
-            if (cause.cause == null) {
+            val superCause = cause.cause
+            if (superCause == null) {
                 LOG.error("  by {}", cause)
             } else {
-                LOG.error("  by P{", cause::class)
-                logCauses(cause.cause)
+                LOG.error("  by {}", cause::class)
+                logCauses(superCause)
             }
         }
     }

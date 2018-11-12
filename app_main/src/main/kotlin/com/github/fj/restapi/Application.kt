@@ -6,7 +6,6 @@ package com.github.fj.restapi
 
 import com.google.common.base.Joiner
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
 
 /**
@@ -15,9 +14,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 01 - Jan - 2018
  */
-@SpringBootApplication(
-        exclude = [UserDetailsServiceAutoConfiguration::class]
-)
+@SpringBootApplication
 open class Application {
     companion object {
         private val configurationNames = arrayOf("application", "application-" + BuildConfig.currentProfile.value)

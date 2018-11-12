@@ -59,6 +59,7 @@ class AuthenticationObjectImpl(
         return "AuthenticationObjectImpl(" +
                 "userId=${user.id}," +
                 "userIdToken=${user.idToken}," +
+                "authorities=$authorities," +
                 "accessToken=$token," +
                 "isAuthenticated=$isAuthenticated" +
                 ")"

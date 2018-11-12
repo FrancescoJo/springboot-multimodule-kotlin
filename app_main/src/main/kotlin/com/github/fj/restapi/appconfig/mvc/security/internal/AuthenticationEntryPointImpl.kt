@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletResponse
  * any meaning of "Request entry point", it's rather than focused on postprocessing
  * request success or failures.
  *
+ * Read [org.springframework.security.web.authentication.www.BasicAuthenticationFilter]
+ * for its true concept.
+ *
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 27 - Oct - 2018
  */

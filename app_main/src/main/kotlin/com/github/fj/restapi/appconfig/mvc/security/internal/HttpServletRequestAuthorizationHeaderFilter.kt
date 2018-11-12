@@ -45,6 +45,7 @@ class HttpServletRequestAuthorizationHeaderFilter(
 
         val token = findAuthorizationHeader(req, log)
         if (token != null) {
+            log.t("HTTP Authorization header has been found with: ${token.scheme} scheme")
             SecurityContextHolder.getContext().authentication = token
         }
 

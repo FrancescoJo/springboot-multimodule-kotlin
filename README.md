@@ -162,9 +162,3 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 - Make Pre/Post authorise works properly
 - Spring RESTDoc support
 - Fix all code warnings
-- Docker integration
-- Flatten all commit history
-
-- non-JPA implementation
-- More complex project model on another branch
-- JWT Token support

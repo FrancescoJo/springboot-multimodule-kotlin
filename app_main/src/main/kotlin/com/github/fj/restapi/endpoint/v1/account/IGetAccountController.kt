@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.ResponseBody
@@ -33,7 +34,7 @@ interface IGetAccountController {
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 401, message = "If given credential was tampered"),
             ApiResponse(code = 403, message = "If user's privilege is not allowed to perform this request."))
-//    @PreAuthorize("hasRole('USER')")
+    // @PreAuthorize("hasAnyAuthority('USER')")
     @RequestMapping(method = [RequestMethod.GET])
     @LoggedActivity(UserActivity.GET_PROFILE)
     @ResponseBody

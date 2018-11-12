@@ -9,8 +9,12 @@ import com.github.fj.restapi.appconfig.mvc.security.internal.*
 import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.endpoint.ApiPaths
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -34,7 +38,6 @@ class SecurityConfig @Inject constructor(
         private val successHandler: SavedRequestAwareAuthenticationSuccessHandler,
         private val failureHandler: AuthenticationFailureHandler
 ) : WebSecurityConfigurerAdapter() {
-
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.authenticationProvider(HttpAuthorizationTokenAuthenticationProvider(LOG, authBusiness))
     }
@@ -62,6 +65,19 @@ class SecurityConfig @Inject constructor(
                 .deleteCookies()
                 .invalidateHttpSession(true)
     }
+
+    /**
+     * As [org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration]
+     * noted, this configuration is must be provided to bypass Spring security default configuration.
+     */
+    @Bean
+    override fun authenticationManager(): AuthenticationManager {
+        return ProviderManager(listOf(tokenAuthProvider()))
+    }
+
+    @Bean
+    fun tokenAuthProvider(): AuthenticationProvider =
+            HttpAuthorizationTokenAuthenticationProvider(LOG, authBusiness)
 
     companion object {
         private val FILTER_EXCLUDE_REQUESTS = arrayOf(
