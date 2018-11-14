@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse
 @AllOpen
 @Component
 class AuthenticationEntryPointImpl : AuthenticationEntryPoint {
-    override fun commence(req: HttpServletRequest, resp: HttpServletResponse, e: AuthenticationException?) {
+    override fun commence(req: HttpServletRequest, resp: HttpServletResponse,
+                          e: AuthenticationException?) {
         // Let fail all authentication requests where authorisation exception has been raised.
         resp.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized")
     }

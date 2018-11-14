@@ -24,17 +24,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @AllOpen
 @Configuration
 class ControllerParamsConfig : WebMvcConfigurer {
-    override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
-        argumentResolvers.add(UserArgumentResolver())
+    override fun addArgumentResolvers(argResolvers: MutableList<HandlerMethodArgumentResolver>) {
+        argResolvers.add(UserArgumentResolver())
     }
 
     private class UserArgumentResolver : HandlerMethodArgumentResolver {
-        override fun resolveArgument(parameter: MethodParameter, mavContainer: ModelAndViewContainer?,
-                                     webRequest: NativeWebRequest, binderFactory: WebDataBinderFactory?): Any? {
+        override fun resolveArgument(param: MethodParameter, mavContainer: ModelAndViewContainer?,
+                                     webReq: NativeWebRequest,
+                                     binderFactory: WebDataBinderFactory?): Any? {
             val currentSecurityContext = (SecurityContextHolder.getContext()?.authentication
-                    ?: throw UnauthorisedException("You are not authorised.")) as? AuthenticationObjectImpl
-                    ?: throw UnsupportedOperationException("Your authentication kind is not supported: " +
-                            "${SecurityContextHolder.getContext()?.authentication}")
+                    ?: throw UnauthorisedException("You are not authorised."))
+                    as? AuthenticationObjectImpl
+                    ?: throw UnsupportedOperationException("Your authentication kind is " +
+                            "not supported: ${SecurityContextHolder.getContext()?.authentication}")
 
             return currentSecurityContext.details
         }

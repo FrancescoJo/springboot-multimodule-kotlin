@@ -11,7 +11,8 @@ import com.github.fj.lib.util.ProtectedProperty
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 08 - Nov - 2018
  */
-class JacksonDeserialisationModule : SimpleModule(JacksonDeserialisationModule::class.java.canonicalName) {
+class JacksonDeserialisationModule : SimpleModule(
+        JacksonDeserialisationModule::class.java.canonicalName) {
     init {
         addSerializer(ProtectedProperty.ProtectedPropertyJacksonSerialiser())
 

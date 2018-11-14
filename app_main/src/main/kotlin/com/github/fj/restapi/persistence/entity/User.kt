@@ -13,13 +13,29 @@ import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
 import com.github.fj.restapi.persistence.consts.account.Role
 import com.github.fj.restapi.persistence.consts.account.Status
-import com.github.fj.restapi.persistence.converter.entity.*
+import com.github.fj.restapi.persistence.converter.entity.AccessTokenEncodingConverter
+import com.github.fj.restapi.persistence.converter.entity.ByteArrayInetAddressConverter
+import com.github.fj.restapi.persistence.converter.entity.LoginTypeConverter
+import com.github.fj.restapi.persistence.converter.entity.MemberStatusConverter
+import com.github.fj.restapi.persistence.converter.entity.PlatformTypeConverter
+import com.github.fj.restapi.persistence.converter.entity.SemanticVersionConverter
 import com.github.fj.restapi.vo.account.AccessToken
 import java.io.Serializable
 import java.net.InetAddress
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToOne
+import javax.persistence.Table
+import javax.persistence.UniqueConstraint
 
 /**
  * Stores crucial user information for accessing service.

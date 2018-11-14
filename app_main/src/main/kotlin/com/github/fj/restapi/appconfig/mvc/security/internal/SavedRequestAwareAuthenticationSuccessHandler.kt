@@ -27,21 +27,22 @@ import javax.servlet.http.HttpServletResponse
 class SavedRequestAwareAuthenticationSuccessHandler : SimpleUrlAuthenticationSuccessHandler() {
     private var requestCache: RequestCache = HttpSessionRequestCache()
 
-    override fun onAuthenticationSuccess(request: HttpServletRequest,
-                                         response: HttpServletResponse, authentication: Authentication) {
-        requestCache.getRequest(request, response).let {
+    override fun onAuthenticationSuccess(req: HttpServletRequest, resp: HttpServletResponse,
+                                         auth: Authentication) {
+        requestCache.getRequest(req, resp).let {
             if (it == null) {
-                return super.onAuthenticationSuccess(request, response, authentication)
+                return super.onAuthenticationSuccess(req, resp, auth)
             }
         }
 
         targetUrlParameter.let {
-            if (isAlwaysUseDefaultTargetUrl || !it.isNullOrBlank() && !request.getParameter(it).isNullOrBlank()) {
-                requestCache.removeRequest(request, response)
-                return super.onAuthenticationSuccess(request, response, authentication)
+            if (isAlwaysUseDefaultTargetUrl ||
+                    !it.isNullOrBlank() && !req.getParameter(it).isNullOrBlank()) {
+                requestCache.removeRequest(req, resp)
+                return super.onAuthenticationSuccess(req, resp, auth)
             }
         }
 
-        clearAuthenticationAttributes(request)
+        clearAuthenticationAttributes(req)
     }
 }

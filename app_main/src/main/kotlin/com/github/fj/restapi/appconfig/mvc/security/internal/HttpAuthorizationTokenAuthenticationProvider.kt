@@ -6,6 +6,7 @@ package com.github.fj.restapi.appconfig.mvc.security.internal
 
 import com.github.fj.restapi.appconfig.mvc.security.HttpAuthScheme
 import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.exception.AuthTokenException
 import org.slf4j.Logger
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 import org.springframework.security.authentication.AuthenticationProvider
@@ -28,12 +29,13 @@ class HttpAuthorizationTokenAuthenticationProvider(
         val authToken = authentication as HttpAuthorizationToken
         val accessToken = when (authToken.scheme) {
             HttpAuthScheme.TOKEN -> authBusiness.parseAccessToken(authToken.token)
-            else -> throw UnsupportedOperationException("$authToken type of authentication is not supported.")
+            else -> throw UnsupportedOperationException(
+                    "$authToken type of authentication is not supported.")
         }
 
         val ourAuthentication = try {
             authBusiness.authenticate(accessToken)
-        } catch (e: Exception) {
+        } catch (e: AuthTokenException) {
             throw AuthenticationCredentialsNotFoundException(e.message, e)
         }
 

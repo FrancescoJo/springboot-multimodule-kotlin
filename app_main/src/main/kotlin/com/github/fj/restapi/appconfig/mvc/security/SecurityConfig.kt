@@ -5,7 +5,11 @@
 package com.github.fj.restapi.appconfig.mvc.security
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.appconfig.mvc.security.internal.*
+import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationEntryPointImpl
+import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationFailureHandler
+import com.github.fj.restapi.appconfig.mvc.security.internal.HttpAuthorizationTokenAuthenticationProvider
+import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
+import com.github.fj.restapi.appconfig.mvc.security.internal.SavedRequestAwareAuthenticationSuccessHandler
 import com.github.fj.restapi.appconfig.mvc.security.spel.PreAuthorizeSpelInterceptor
 import com.github.fj.restapi.component.account.AuthenticationBusiness
 import com.github.fj.restapi.endpoint.ApiPaths
@@ -44,8 +48,9 @@ class SecurityConfig @Inject constructor(
     }
 
     override fun configure(http: HttpSecurity) {
-        http.addFilterBefore(HttpServletRequestAuthorizationHeaderFilter(LOG, FILTER_EXCLUDE_REQUESTS.toList()),
-                BasicAuthenticationFilter::class.java)
+        @Suppress("SpreadOperator") // This logic is called only once.
+        http.addFilterBefore(HttpServletRequestAuthorizationHeaderFilter(LOG,
+                FILTER_EXCLUDE_REQUESTS.toList()), BasicAuthenticationFilter::class.java)
                 .cors().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -28,19 +28,21 @@ class PreAuthorizeSpelRoot(
      * Implementation detail copied from [org.springframework.security.config.method.GlobalMethodSecurityBeanDefinitionParser.AbstractGrantedAuthorityDefaultsBeanFactory]
      */
     private val rolePrefix: String by lazy {
-        return@lazy applicationContext.getBeanNamesForType(GrantedAuthorityDefaults::class.java).takeIf { it.size == 1 }?.let {
-            return@let applicationContext.getBean(it[0], GrantedAuthorityDefaults::class.java).rolePrefix
-        } ?: "ROLE_"
+        applicationContext.getBeanNamesForType(GrantedAuthorityDefaults::class.java)
+                .takeIf { it.size == 1 }?.let {
+                    applicationContext.getBean(it[0], GrantedAuthorityDefaults::class.java)
+                            .rolePrefix
+                } ?: "ROLE_"
     }
 
-    override fun hasRole(roleStr: String): Boolean =
-            Role.of(rolePrefix + roleStr).let {
-                if (it == Role.UNDEFINED) {
-                    throw UnsupportedOperationException("$roleStr is not appropriate for specifying any role. Use ${rolePrefix + roleStr} instead.")
-                } else {
-                    return true
-                }
-            }
+    override fun hasRole(roleStr: String): Boolean = Role.of(rolePrefix + roleStr).let {
+        if (it == Role.UNDEFINED) {
+            throw UnsupportedOperationException("$roleStr is not appropriate for specifying any " +
+                    "role. Use ${rolePrefix + roleStr} instead.")
+        } else {
+            return true
+        }
+    }
 
     override fun hasAnyRole(vararg roles: String): Boolean =
             roles.map { Role.of(it) }.any {
@@ -61,8 +63,9 @@ class PreAuthorizeSpelRoot(
     }
 
     override fun hasIpAddress(ipAddressStr: String): Boolean {
-        val request = (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.request
-                ?: throw UnsupportedOperationException("Not called in the context of an HTTP request")
+        val request = (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)
+                ?.request
+                ?: throw UnsupportedOperationException("Not called in the HTTP request context.")
 
         return IpAddressMatcher(ipAddressStr).matches(request)
     }

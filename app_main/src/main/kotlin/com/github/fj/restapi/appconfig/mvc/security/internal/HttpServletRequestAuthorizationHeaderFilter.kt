@@ -58,21 +58,19 @@ class HttpServletRequestAuthorizationHeaderFilter(
 
         private val AUTHORIZATION_SYNTAX = Pattern.compile("[A-Za-z]+ [A-Za-z0-9]+")
 
-        fun findAuthorizationHeader(request: HttpServletRequest, log: Logger? = null): HttpAuthorizationToken? {
-            return request.getHeader(HEADER_AUTHORIZATION).let { h ->
-                if (h.isNullOrEmpty()) {
-                    log?.t("No {} header in the request.", HEADER_AUTHORIZATION)
-                    return null
+        fun findAuthorizationHeader(req: HttpServletRequest, log: Logger? = null):
+                HttpAuthorizationToken? {
+            req.getHeader(HEADER_AUTHORIZATION).let { h ->
+                when {
+                    h.isNullOrEmpty() -> log?.t(
+                            "No {} header in the request.", HEADER_AUTHORIZATION)
+                    !h.matchesIn(AUTHORIZATION_SYNTAX) -> log?.t(
+                            "{} header does not match the syntax: '{}'", HEADER_AUTHORIZATION, h)
+                    else -> return h.split(" ").let {
+                        HttpAuthorizationToken(HttpAuthScheme.byTypeValue(it[0]), it[1])
+                    }
                 }
-
-                if (!h.matchesIn(AUTHORIZATION_SYNTAX)) {
-                    log?.t("{} header does not match the syntax: '{}'", HEADER_AUTHORIZATION, h)
-                    return null
-                }
-
-                return@let h.split(" ").let {
-                    HttpAuthorizationToken(HttpAuthScheme.byTypeValue(it[0]), it[1])
-                }
+                return null
             }
         }
 

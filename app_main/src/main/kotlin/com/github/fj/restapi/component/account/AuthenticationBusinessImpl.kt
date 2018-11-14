@@ -53,7 +53,8 @@ class AuthenticationBusinessImpl(
 
     @Suppress("UnstableApiUsage")
     override fun hash(data: ByteArray): ByteArray =
-            com.google.common.hash.Hashing.goodFastHash(data.size * 8).hashBytes(data).asBytes()
+            com.google.common.hash.Hashing.goodFastHash(data.size * BITS_PER_BYTE)
+                    .hashBytes(data).asBytes()
 
     override fun findAccessTokenFrom(httpRequest: HttpServletRequest): AccessToken? {
         val httpAuthToken = HttpServletRequestAuthorizationHeaderFilter
@@ -104,7 +105,7 @@ class AuthenticationBusinessImpl(
             return@with get()
         }
 
-        return parseAccessToken(rawToken, user.authIv).apply {
+        return parseAccessToken(aes256CipherKey, rawToken, user.authIv).apply {
             this.user = user
         }
     }
@@ -139,70 +140,18 @@ class AuthenticationBusinessImpl(
         return AuthenticationObjectImpl(tokenUser, token)
     }
 
-    @VisibleForTesting
-    fun parseAccessToken(rawToken: ByteArray, iv: ByteArray): AccessToken {
-        val decodedToken = decrypt(aes256CipherKey, iv, rawToken)
-        val decodedBuf = ByteBuffer.wrap(decodedToken)
-
-        val mode = ByteArray(LENGTH_BYTES_HEADER).let {
-            decodedBuf.get(it)
-            return@let it.parseEncoded()
-        }
-
-        val uIdToken: String
-        val loginPlatformHash: Int
-        val issuedTimestamp: Int
-        val userRegisteredTimestamp: Int
-
-        val uIdTokenLengthReader: (ByteBuffer) -> Any = { it.get().toInt() }
-        val uIdTokenReader: (Int, ByteBuffer) -> Any = { length, buf ->
-            val uIdTokenArray = ByteArray(length)
-            for (i in 0 until length) {
-                uIdTokenArray[i] = buf.get()
-            }
-
-            String(uIdTokenArray)
-        }
-        val loginTypeReader: (ByteBuffer) -> Any = { it.int }
-        val timestampReader: (ByteBuffer) -> Any = { it.int }
-        val registeredDateReader: (ByteBuffer) -> Any = { it.int }
-
-        when (mode) {
-            AccessToken.Encoded.FORWARD -> {
-                val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }
-                val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, ByteArray(LENGTH_PAYLOAD_HEADER)
-                        .apply { decodedBuf.get(this) }))
-
-                val length = uIdTokenLengthReader(payloadBuf) as Int
-                uIdToken = uIdTokenReader(length, payloadBuf) as String
-                loginPlatformHash = loginTypeReader(payloadBuf) as Int
-                issuedTimestamp = timestampReader(payloadBuf) as Int
-                userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
-            }
-            AccessToken.Encoded.BACKWARD -> {
-                val encodedPayload = ByteArray(LENGTH_PAYLOAD_HEADER).apply { decodedBuf.get(this) }.reversedArray()
-                val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }.reversedArray()
-                val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, encodedPayload))
-
-                val length = uIdTokenLengthReader(payloadBuf) as Int
-                userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
-                issuedTimestamp = timestampReader(payloadBuf) as Int
-                loginPlatformHash = loginTypeReader(payloadBuf) as Int
-                uIdToken = uIdTokenReader(length, payloadBuf) as String
-            }
-            else -> throw UnknownAuthTokenException("$mode encoding strategy is unsupported.")
-        }
-
-        return AccessToken(rawToken.toList(), mode, iv.toList(), uIdToken, loginPlatformHash,
-                utcLocalDateTimeOf(issuedTimestamp), utcLocalDateTimeOf(userRegisteredTimestamp))
-    }
-
     companion object {
         private const val CIPHER_ALG = "AES"
         private const val LENGTH_BYTES_HEADER = 16
         private const val LENGTH_PAYLOAD_HEADER = 32
         private const val LENGTH_IV_HEADER = 16
+        private const val BITS_PER_BYTE = 8
+        private const val INTEGER_BITS_LEN = 32
+        private const val MASKER_BIT_POS_MOD = 30
+        private const val BITMASK_LSB_0 = -2
+        private const val BITMASK_LSB_1 = 1
 
+        @Suppress("ComplexMethod")  // Necessary evil for adding randomness of our token.
         private fun createAccessToken(user: User, mode: AccessToken.Encoded,
                                       key: Key, iv: ByteArray, now: LocalDateTime): AccessToken {
             val garbageFiller: (ByteBuffer) -> Unit = { buf ->
@@ -217,14 +166,14 @@ class AuthenticationBusinessImpl(
                  */
                 val direction = random.nextInt(Int.MIN_VALUE, Int.MAX_VALUE)
                 val positionBase = random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE)
-                        .toIntByBitPosition(random.nextInt(0, 32))
-                val position = 1 + Math.abs(positionBase % 30)
+                        .toIntByBitPosition(random.nextInt(0, INTEGER_BITS_LEN))
+                val position = 1 + Math.abs(positionBase % MASKER_BIT_POS_MOD)
 
                 val head = (1 shl position).let {
                     val filtered = if (mode == AccessToken.Encoded.FORWARD) {
-                        direction and -2    // Bitmask: LSB 0
+                        direction and BITMASK_LSB_0
                     } else {
-                        direction or 1      // Bitmask: LSB 1
+                        direction or BITMASK_LSB_1
                     }
 
                     return@let if (mode == AccessToken.Encoded.FORWARD) {
@@ -294,28 +243,84 @@ class AuthenticationBusinessImpl(
                     utcLocalDateTimeOf(timestamp), utcLocalDateTimeOf(createdTimestamp))
         }
 
+        @Suppress("ComplexMethod")  // Necessary evil for adding randomness of our token.
+        private fun parseAccessToken(aes256CipherKey: Key, rawToken: ByteArray, iv: ByteArray): AccessToken {
+            val decodedToken = decrypt(aes256CipherKey, iv, rawToken)
+            val decodedBuf = ByteBuffer.wrap(decodedToken)
+
+            val mode = ByteArray(LENGTH_BYTES_HEADER).let {
+                decodedBuf.get(it)
+                return@let it.parseEncoded()
+            }
+
+            val uIdToken: String
+            val loginPlatformHash: Int
+            val issuedTimestamp: Int
+            val userRegisteredTimestamp: Int
+
+            val uIdTokenLengthReader: (ByteBuffer) -> Any = { it.get().toInt() }
+            val uIdTokenReader: (Int, ByteBuffer) -> Any = { length, buf ->
+                val uIdTokenArray = ByteArray(length)
+                for (i in 0 until length) {
+                    uIdTokenArray[i] = buf.get()
+                }
+
+                String(uIdTokenArray)
+            }
+            val loginTypeReader: (ByteBuffer) -> Any = { it.int }
+            val timestampReader: (ByteBuffer) -> Any = { it.int }
+            val registeredDateReader: (ByteBuffer) -> Any = { it.int }
+
+            when (mode) {
+                AccessToken.Encoded.FORWARD -> {
+                    val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }
+                    val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, ByteArray(LENGTH_PAYLOAD_HEADER)
+                            .apply { decodedBuf.get(this) }))
+
+                    val length = uIdTokenLengthReader(payloadBuf) as Int
+                    uIdToken = uIdTokenReader(length, payloadBuf) as String
+                    loginPlatformHash = loginTypeReader(payloadBuf) as Int
+                    issuedTimestamp = timestampReader(payloadBuf) as Int
+                    userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
+                }
+                AccessToken.Encoded.BACKWARD -> {
+                    val encodedPayload = ByteArray(LENGTH_PAYLOAD_HEADER).apply { decodedBuf.get(this) }.reversedArray()
+                    val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }.reversedArray()
+                    val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, encodedPayload))
+
+                    val length = uIdTokenLengthReader(payloadBuf) as Int
+                    userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
+                    issuedTimestamp = timestampReader(payloadBuf) as Int
+                    loginPlatformHash = loginTypeReader(payloadBuf) as Int
+                    uIdToken = uIdTokenReader(length, payloadBuf) as String
+                }
+                else -> throw UnknownAuthTokenException("$mode encoding strategy is unsupported.")
+            }
+
+            return AccessToken(rawToken.toList(), mode, iv.toList(), uIdToken, loginPlatformHash,
+                    utcLocalDateTimeOf(issuedTimestamp), utcLocalDateTimeOf(userRegisteredTimestamp))
+        }
+
         private fun ByteArray.parseEncoded(): AccessToken.Encoded {
             @Suppress("UsePropertyAccessSyntax")
-            return with(ByteBuffer.wrap(this)) {
+            with(ByteBuffer.wrap(this)) {
                 val head = getInt()
-                val position = 1 shl (1 + Math.abs(getInt() % 30))
+                val position = 1 shl (1 + Math.abs(getInt() % MASKER_BIT_POS_MOD))
+                val parity = Math.abs(head % 2)
 
-                return@with Math.abs(head % 2).let {
-                    return@let if (it == 0) {
-                        // Value of sign bit must be '1' to match 'FORWARD' mode
-                        if ((head and position) == position) {
-                            AccessToken.Encoded.FORWARD
-                        } else {
-                            throw UnknownAuthTokenException("Malformed access token.")
-                        }
-
+                return if (parity == 0) {
+                    // Value of sign bit must be '1' to match 'FORWARD' mode
+                    if ((head and position) == position) {
+                        AccessToken.Encoded.FORWARD
                     } else {
-                        // Value of sign bit must be '0' to match 'BACKWARD' mode
-                        if ((head and position == 0)) {
-                            AccessToken.Encoded.BACKWARD
-                        } else {
-                            throw UnknownAuthTokenException("Malformed access token.")
-                        }
+                        throw UnknownAuthTokenException("Malformed access token.")
+                    }
+                } else {
+                    // Value of sign bit must be '0' to match 'BACKWARD' mode
+                    if ((head and position == 0)) {
+                        AccessToken.Encoded.BACKWARD
+                    } else {
+                        throw UnknownAuthTokenException("Malformed access token.")
                     }
                 }
             }
@@ -326,7 +331,7 @@ class AuthenticationBusinessImpl(
          */
         private fun Long.toIntByBitPosition(start: Int): Int {
             val rightShifted = ushr(start)
-            val mask = (1L shl 32) - 1L
+            val mask = (1L shl INTEGER_BITS_LEN) - 1L
             return (rightShifted and mask).toInt()
         }
 

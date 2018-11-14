@@ -85,8 +85,8 @@ class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
         }
     }
 
-    private fun addLogAnnotatedParams(p: JoinPoint, logObject: AccessLog,
-                                      encasing: Class<*>, name: String, paramTypes: Array<Class<*>>) {
+    private fun addLogAnnotatedParams(p: JoinPoint, logObject: AccessLog, encasing: Class<*>,
+                                      name: String, paramTypes: Array<Class<*>>) {
         try {
             val m = encasing.getMethod(name, *paramTypes)
             m.parameters.forEachIndexed { i, param ->
@@ -98,18 +98,19 @@ class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
         }
     }
 
-    private fun Parameter.hasLoggableAnnotation(): Boolean {
-        return annotations.any {
-            val name = it.annotationClass.qualifiedName
-            return@any RequestBody::class.qualifiedName == name || RequestParam::class.qualifiedName == name
+    private fun Parameter.hasLoggableAnnotation(): Boolean = annotations.any {
+        return@any it.annotationClass.qualifiedName.let { name ->
+            RequestBody::class.qualifiedName == name || RequestParam::class.qualifiedName == name
         }
     }
 
-    @AfterReturning("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)", returning = "returned")
+    @AfterReturning("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)",
+            returning = "returned")
     fun logAfterEndpoint(p: JoinPoint, returned: Any?) =
             logAfterInternal((p.signature as? MethodSignature)?.method, returned)
 
-    @AfterThrowing("within(your.package.where.is.endpoint.${ApiPaths.CURRENT_VERSION}..*)", throwing = "e")
+    @AfterThrowing("within(your.package.where.is.endpoint.${ApiPaths.CURRENT_VERSION}..*)",
+            throwing = "e")
     fun logAfterException(p: JoinPoint, e: Exception) =
             logAfterInternal((p.signature as? MethodSignature)?.method, e)
 
@@ -123,11 +124,12 @@ class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
         }
 
         val myParams = m.parameters.map { it.type }.toTypedArray()
-        val isResponseBody = if (findAnnotatedMethod(m, myParams, ResponseBody::class.java) != null) {
+        val bodyKlass = ResponseBody::class
+        val isResponseBody = if (findAnnotatedMethod(m, myParams, bodyKlass.java) != null) {
             true
         } else {
             m.returnType.annotations.any {
-                ResponseBody::class.qualifiedName == it.annotationClass.qualifiedName
+                bodyKlass.qualifiedName == it.annotationClass.qualifiedName
             }
         }
 

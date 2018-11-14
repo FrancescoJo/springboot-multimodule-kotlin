@@ -28,21 +28,24 @@ import javax.servlet.http.HttpServletResponse
  * @since 12 - Nov - 2018
  */
 class PreAuthorizeSpelInterceptor(
-        private val applicationContext: ApplicationContext
+        private val appCtxt: ApplicationContext
 ) : HandlerInterceptorAdapter() {
     private val parser = SpelExpressionParser()
     private val exprCache = ConcurrentHashMap<HandlerMethod, Expression>()
 
-    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val authentication = SecurityContextHolder.getContext().authentication as? AuthenticationObjectImpl
-                ?: return true
-        val handlerMethod = handler as? HandlerMethod ?: return true
+    override fun preHandle(req: HttpServletRequest, res: HttpServletResponse, handler: Any)
+            : Boolean {
+        val ctxtAuthentication = SecurityContextHolder.getContext().authentication
+        val authentication = ctxtAuthentication as? AuthenticationObjectImpl
+        val handlerMethod = handler as? HandlerMethod
+        if (authentication != null && handlerMethod != null) {
+            prehandleInternal(authentication, handlerMethod)
+        }
 
-        prehandleInternal(authentication, handlerMethod)
         return true
     }
 
-    private fun prehandleInternal(authentication: AuthenticationObjectImpl, method: HandlerMethod) {
+    private fun prehandleInternal(auth: AuthenticationObjectImpl, method: HandlerMethod) {
         val preAuthorize = method.getMethodAnnotation(PreAuthorize::class.java) ?: return
 
         val expression = exprCache[method].let {
@@ -54,8 +57,8 @@ class PreAuthorizeSpelInterceptor(
             }
         }
 
-        val spelContext = StandardEvaluationContext(PreAuthorizeSpelRoot(applicationContext, authentication))
-        val unauthorised = expression.getValue(spelContext, Boolean::class.java) == true
+        val spelCtxt = StandardEvaluationContext(PreAuthorizeSpelRoot(appCtxt, auth))
+        val unauthorised = expression.getValue(spelCtxt, Boolean::class.java) == true
         if (!unauthorised) {
             throw UnauthorisedException("Access to this resource is denied.")
         }

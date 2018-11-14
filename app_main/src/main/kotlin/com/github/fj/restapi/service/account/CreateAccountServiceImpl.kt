@@ -24,6 +24,8 @@ import com.github.fj.restapi.util.extractInetAddress
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.stereotype.Service
+import java.net.InetAddress
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
@@ -55,25 +57,15 @@ class CreateAccountServiceImpl @Inject constructor(
             throw AccountAlreadyExistException("Account already exists.")
         }
 
-        val user = User().apply {
+        val user = userRepo.save(User().apply {
             val now = utcNow()
             val ipAddr = httpReq.extractInetAddress()
-
-            var maybeUserWithIdToken: Optional<User>
-            var newIdToken: String
-            do {
-                newIdToken = getRandomCapitalAlphaNumericString(CreateAccountService.ID_TOKEN_LENGTH)
-                maybeUserWithIdToken = userRepo.findByIdToken(newIdToken)
-            } while (maybeUserWithIdToken.isPresent)
+            val newIdToken = issueNewIdToken()
 
             idToken = newIdToken
             status = Status.NORMAL
             role = Role.USER
-            name = when (req.loginType) {
-                LoginType.GUEST -> "$idToken@GUEST"
-                LoginType.BASIC -> requireNotNull(req.username)
-                else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
-            }
+            name = createUserName(req, idToken)
             loginType = req.loginType
             platformType = req.platformType
             platformVersion = req.platformVersion
@@ -82,7 +74,36 @@ class CreateAccountServiceImpl @Inject constructor(
             createdDate = now
             createdIp = ipAddr
             pushToken = req.pushToken.value
-            invitedBy = if (req.invitedBy.isNullOrUnicodeBlank()) {
+            invitedBy = guessInvitedBy(req)
+            credential = createCredential(req, credentialBytes)
+            member = createMembership(req, now, ipAddr)
+            setAccessToken(authBusiness.createAccessToken(this))
+        })
+
+        return AuthenticationResponseDto.create(user)
+    }
+
+    private fun issueNewIdToken(): String {
+        var maybeUserWithIdToken: Optional<User>
+        var newIdToken: String
+        do {
+            newIdToken = getRandomCapitalAlphaNumericString(CreateAccountService.ID_TOKEN_LENGTH)
+            maybeUserWithIdToken = userRepo.findByIdToken(newIdToken)
+        } while (maybeUserWithIdToken.isPresent)
+
+        return newIdToken
+    }
+
+    private fun createUserName(req: CreateAccountRequestDto, idToken: String): String {
+        return when (req.loginType) {
+            LoginType.GUEST -> "$idToken@GUEST"
+            LoginType.BASIC -> requireNotNull(req.username)
+            else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
+        }
+    }
+
+    private fun guessInvitedBy(req: CreateAccountRequestDto): Long =
+            if (req.invitedBy.isNullOrUnicodeBlank()) {
                 Optional.empty()
             } else {
                 userRepo.findByIdToken(requireNotNull(req.invitedBy))
@@ -94,22 +115,20 @@ class CreateAccountServiceImpl @Inject constructor(
                 }
             }
 
-            credential = when (req.loginType) {
-                LoginType.GUEST -> ByteArray(0)
-                LoginType.BASIC -> authBusiness.hash(credentialBytes)
-                else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
-            }
-            member = Membership().apply {
+    private fun createCredential(req: CreateAccountRequestDto, credentialBytes: ByteArray): ByteArray {
+        return when (req.loginType) {
+            LoginType.GUEST -> ByteArray(0)
+            LoginType.BASIC -> authBusiness.hash(credentialBytes)
+            else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
+        }
+    }
+
+    private fun createMembership(req: CreateAccountRequestDto, now: LocalDateTime,
+                                 ipAddr: InetAddress) =
+            Membership().apply {
                 nickname = req.nickname
                 gender = req.gender ?: Gender.UNDEFINED
                 lastActiveTimestamp = now
                 lastActiveIp = ipAddr
             }
-        }.apply {
-            setAccessToken(authBusiness.createAccessToken(this))
-        }
-        userRepo.save(user)
-
-        return AuthenticationResponseDto.create(user)
-    }
 }

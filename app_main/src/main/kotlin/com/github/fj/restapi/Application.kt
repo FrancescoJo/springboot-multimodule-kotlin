@@ -21,6 +21,7 @@ open class Application {
 
         @JvmStatic
         fun main(args: Array<String>) {
+            @Suppress("SpreadOperator") // This logic is called only once.
             SpringApplicationBuilder(Application::class.java)
                     .properties("spring.config.name:" +
                             Joiner.on(",").skipNulls().join(configurationNames))

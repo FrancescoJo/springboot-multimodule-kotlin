@@ -31,11 +31,13 @@ fun HttpServletRequest.extractIpStr(): String {
     }
 
     with(getHeader("X-forwarded-for")) {
-        if (!isNullOrUnicodeBlank()) {
-            split(",").let {
-                if (!it[0].isUnknown()) {
-                    return it[0]
-                }
+        if (isNullOrUnicodeBlank()) {
+            return@with
+        }
+
+        split(",").let {
+            if (!it[0].isUnknown()) {
+                return it[0]
             }
         }
     }

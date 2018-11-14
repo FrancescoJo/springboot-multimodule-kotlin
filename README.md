@@ -160,4 +160,4 @@ There are some demo scripts under `settings/letsencrypt` directory for it, and c
 
 ## TO-DOs
 - Spring RESTDoc support
-- Fix all Detekt code warnings
+- Fix broken `@PreAuthorize`/`@PostAuthorize` setup

@@ -7,22 +7,15 @@ package com.github.fj.restapi.persistence.consts.account
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import com.github.fj.lib.annotation.UndefinableEnum
+import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_ADMIN
+import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_ANONYMOUS
+import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_BY_ROLE
+import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_MODERATOR
+import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_PREMIUM_USER
+import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_USER
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import java.util.*
-
-private val AUTHORITY_ANONYMOUS: GrantedAuthority = SimpleGrantedAuthority("ANONYMOUS")
-private val AUTHORITY_USER: GrantedAuthority = SimpleGrantedAuthority("USER")
-private val AUTHORITY_PREMIUM_USER: GrantedAuthority = SimpleGrantedAuthority("PREMIUM_USER")
-private val AUTHORITY_MODERATOR: GrantedAuthority = SimpleGrantedAuthority("MODERATOR")
-private val AUTHORITY_ADMIN: GrantedAuthority = SimpleGrantedAuthority("ADMIN")
-private val AUTHORITY_BY_ROLE = HashMap<String, GrantedAuthority>().apply {
-    put("ANONYMOUS", AUTHORITY_ANONYMOUS)
-    put("USER", AUTHORITY_USER)
-    put("PREMIUM_USER", AUTHORITY_PREMIUM_USER)
-    put("MODERATOR", AUTHORITY_MODERATOR)
-    put("ADMIN", AUTHORITY_ADMIN)
-}
 
 /**
  * Represents user's current role.
@@ -30,6 +23,7 @@ private val AUTHORITY_BY_ROLE = HashMap<String, GrantedAuthority>().apply {
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 03 - Nov - 2018
  */
+@Suppress("MagicNumber")    // Numbers here are self documenting.
 @UndefinableEnum
 enum class Role(val key: Int, val authorities: Collection<GrantedAuthority>) {
     ANONYMOUS(1, Collections.singleton(AUTHORITY_ANONYMOUS)),
