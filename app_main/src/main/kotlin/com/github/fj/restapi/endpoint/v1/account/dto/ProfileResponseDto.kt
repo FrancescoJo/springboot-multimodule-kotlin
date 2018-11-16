@@ -37,8 +37,9 @@ data class ProfileResponseDto(
     @JsonProperty
     val nickname: String,
 
-    @ApiModelProperty("Gender, may not be revealed. Maybe null",
-            example = "m", required = true)
+    @ApiModelProperty("Gender, Empty value or omitting this field means " +
+            "your gender will be invisible to other people.", example = "m", required = false,
+            allowableValues = "m: MALE, f: FEMALE, \"\": UNDEFINED")
     @JsonProperty
     val gender: Gender?,
 

@@ -27,7 +27,7 @@ import org.springframework.validation.Errors
 @JsonDeserialize
 data class CreateAccountRequestDto @JvmOverloads constructor(
         @ApiModelProperty("Firebase Cloud Messaging push token.",
-                example = "<FCM PUSH TOKEN>", required = true)
+                example = "<FCM PUSH TOKEN>", required = true, dataType = "kotlin.String")
         @JsonProperty
         val pushToken: ProtectedProperty<String> = ProtectedProperty(""),
 
@@ -49,16 +49,18 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
         val nickname: String = "",
 
         @ApiModelProperty("User gender. Empty value or omitting this field means " +
-                "your gender will be invisible to other people.", example = "m", required = false)
+                "your gender will be invisible to other people.", example = "m", required = false,
+                allowableValues = "m: MALE, f: FEMALE, \"\": UNDEFINED")
         @JsonProperty
         val gender: Gender? = Gender.UNDEFINED,
 
-        @ApiModelProperty("Login type. Read document for supported login types.",
-                example = "b", required = true)
+        @ApiModelProperty("Login type.", example = "b", required = true,
+                allowableValues = "b: BASIC, g: GUEST")
         @JsonProperty
         val loginType: LoginType = LoginType.UNDEFINED,
 
-        @ApiModelProperty("Client platform's type.", example = "a", required = true)
+        @ApiModelProperty("Client platform's type.", example = "a", required = true,
+                allowableValues = "a: ANDROID, i: IOS, w: WEB")
         @JsonProperty
         val platformType: PlatformType = PlatformType.UNDEFINED,
 
@@ -98,7 +100,7 @@ data class CreateAccountRequestDto @JvmOverloads constructor(
 
                     loginType == LoginType.BASIC && (
                             requireNotNull(username).length < User.MINIMUM_NAME_LENGTH ||
-                            requireNotNull(username).length > User.MAXIMUM_NAME_LENGTH
+                                    requireNotNull(username).length > User.MAXIMUM_NAME_LENGTH
                             ) ->
                         ValidationFailures.VALUE_INSUFFICIENT
 

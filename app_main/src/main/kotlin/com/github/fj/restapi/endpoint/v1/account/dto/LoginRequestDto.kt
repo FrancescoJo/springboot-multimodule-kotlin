@@ -36,12 +36,13 @@ data class LoginRequestDto(
         @JsonProperty
         val credential: ProtectedProperty<String> = ProtectedProperty(""),
 
-        @ApiModelProperty("Login type. Read document for supported login types.",
-                example = "b", required = true)
+        @ApiModelProperty("Login type.", example = "b", required = true,
+                allowableValues = "b: BASIC, g: GUEST")
         @JsonProperty
         val loginType: LoginType = LoginType.UNDEFINED,
 
-        @ApiModelProperty("Client platform's type.", example = "a", required = true)
+        @ApiModelProperty("Client platform's type.", example = "a", required = true,
+                allowableValues = "a: ANDROID, i: IOS, w: WEB")
         @JsonProperty
         val platformType: PlatformType = PlatformType.UNDEFINED,
 

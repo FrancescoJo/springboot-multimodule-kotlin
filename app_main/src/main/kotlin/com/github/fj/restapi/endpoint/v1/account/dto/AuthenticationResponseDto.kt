@@ -26,8 +26,8 @@ import java.time.LocalDateTime
 @JsonSerialize
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AuthenticationResponseDto(
-        @ApiModelProperty("Your login method. b: BASIC, g: GUEST",
-                example = "b", required = true)
+        @ApiModelProperty("Login type.", example = "b", required = true,
+                allowableValues = "b: BASIC, g: GUEST")
         @JsonProperty
         val loginType: LoginType,
 
@@ -45,12 +45,13 @@ data class AuthenticationResponseDto(
         @JsonProperty
         val nickname: String,
 
-        @ApiModelProperty("Gender, as user registered.", example = "m", required = true)
+        @ApiModelProperty("Gender, as user registered.", example = "m", required = true,
+                allowableValues = "m: MALE, f: FEMALE, \"\": UNDEFINED")
         @JsonProperty
         val gender: Gender,
 
-        @ApiModelProperty("Account status.", example = "n",
-                allowableValues = "n, s, b", required = true)
+        @ApiModelProperty("Account status.", example = "n", required = true,
+                allowableValues = "n: NORMAL, s: SUSPENDED, b: BANNED")
         @JsonProperty
         val status: Status,
 

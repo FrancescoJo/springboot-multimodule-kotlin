@@ -6,6 +6,7 @@ package com.github.fj.restapi.appconfig
 
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.endpoint.ApiPaths
+import com.github.fj.restapi.persistence.entity.User
 import com.google.common.base.Predicate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -56,6 +57,9 @@ class SwaggerConfig : WebMvcConfigurer {
     companion object {
         private fun newDocket(group: String, title: String, description: String,
                               pathPredicate: Predicate<String>) = Docket(DocumentationType.SWAGGER_2)
+                .ignoredParameterTypes(
+                        User::class.java
+                )
                 .useDefaultResponseMessages(false)
                 .groupName(group)
                 .select()
