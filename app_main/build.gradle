@@ -107,12 +107,10 @@ dependencies {
 
     compile "io.seruco.encoding:base62:0.1.2"
 
-    testCompile project(path: ":app_lib", configuration: "testArtifacts")
+    testCompile "com.github.FrancescoJo:kotlin-jvmlib-test:1.0.0"
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("org.springframework.security:spring-security-test")
-    testCompile("com.h2database:h2")
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 dependencyManagement {

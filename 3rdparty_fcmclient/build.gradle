@@ -13,8 +13,10 @@ jar {
 }
 
 dependencies {
-    compile project(":app_lib")
+    compile "com.github.FrancescoJo:kotlin-jvmlib:1.0.1"
 
+    // The production code uses the SLF4J logging API at compile time
+    compile "org.slf4j:slf4j-api:$version_slf4j"
     compile "com.google.api-client:google-api-client:$version_google_api_client"
     compile "com.google.code.gson:gson:$version_gson"
 }
