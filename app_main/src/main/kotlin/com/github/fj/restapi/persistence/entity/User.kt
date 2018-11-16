@@ -47,7 +47,9 @@ import javax.persistence.UniqueConstraint
 @Table(name = "users", uniqueConstraints = [
     UniqueConstraint(name = "UK_Users_Identity", columnNames = arrayOf("id", "id_token", "name")),
     UniqueConstraint(name = "UK_Users_Status", columnNames = arrayOf("id", "status")),
-    UniqueConstraint(name = "UK_Users_Credential", columnNames = arrayOf("name", "login_type", "email", "credential"))
+    UniqueConstraint(name = "UK_Users_Credential",
+            columnNames = arrayOf("name", "login_type", "email", "credential")
+    )
 ])
 class User : Serializable {
     @Id
@@ -111,7 +113,8 @@ class User : Serializable {
     @Column(name = "auth_iv", length = 16, nullable = false, columnDefinition = "VARBINARY(16)")
     var authIv: ByteArray = ByteArray(0)
 
-    @Column(name = "access_token", length = 127, unique = true, nullable = false, columnDefinition = "VARBINARY(127)")
+    @Column(name = "access_token", length = 127, unique = true, nullable = false,
+            columnDefinition = "VARBINARY(127)")
     var rawAccessToken: ByteArray = ByteArray(0)
 
     @Column(name = "token_issued_date", nullable = true)

@@ -18,7 +18,8 @@ import java.time.LocalDateTime
 @ApiModel(description = "Holds basic profile of authorised user.")
 @JsonSerialize
 data class ProfileResponseDto(
-    @ApiModelProperty("An encrypted user id, can be shared across users.", example = "ATF4QL92ZW350B6F.", required = true)
+    @ApiModelProperty("An encrypted user id, can be shared across users.",
+            example = "ATF4QL92ZW350B6F.", required = true)
     @JsonProperty
     val id: String,
 
@@ -26,27 +27,33 @@ data class ProfileResponseDto(
     @JsonProperty
     val membershipLevel: Int,
 
-    @ApiModelProperty("A date since this user has been joined. Based on UTC clock.", example = "2018-11-04T00:00:01", required = true)
+    @ApiModelProperty("A date since this user has been joined. Based on UTC clock.",
+            example = "2018-11-04T00:00:01", required = true)
     @JsonProperty
     val joinedSince: LocalDateTime,
 
-    @ApiModelProperty("A display name of this user.", example = "John doe", required = true)
+    @ApiModelProperty("A display name of this user.",
+            example = "John doe", required = true)
     @JsonProperty
     val nickname: String,
 
-    @ApiModelProperty("Gender, may not be revealed. Maybe null", example = "m", required = true)
+    @ApiModelProperty("Gender, may not be revealed. Maybe null",
+            example = "m", required = true)
     @JsonProperty
     val gender: Gender?,
 
-    @ApiModelProperty("A last active time this user has been spotted. Maybe null.", example = "2018-11-04T00:00:01", required = false)
+    @ApiModelProperty("A last active time this user has been spotted. Maybe null.",
+            example = "2018-11-04T00:00:01", required = false)
     @JsonProperty
     val lastActive: LocalDateTime?,
 
-    @ApiModelProperty("Suspended time since, if user has been suspended. Maybe null.", example = "2018-11-04T00:00:01", required = false)
+    @ApiModelProperty("Suspended time since, if user has been suspended. Maybe null.",
+            example = "2018-11-04T00:00:01", required = false)
     @JsonProperty
     var suspendedOn: LocalDateTime?,
 
-    @ApiModelProperty("Suspended time until, if user has been suspended. Maybe null.", example = "2018-11-04T00:00:01", required = false)
+    @ApiModelProperty("Suspended time until, if user has been suspended. Maybe null.",
+            example = "2018-11-04T00:00:01", required = false)
     @JsonProperty
     var suspendedUntil: LocalDateTime?
 )

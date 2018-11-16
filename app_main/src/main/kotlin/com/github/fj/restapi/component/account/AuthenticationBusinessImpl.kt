@@ -114,16 +114,18 @@ class AuthenticationBusinessImpl(
     override fun authenticate(token: AccessToken): Authentication {
         val tokenUser = token.user ?: throw UnknownAuthTokenException("This token is tampered.")
 
-        if (tokenUser.idToken != token.uIdToken) {
-            throw UnknownAuthTokenException("This token is tampered.")
-        }
+        tokenUser.run {
+            if (idToken != token.uIdToken) {
+                throw UnknownAuthTokenException("This token is tampered.")
+            }
 
-        if (Objects.hash(tokenUser.platformType.name, tokenUser.loginType.name) != token.loginPlatformHash) {
-            throw UnknownAuthTokenException("This token is tampered.")
-        }
+            if (Objects.hash(platformType.name, loginType.name) != token.loginPlatformHash) {
+                throw UnknownAuthTokenException("This token is tampered.")
+            }
 
-        if (tokenUser.createdDate.truncatedTo(ChronoUnit.SECONDS) != token.userRegisteredTimestamp) {
-            throw UnknownAuthTokenException("This token is tampered.")
+            if (createdDate.truncatedTo(ChronoUnit.SECONDS) != token.userRegisteredTimestamp) {
+                throw UnknownAuthTokenException("This token is tampered.")
+            }
         }
 
         val now = utcNow()
@@ -151,7 +153,8 @@ class AuthenticationBusinessImpl(
         private const val BITMASK_LSB_0 = -2
         private const val BITMASK_LSB_1 = 1
 
-        @Suppress("ComplexMethod")  // Necessary evil for adding randomness of our token.
+        // Suppress: Necessary evil for adding randomness of our token.
+        @Suppress("ComplexMethod", "ReturnCount")
         private fun createAccessToken(user: User, mode: AccessToken.Encoded,
                                       key: Key, iv: ByteArray, now: LocalDateTime): AccessToken {
             val garbageFiller: (ByteBuffer) -> Unit = { buf ->
@@ -208,10 +211,10 @@ class AuthenticationBusinessImpl(
                 uIdTokenLengthWriter.invoke(this)
                 listOf(uIdTokenWriter, loginTypeWriter, timestampWriter,
                         registeredDateWriter).let {
-                    if (mode == AccessToken.Encoded.FORWARD) {
-                        return@let it
+                    return@let if (mode == AccessToken.Encoded.FORWARD) {
+                        it
                     } else {
-                        return@let it.reversed()
+                        it.reversed()
                     }
                 }.forEach {
                     it.invoke(this)
@@ -233,18 +236,19 @@ class AuthenticationBusinessImpl(
                         put(encrypt(key, innerIv, payload).reversedArray())
                         put(innerIv.reversedArray())
                     }
-                    else -> throw UnknownAuthTokenException("$mode encoding strategy is unsupported.")
+                    else -> throw UnknownAuthTokenException("$mode encoding strategy is " +
+                            "unsupported.")
                 }
-            }.array().let {
-                return@let encrypt(key, iv, it)
-            }
+            }.array().let { encrypt(key, iv, it) }
 
             return AccessToken(encrypted.toList(), mode, iv.toList(), uIdToken, loginPlatformHash,
                     utcLocalDateTimeOf(timestamp), utcLocalDateTimeOf(createdTimestamp))
         }
 
-        @Suppress("ComplexMethod")  // Necessary evil for adding randomness of our token.
-        private fun parseAccessToken(aes256CipherKey: Key, rawToken: ByteArray, iv: ByteArray): AccessToken {
+        // Suppress: Necessary evil for adding randomness of our token.
+        @Suppress("ComplexMethod")
+        private fun parseAccessToken(aes256CipherKey: Key, rawToken: ByteArray, iv: ByteArray):
+                AccessToken {
             val decodedToken = decrypt(aes256CipherKey, iv, rawToken)
             val decodedBuf = ByteBuffer.wrap(decodedToken)
 
@@ -274,8 +278,11 @@ class AuthenticationBusinessImpl(
             when (mode) {
                 AccessToken.Encoded.FORWARD -> {
                     val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }
-                    val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, ByteArray(LENGTH_PAYLOAD_HEADER)
-                            .apply { decodedBuf.get(this) }))
+                    val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv,
+                            ByteArray(LENGTH_PAYLOAD_HEADER).apply {
+                                decodedBuf.get(this)
+                            }
+                    ))
 
                     val length = uIdTokenLengthReader(payloadBuf) as Int
                     uIdToken = uIdTokenReader(length, payloadBuf) as String
@@ -284,9 +291,15 @@ class AuthenticationBusinessImpl(
                     userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
                 }
                 AccessToken.Encoded.BACKWARD -> {
-                    val encodedPayload = ByteArray(LENGTH_PAYLOAD_HEADER).apply { decodedBuf.get(this) }.reversedArray()
-                    val innerIv = ByteArray(LENGTH_IV_HEADER).apply { decodedBuf.get(this) }.reversedArray()
-                    val payloadBuf = ByteBuffer.wrap(decrypt(aes256CipherKey, innerIv, encodedPayload))
+                    val encodedPayload = ByteArray(LENGTH_PAYLOAD_HEADER).apply {
+                        decodedBuf.get(this)
+                    }.reversedArray()
+                    val innerIv = ByteArray(LENGTH_IV_HEADER).apply {
+                        decodedBuf.get(this)
+                    }.reversedArray()
+                    val payloadBuf = ByteBuffer.wrap(
+                            decrypt(aes256CipherKey, innerIv, encodedPayload)
+                    )
 
                     val length = uIdTokenLengthReader(payloadBuf) as Int
                     userRegisteredTimestamp = registeredDateReader(payloadBuf) as Int
@@ -298,7 +311,8 @@ class AuthenticationBusinessImpl(
             }
 
             return AccessToken(rawToken.toList(), mode, iv.toList(), uIdToken, loginPlatformHash,
-                    utcLocalDateTimeOf(issuedTimestamp), utcLocalDateTimeOf(userRegisteredTimestamp))
+                    utcLocalDateTimeOf(issuedTimestamp),
+                    utcLocalDateTimeOf(userRegisteredTimestamp))
         }
 
         private fun ByteArray.parseEncoded(): AccessToken.Encoded {

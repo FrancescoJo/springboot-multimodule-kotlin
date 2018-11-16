@@ -174,10 +174,12 @@ class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
         val myParams = method.parameters.map { it.type }.toTypedArray()
         val target = LoggedActivity::class.java
 
-        val realMethod = findAnnotatedMethod(method, myParams, target) ?: return null
-        return realMethod.getAnnotation(target).activity
+        return findAnnotatedMethod(method, myParams, target)
+                ?.getAnnotation(target)
+                ?.activity
     }
 
+    @Suppress("ReturnCount")    // Early return is much readable in this case
     private fun findAnnotatedMethod(m: Method, mArgTyps: Array<Class<*>>?,
                                     ak: Class<out Annotation>): Method? {
         if (m.annotations.any { it.annotationClass.qualifiedName == ak.canonicalName }) {

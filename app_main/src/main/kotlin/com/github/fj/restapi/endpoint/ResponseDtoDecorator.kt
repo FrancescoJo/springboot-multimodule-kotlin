@@ -23,7 +23,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 @AllOpen
 @RestControllerAdvice
 class ResponseDtoDecorator : ResponseBodyAdvice<Any> {
-    override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {
+    override fun supports(returnType: MethodParameter,
+                          converterType: Class<out HttpMessageConverter<*>>): Boolean {
         val methodReturnType = returnType.method?.returnType ?: return false
         return methodReturnType.declaredAnnotations.any {
             it.annotationClass == JsonSerialize::class
@@ -31,7 +32,8 @@ class ResponseDtoDecorator : ResponseBodyAdvice<Any> {
     }
 
     override fun beforeBodyWrite(body: Any?, returnType: MethodParameter,
-                                 selectedContentType: MediaType, selectedConverterType: Class<out HttpMessageConverter<*>>,
+                                 selectedContentType: MediaType,
+                                 selectedConverterType: Class<out HttpMessageConverter<*>>,
                                  request: ServerHttpRequest, response: ServerHttpResponse): Any? {
         if (body == null) {
             return null

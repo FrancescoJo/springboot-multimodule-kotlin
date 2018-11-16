@@ -28,7 +28,9 @@ import javax.persistence.UniqueConstraint
  */
 @Entity
 @Table(name = "access_log", uniqueConstraints = [
-    UniqueConstraint(name = "UK_Access_Log_History", columnNames = arrayOf("timestamp", "user_id", "activity"))
+    UniqueConstraint(name = "UK_Access_Log_History",
+            columnNames = arrayOf("timestamp", "user_id", "activity")
+    )
 ])
 class AccessLog : Serializable {
     @Id

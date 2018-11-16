@@ -26,8 +26,9 @@ import javax.validation.Valid
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 28 - Oct - 2018
  */
-@Api(value = "Login", description = "Asks an authentication challenge for access token. For guest " +
-        "users, last issued access token, which acts as password, is also required for re-authentication.")
+@Api(value = "Login", description = "Asks an authentication challenge for access token. " +
+        "For guest users, last issued access token, which acts as password, is also required for " +
+        "re-authentication.")
 @RequestMapping(path = [ApiPaths.API_V1_ACCOUNT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         consumes = [MediaType.APPLICATION_JSON_VALUE])
@@ -38,7 +39,8 @@ interface ILoginController {
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
             ApiResponse(code = 400, message = "If request is malformed"),
             ApiResponse(code = 401, message = "If given credential was tampered"),
-            ApiResponse(code = 403, message = "If given credential was rejected by third party SSO providers"))
+            ApiResponse(code = 403, message = "If given credential was rejected by " +
+                    "third party SSO providers"))
     @RequestMapping(method = [RequestMethod.PATCH])
     @LoggedActivity(UserActivity.LOG_IN)
     @ResponseBody

@@ -28,9 +28,15 @@ import java.util.*
 enum class Role(val key: Int, val authorities: Collection<GrantedAuthority>) {
     ANONYMOUS(1, Collections.singleton(AUTHORITY_ANONYMOUS)),
     USER(10, Collections.singleton(AUTHORITY_USER)),
-    PREMIUM_USER(20, Collections.unmodifiableCollection(setOf(AUTHORITY_USER, AUTHORITY_PREMIUM_USER))),
-    MODERATOR(30, Collections.unmodifiableCollection(setOf(AUTHORITY_USER, AUTHORITY_MODERATOR))),
-    ADMINISTRATOR(100, Collections.unmodifiableCollection(setOf(AUTHORITY_USER, AUTHORITY_MODERATOR, AUTHORITY_ADMIN))),
+    PREMIUM_USER(20, Collections.unmodifiableCollection(
+            setOf(AUTHORITY_USER, AUTHORITY_PREMIUM_USER))
+    ),
+    MODERATOR(30, Collections.unmodifiableCollection(
+            setOf(AUTHORITY_USER, AUTHORITY_MODERATOR))
+    ),
+    ADMINISTRATOR(100, Collections.unmodifiableCollection(
+            setOf(AUTHORITY_USER, AUTHORITY_MODERATOR, AUTHORITY_ADMIN))
+    ),
     UNDEFINED(-1, Collections.emptyList());
 
     fun isAnonymous(): Boolean = this == ANONYMOUS

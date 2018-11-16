@@ -61,7 +61,8 @@ private class ValidEmailConstraint : ConstraintValidator<ValidEmail, String> {
     }
 
     companion object {
-        private const val EMAIL_REGEX = "^[_a-zA-Z0-9-]+([._a-zA-Z0-9-]*)@[a-zA-Z0-9]+(\\.[a-zA-Z0-9-]+)+$"
+        private const val EMAIL_REGEX =
+                "^[_a-zA-Z0-9-]+([._a-zA-Z0-9-]*)@[a-zA-Z0-9]+(\\.[a-zA-Z0-9-]+)+$"
         private const val EMAIL_LENGTH = User.EMAIL_LENGTH
 
         private val EMAIL_PATTERN = EMAIL_REGEX.toPattern()

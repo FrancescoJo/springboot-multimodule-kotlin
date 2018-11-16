@@ -16,7 +16,8 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel(description = "Represents successful account deletion.")
 @JsonSerialize
 data class DeleteAccountResponseDto(
-        @ApiModelProperty("A good bye message from server.", example = "Goodbye.", required = true)
+        @ApiModelProperty("A good bye message from server.",
+                example = "Goodbye.", required = true)
         @JsonProperty
         val message: String = ""
 )

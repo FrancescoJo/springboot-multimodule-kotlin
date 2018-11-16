@@ -23,7 +23,8 @@ class GeneralHttpException private constructor(status: HttpStatus,
                 if (resourceName.isEmpty()) {
                     GeneralHttpException(httpStatus, httpStatus.reasonPhrase, cause)
                 } else {
-                    GeneralHttpException(httpStatus, httpStatus.reasonPhrase + ": $resourceName", cause)
+                    GeneralHttpException(httpStatus, httpStatus.reasonPhrase + ": $resourceName",
+                            cause)
                 }
     }
 }

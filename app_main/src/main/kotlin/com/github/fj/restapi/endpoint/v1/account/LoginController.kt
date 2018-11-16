@@ -28,7 +28,8 @@ class LoginController @Inject constructor(
         private val authBusiness: AuthenticationBusiness,
         private val loginService: LoginService
 ) : ILoginController {
-    override fun onPatch(request: LoginRequestDto, httpRequest: HttpServletRequest): AuthenticationResponseDto {
+    override fun onPatch(request: LoginRequestDto, httpRequest: HttpServletRequest):
+            AuthenticationResponseDto {
         LOG.debug("Login request: {}", request)
 
         return when (request.loginType) {

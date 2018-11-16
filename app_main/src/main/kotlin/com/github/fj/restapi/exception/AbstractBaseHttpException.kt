@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 15 - Jan - 2018
  */
-abstract class AbstractBaseHttpException(override val message: String = "", cause: Throwable? = null) :
-        Exception(message, cause) {
+abstract class AbstractBaseHttpException(override val message: String = "",
+                                         cause: Throwable? = null) : Exception(message, cause) {
     abstract val httpStatus: HttpStatus
 
     val reason: String

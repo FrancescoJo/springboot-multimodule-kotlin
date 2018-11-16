@@ -49,8 +49,8 @@ class CreateAccountServiceImpl @Inject constructor(
                 val hashedCredential = authBusiness.hash(credentialBytes)
                 userRepo.findByBasicCredential(requireNotNull(req.username), hashedCredential)
             }
-            else -> throw HttpMessageNotReadableException("${req.loginType} login is not supported.",
-                    ServletServerHttpRequest(httpReq))
+            else -> throw HttpMessageNotReadableException("${req.loginType} login is " +
+                    "not supported.", ServletServerHttpRequest(httpReq))
         }
 
         if (maybeUser.isPresent) {
@@ -115,7 +115,8 @@ class CreateAccountServiceImpl @Inject constructor(
                 }
             }
 
-    private fun createCredential(req: CreateAccountRequestDto, credentialBytes: ByteArray): ByteArray {
+    private fun createCredential(req: CreateAccountRequestDto, credentialBytes: ByteArray):
+            ByteArray {
         return when (req.loginType) {
             LoginType.GUEST -> ByteArray(0)
             LoginType.BASIC -> authBusiness.hash(credentialBytes)

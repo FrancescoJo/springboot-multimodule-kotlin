@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest
  * Note that this approach is not accurate on various web containers and additional logic may be
  * needed to fulfill your business requirement.
  */
+@Suppress("ReturnCount")    // Early return is much readable in this case
 fun HttpServletRequest.extractIpStr(): String {
     with(getHeader("X-Real-IP")) {
         if (!isNullOrUnicodeBlank() && !isUnknown()) {

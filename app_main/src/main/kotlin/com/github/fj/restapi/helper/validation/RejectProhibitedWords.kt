@@ -26,7 +26,7 @@ private class ProhibitedWordsConstraint : ConstraintValidator<RejectProhibitedWo
     private lateinit var message: String
     private var required: Boolean = false
 
-    override fun initialize(constraintAnnotation: RejectProhibitedWords) = constraintAnnotation.let {
+    override fun initialize(constraint: RejectProhibitedWords) = constraint.let {
         this.fieldName = it.fieldName
         this.message = it.message
         this.required = it.required

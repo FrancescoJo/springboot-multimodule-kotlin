@@ -46,7 +46,8 @@ class PushConfig {
                     PushPlatform.ANDROID -> fcmAndroidAppName
                     PushPlatform.IOS -> fcmIosAppName
                     PushPlatform.WEB -> fcmWebAppName
-                    else -> throw UnsupportedOperationException("Push to $platform is not supported.")
+                    else ->
+                        throw UnsupportedOperationException("Push to $platform is not supported.")
                 }
             }, fcmServerKey)
 }

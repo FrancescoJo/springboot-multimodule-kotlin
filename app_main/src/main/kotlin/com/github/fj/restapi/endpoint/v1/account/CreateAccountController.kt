@@ -24,7 +24,8 @@ import javax.servlet.http.HttpServletRequest
 class CreateAccountController @Inject constructor(
         private val svc: CreateAccountService
 ) : ICreateAccountController {
-    override fun onPost(request: CreateAccountRequestDto, httpServletRequest: HttpServletRequest): AuthenticationResponseDto {
+    override fun onPost(request: CreateAccountRequestDto, httpServletRequest: HttpServletRequest):
+            AuthenticationResponseDto {
         LOG.debug("Create account request: {}", request)
         svc.createAccount(request, httpServletRequest).let {
             LOG.debug("Create account response: {}", it)

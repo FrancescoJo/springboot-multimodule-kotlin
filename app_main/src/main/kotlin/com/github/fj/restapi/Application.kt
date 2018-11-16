@@ -17,7 +17,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 @SpringBootApplication
 open class Application {
     companion object {
-        private val configurationNames = arrayOf("application", "application-" + BuildConfig.currentProfile.value)
+        private val configurationNames = arrayOf("application", "application-" +
+                BuildConfig.currentProfile.value)
 
         @JvmStatic
         fun main(args: Array<String>) {

@@ -45,12 +45,14 @@ import javax.servlet.http.HttpServletRequest
 class CustomErrorHandler : ErrorController {
     @ExceptionHandler(AuthenticationException::class)
     fun handleSpring401(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
-        return handleError(req, GeneralHttpException.create(HttpStatus.UNAUTHORIZED, req.requestURI ?: ""))
+        return handleError(req, GeneralHttpException.create(HttpStatus.UNAUTHORIZED,
+                req.requestURI ?: ""))
     }
 
     @ExceptionHandler(NoHandlerFoundException::class)
     fun handleSpring404(req: HttpServletRequest): ResponseEntity<ErrorResponseDto> {
-        return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND, req.requestURI ?: ""))
+        return handleError(req, GeneralHttpException.create(HttpStatus.NOT_FOUND,
+                req.requestURI ?: ""))
     }
 
     @ExceptionHandler(Exception::class)
@@ -65,12 +67,14 @@ class CustomErrorHandler : ErrorController {
             is HttpMessageNotReadableException -> {
                 logError("Spring handled exception:", ex)
                 status = HttpStatus.BAD_REQUEST
-                AbstractResponseDto.error("Cannot process given request.", "Malformed request message")
+                AbstractResponseDto.error("Cannot process given request.",
+                        "Malformed request message")
             }
             is JsonProcessingException -> {
                 logError("JSON parsing exception:", ex)
                 status = HttpStatus.BAD_REQUEST
-                AbstractResponseDto.error("Cannot process given request.", "Malformed JSON")
+                AbstractResponseDto.error("Cannot process given request.",
+                        "Malformed JSON")
             }
             is MethodArgumentNotValidException -> {
                 logError("Validation failure exception:", ex)

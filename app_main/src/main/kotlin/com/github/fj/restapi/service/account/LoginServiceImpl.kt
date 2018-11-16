@@ -28,7 +28,8 @@ class LoginServiceImpl @Inject constructor(
         private val userRepo: UserRepository,
         private val authBusiness: AuthenticationBusiness
 ) : LoginService {
-    override fun guestLogin(accessToken: AccessToken, request: LoginRequestDto): AuthenticationResponseDto {
+    override fun guestLogin(accessToken: AccessToken, request: LoginRequestDto):
+            AuthenticationResponseDto {
         val user = userRepo.findByGuestCredential(accessToken.raw.toByteArray()).ensure()
         try {
             authBusiness.authenticate(accessToken)

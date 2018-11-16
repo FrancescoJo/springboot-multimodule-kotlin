@@ -34,8 +34,10 @@ interface ICreateAccountController {
             notes = "Creates account for service usage with initially provided information.",
             response = AuthenticationResponseDto::class)
     @ApiResponses(ApiResponse(code = 200, message = "Successful transaction"),
-            ApiResponse(code = 400, message = "If request is malformed, nickname is not permitted or already exists."),
-            ApiResponse(code = 403, message = "If an account with same identity is already created"))
+            ApiResponse(code = 400, message = "If request is malformed, nickname is " +
+                    "not permitted or already exists."),
+            ApiResponse(code = 403, message = "If an account with same identity is " +
+                    "already created"))
     @RequestMapping(method = [RequestMethod.POST])
     @LoggedActivity(UserActivity.CREATE_ACCOUNT)
     @ResponseBody

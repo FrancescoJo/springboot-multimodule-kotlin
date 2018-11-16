@@ -25,7 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 28 - Oct - 2018
  */
-@Api(value = "DeleteAccount", description = "Deletes owning account and abandon all service usage history.")
+@Api(value = "DeleteAccount",
+        description = "Deletes owning account and abandon all service usage history.")
 @RequestMapping(path = [ApiPaths.API_V1_ACCOUNT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         consumes = [MediaType.APPLICATION_JSON_VALUE])
@@ -40,5 +41,6 @@ interface IDeleteAccountController {
     @RequestMapping(method = [RequestMethod.DELETE])
     @LoggedActivity(UserActivity.DELETE_ACCOUNT)
     @ResponseBody
-    fun onDelete(user: User, @RequestBody deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto
+    fun onDelete(user: User, @RequestBody deleteReason: DeleteAccountRequestDto?):
+            DeleteAccountResponseDto
 }

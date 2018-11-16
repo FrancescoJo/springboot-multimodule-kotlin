@@ -24,18 +24,20 @@ import org.springframework.validation.Errors
 @ApiModel(description = "Login request payload")
 @JsonDeserialize
 data class LoginRequestDto(
-        @ApiModelProperty("A user name, must not be empty and must be ${User.MINIMUM_NAME_LENGTH} - " +
-                "${User.MAXIMUM_NAME_LENGTH} alphanumeric letters long if the the loginType is " +
-                "BASIC. Maybe empty or omitted if you are using another login type.",
-                example = "Good Username", required = false)
+        @ApiModelProperty("A user name, must not be empty and must be " +
+                "${User.MINIMUM_NAME_LENGTH} - ${User.MAXIMUM_NAME_LENGTH} alphanumeric letters " +
+                "long if the the loginType is BASIC. Maybe empty or omitted if you are using " +
+                "another login type.", example = "Good Username", required = false)
         @JsonProperty
         val username: String = "",
 
-        @ApiModelProperty("Could be a password, 3rd party SSO access token, etc.", example = "", required = true)
+        @ApiModelProperty("Could be a password, 3rd party SSO access token, etc.",
+                example = "", required = true)
         @JsonProperty
         val credential: ProtectedProperty<String> = ProtectedProperty(""),
 
-        @ApiModelProperty("Login type. Read document for supported login types.", example = "b", required = true)
+        @ApiModelProperty("Login type. Read document for supported login types.",
+                example = "b", required = true)
         @JsonProperty
         val loginType: LoginType = LoginType.UNDEFINED,
 
@@ -47,7 +49,8 @@ data class LoginRequestDto(
         @JsonProperty
         val platformVersion: String = "",
 
-        @ApiModelProperty("App version that client is currently using.", example = "0.0.1", required = true)
+        @ApiModelProperty("App version that client is currently using.",
+                example = "0.0.1", required = true)
         @JsonProperty
         val appVersion: String = ""
 ) {
@@ -58,19 +61,24 @@ data class LoginRequestDto(
             override fun supports(klass: Class<*>) =
                     LoginRequestDto::class.java.isAssignableFrom(klass)
 
-            override fun validateNonNull(target: LoginRequestDto, e: Errors): ValidationFailures? =
-                    with(target) {
-                        return@with when {
-                            loginType == LoginType.BASIC && (username.isBlank() || credential.value.isBlank()) ->
-                                ValidationFailures.VALUE_INSUFFICIENT
-                            loginType == LoginType.GUEST && (!username.isBlank() || !credential.value.isBlank()) ->
-                                ValidationFailures.VALUE_UNNECESSARY
-                            loginType == LoginType.UNDEFINED || platformType == PlatformType.UNDEFINED ||
-                                    platformVersion.isEmpty() || appVersion.isEmpty() ->
-                                ValidationFailures.VALUE_INSUFFICIENT
-                            else -> null
-                        }
-                    }
+            override fun validateNonNull(target: LoginRequestDto, e: Errors):
+                    ValidationFailures? = with(target) {
+                return@with when {
+                    loginType == LoginType.BASIC && (
+                            username.isBlank() || credential.value.isBlank()) ->
+                        ValidationFailures.VALUE_INSUFFICIENT
+
+                    loginType == LoginType.GUEST && (
+                            !username.isBlank() || !credential.value.isBlank()) ->
+                        ValidationFailures.VALUE_UNNECESSARY
+
+                    loginType == LoginType.UNDEFINED ||
+                            platformType == PlatformType.UNDEFINED ||
+                            platformVersion.isEmpty() || appVersion.isEmpty() ->
+                        ValidationFailures.VALUE_INSUFFICIENT
+                    else -> null
+                }
+            }
         }
     }
 }

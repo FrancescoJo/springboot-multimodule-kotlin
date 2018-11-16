@@ -24,7 +24,8 @@ import javax.inject.Inject
 class DeleteAccountServiceImpl @Inject constructor(
         private val userRepo: UserRepository
 ) : DeleteAccountService {
-    override fun deleteAccount(user: User, deleteReason: DeleteAccountRequestDto?): DeleteAccountResponseDto {
+    override fun deleteAccount(user: User, deleteReason: DeleteAccountRequestDto?):
+            DeleteAccountResponseDto {
         user.run {
             status = Status.WITHDRAWN
             member.suspendedOn = utcNow()

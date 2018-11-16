@@ -26,7 +26,8 @@ import java.time.LocalDateTime
 @JsonSerialize
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AuthenticationResponseDto(
-        @ApiModelProperty("Your login method. b: BASIC, g: GUEST", example = "b", required = true)
+        @ApiModelProperty("Your login method. b: BASIC, g: GUEST",
+                example = "b", required = true)
         @JsonProperty
         val loginType: LoginType,
 
@@ -34,11 +35,13 @@ data class AuthenticationResponseDto(
          * This value must be [com.github.fj.restapi.persistence.entity.User.idToken].
          * It is strongly discouraged to expose numeric primary key to the outside world.
          */
-        @ApiModelProperty("An encrypted user Id. Unique value.", example = "AqCzKa7E", required = true)
+        @ApiModelProperty("An encrypted user Id. Unique value.",
+                example = "AqCzKa7E", required = true)
         @JsonProperty
         val id: String = "",
 
-        @ApiModelProperty("Nickname, as user registered. This value is not unique.", example = "My Nickname", required = true)
+        @ApiModelProperty("Nickname, as user registered. This value is not unique.",
+                example = "My Nickname", required = true)
         @JsonProperty
         val nickname: String,
 
@@ -46,11 +49,13 @@ data class AuthenticationResponseDto(
         @JsonProperty
         val gender: Gender,
 
-        @ApiModelProperty("Account status.", example = "n", allowableValues = "n, s, b", required = true)
+        @ApiModelProperty("Account status.", example = "n",
+                allowableValues = "n, s, b", required = true)
         @JsonProperty
         val status: Status,
 
-        @ApiModelProperty("An UNIX timestamp that indicates user's last activity.", example = "2018-10-27T00:00:01", required = true)
+        @ApiModelProperty("An UNIX timestamp that indicates user's last activity.",
+                example = "2018-10-27T00:00:01", required = true)
         @JsonProperty
         val lastActive: LocalDateTime,
 
@@ -60,14 +65,14 @@ data class AuthenticationResponseDto(
         @JsonProperty
         val accessToken: ProtectedProperty<String>,
 
-        @ApiModelProperty("An UNIX timestamp that will appear if a user account is " +
-                "banned or suspended in certain timespan. Field may not found or the value will be 0" +
+        @ApiModelProperty("An UNIX timestamp that will appear if a user account is banned " +
+                "or suspended in certain timespan. Field may not found or the value will be 0" +
                 "if your account status is good.", example = "<UNIX TIMESTAMP>", required = false)
         @JsonProperty
         val suspendedOn: LocalDateTime?,
 
-        @ApiModelProperty("An UNIX timestamp that will appear if a user account is " +
-                "banned or suspended in certain timespan. Field may not found or the value will be 0" +
+        @ApiModelProperty("An UNIX timestamp that will appear if a user account is banned " +
+                "or suspended in certain timespan. Field may not found or the value will be 0" +
                 "if your account status is good.", example = "<UNIX TIMESTAMP>", required = false)
         @JsonProperty
         val suspendedUntil: LocalDateTime?
