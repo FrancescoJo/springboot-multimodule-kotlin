@@ -10,8 +10,8 @@ import com.github.fj.lib.text.StringUtilsKt;
 import com.github.fj.lib.time.DateTimeUtilsKt;
 import com.github.fj.lib.util.ProtectedProperty;
 import com.github.fj.restapi.appconfig.AppProperties;
-import com.github.fj.restapi.component.account.AuthenticationBusiness;
-import com.github.fj.restapi.component.account.AuthenticationBusinessImpl;
+import com.github.fj.restapi.component.auth.AccessTokenBusiness;
+import com.github.fj.restapi.component.auth.inhouse.InhouseAccessTokenBusinessImpl;
 import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto;
 import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto;
 import com.github.fj.restapi.persistence.consts.account.LoginType;
@@ -96,10 +96,10 @@ public final class AccountRequestUtils {
         final byte[] keyPass = ArrayUtilsKt.getRandomBytes(32);
         when(appProperties.getAccessTokenAes256Key()).thenReturn(keyPass);
 
-        final AuthenticationBusiness tokenCreator
-                = new AuthenticationBusinessImpl(appProperties, userRepository);
+        final AccessTokenBusiness tokenCreator
+                = new InhouseAccessTokenBusinessImpl(appProperties, userRepository);
 
-        return tokenCreator.createAccessToken(user, timestamp);
+        return tokenCreator.create(user, timestamp);
     }
 
     public static LoginRequestDto newRandomLoginRequest(final LoginType loginType) {

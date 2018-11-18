@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.appconfig.mvc.security.internal
+package com.github.fj.restapi.component.auth
 
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.vo.account.AccessToken

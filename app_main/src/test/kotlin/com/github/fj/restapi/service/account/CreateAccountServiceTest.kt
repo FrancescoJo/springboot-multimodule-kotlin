@@ -4,7 +4,8 @@
  */
 package com.github.fj.restapi.service.account
 
-import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
 import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
@@ -41,12 +42,15 @@ class CreateAccountServiceTest {
     @Mock
     private lateinit var mockUserRepo: UserRepository
     @Mock
-    private lateinit var mockAuthBusiness: AuthenticationBusiness
+    private lateinit var mockAuthBusinessFactory: AccessTokenBusinessFactory
+    @Mock
+    private lateinit var mockAuthBusiness: AccessTokenBusiness
 
     @BeforeEach
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        this.sut = CreateAccountServiceImpl(mockUserRepo, mockAuthBusiness)
+        `when`(mockAuthBusinessFactory.get()).thenReturn(mockAuthBusiness)
+        this.sut = CreateAccountServiceImpl(mockUserRepo, mockAuthBusinessFactory)
     }
 
     @Test
@@ -90,7 +94,7 @@ class CreateAccountServiceTest {
         `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.empty())
         `when`(mockAuthBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
-        `when`(mockAuthBusiness.createAccessToken(any(), any())).thenReturn(AccessToken.EMPTY)
+        `when`(mockAuthBusiness.create(any(), any())).thenReturn(AccessToken.EMPTY)
         `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
                 .thenReturn(Optional.empty())
 
@@ -115,7 +119,7 @@ class CreateAccountServiceTest {
         val existingUser = newRandomUser()
         `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
                 .thenReturn(Optional.of(existingUser))
-        `when`(mockAuthBusiness.createAccessToken(any(), any())).thenReturn(AccessToken.EMPTY)
+        `when`(mockAuthBusiness.create(any(), any())).thenReturn(AccessToken.EMPTY)
 
         // when:
         val actual = sut.createAccount(req, httpReq)

@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.appconfig.mvc.security.spel
+package com.github.fj.restapi.component.auth.spel
 
 /**
  * A reinvented wheel version of [org.springframework.security.access.expression.SecurityExpressionRoot].

@@ -2,17 +2,16 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.component.account
+package com.github.fj.restapi.component.auth.inhouse
 
-import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.lib.annotation.VisibleForTesting
 import com.github.fj.lib.collection.getSecureRandomBytes
 import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
-import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
+import com.github.fj.restapi.component.auth.AuthenticationObjectImpl
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
+import com.github.fj.restapi.component.auth.AccessTokenBusiness
 import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
@@ -21,13 +20,12 @@ import com.github.fj.restapi.persistence.repository.UserRepository
 import com.github.fj.restapi.vo.account.AccessToken
 import io.seruco.encoding.base62.Base62
 import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Component
 import java.nio.ByteBuffer
 import java.security.Key
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
-import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.*
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -37,12 +35,10 @@ import javax.servlet.http.HttpServletRequest
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 30 - Oct - 2018
  */
-@AllOpen
-@Component
-class AuthenticationBusinessImpl(
+class InhouseAccessTokenBusinessImpl(
         private val appProperties: AppProperties,
         private val userRepository: UserRepository
-) : AuthenticationBusiness {
+) : AccessTokenBusiness {
     var accessTokenMode = AccessToken.Encoded.RANDOM
 
     private val aes256CipherKey: Key
@@ -51,16 +47,11 @@ class AuthenticationBusinessImpl(
     private val accessTokenLifeSeconds: Long
         get() = appProperties.accessTokenAliveSecs.toLong()
 
-    @Suppress("UnstableApiUsage")
-    override fun hash(data: ByteArray): ByteArray =
-            com.google.common.hash.Hashing.goodFastHash(data.size * BITS_PER_BYTE)
-                    .hashBytes(data).asBytes()
-
-    override fun findAccessTokenFrom(httpRequest: HttpServletRequest): AccessToken? {
+    override fun findFromRequest(httpRequest: HttpServletRequest): AccessToken? {
         val httpAuthToken = HttpServletRequestAuthorizationHeaderFilter
                 .findAuthorizationHeader(httpRequest) ?: return null
 
-        return parseAccessToken(httpAuthToken.token)
+        return parse(httpAuthToken.token)
     }
 
     /**
@@ -74,7 +65,7 @@ class AuthenticationBusinessImpl(
      *
      * Just consider this as AES256 and Base62 encoding usage demonstration.
      */
-    override fun createAccessToken(user: User, timestamp: LocalDateTime): AccessToken {
+    override fun create(user: User, timestamp: LocalDateTime): AccessToken {
         val mode = when (accessTokenMode) {
             AccessToken.Encoded.RANDOM -> {
                 if (ThreadLocalRandom.current().nextInt(0, 2) == 0) {
@@ -95,7 +86,7 @@ class AuthenticationBusinessImpl(
     /**
      * @param token Base62 encoded access token.
      */
-    override fun parseAccessToken(token: String): AccessToken {
+    override fun parse(token: String): AccessToken {
         val rawToken = Base62.createInstance().decode(token.toByteArray())
         val user = with(userRepository.findByAccessToken(rawToken)) {
             if (!isPresent) {
@@ -111,7 +102,7 @@ class AuthenticationBusinessImpl(
     }
 
     @Throws(AuthTokenException::class)
-    override fun authenticate(token: AccessToken): Authentication {
+    override fun validate(token: AccessToken): Authentication {
         val tokenUser = token.user ?: throw UnknownAuthTokenException("This token is tampered.")
 
         tokenUser.run {
@@ -147,7 +138,6 @@ class AuthenticationBusinessImpl(
         private const val LENGTH_BYTES_HEADER = 16
         private const val LENGTH_PAYLOAD_HEADER = 32
         private const val LENGTH_IV_HEADER = 16
-        private const val BITS_PER_BYTE = 8
         private const val INTEGER_BITS_LEN = 32
         private const val MASKER_BIT_POS_MOD = 30
         private const val BITMASK_LSB_0 = -2
@@ -378,4 +368,3 @@ class AuthenticationBusinessImpl(
         }
     }
 }
-

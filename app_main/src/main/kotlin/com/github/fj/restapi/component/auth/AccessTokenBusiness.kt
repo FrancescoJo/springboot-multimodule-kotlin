@@ -2,7 +2,7 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.component.account
+package com.github.fj.restapi.component.auth
 
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.exception.AuthTokenException
@@ -17,20 +17,27 @@ import javax.servlet.http.HttpServletRequest
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 30 - Oct - 2018
  */
-interface AuthenticationBusiness {
-    fun hash(data: ByteArray): ByteArray
+interface AccessTokenBusiness {
+    @Suppress("UnstableApiUsage")
+    fun hash(data: ByteArray): ByteArray =
+            com.google.common.hash.Hashing.goodFastHash(data.size * BITS_PER_BYTE)
+                    .hashBytes(data).asBytes()
 
-    fun findAccessTokenFrom(httpRequest: HttpServletRequest): AccessToken?
+    fun findFromRequest(httpRequest: HttpServletRequest): AccessToken?
 
-    fun createAccessToken(user: User, timestamp: LocalDateTime = utcNow()): AccessToken
+    fun create(user: User, timestamp: LocalDateTime = utcNow()): AccessToken
 
     /**
      * @param token Base62 encoded access token.
      * @throws UnknownAuthTokenException if access token is malformed or not issued.
      */
     @Throws(UnknownAuthTokenException::class)
-    fun parseAccessToken(token: String): AccessToken
+    fun parse(token: String): AccessToken
 
     @Throws(AuthTokenException::class)
-    fun authenticate(token: AccessToken): Authentication
+    fun validate(token: AccessToken): Authentication
+
+    companion object {
+        private const val BITS_PER_BYTE = 8
+    }
 }

@@ -4,6 +4,8 @@ buildscript {
     ext.version_springBoot = "2.1.0.RELEASE"
     ext.version_springPropDeps = "0.0.10.RELEASE"
 
+    ext.version_bouncycastle = "1.60"
+    ext.version_nimbus_jose = "6.3"
     ext.version_guava = "27.0-jre"
     ext.version_slf4j = "1.7.25"
     ext.version_google_api_client = "1.26.0"

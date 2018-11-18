@@ -70,9 +70,12 @@ app:
     fcm-ios-app-name:
     fcm-web-app-name:
 
-  cipher:
+  authentication:
+    # default/jwt, inhouse (personal implementation)
+    token-generation: default
     # Please provide 32 digit HEX presented your encryption key, for example:
     # access-token-aes256-key: C4 9B 24 54 5F 6C 74 FF 0C C7 62 EA 4B 3D 75 1C
     #                          5A 5C 15 F1 6A 95 3F 7C 4C B7 9B EB 53 FE CC 7B
+    # or useless if token generation mode is selected as jwt (by default).
     access-token-aes256-key:
     access-token-alive-seconds: 86400

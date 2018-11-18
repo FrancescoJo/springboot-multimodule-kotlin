@@ -8,6 +8,8 @@ import com.github.fj.lib.collection.getRandomBytes
 import com.github.fj.lib.time.LOCAL_DATE_TIME_MAX
 import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.restapi.appconfig.AppProperties
+import com.github.fj.restapi.component.auth.AccessTokenBusiness
+import com.github.fj.restapi.component.auth.inhouse.InhouseAccessTokenBusinessImpl
 import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
@@ -35,8 +37,8 @@ import java.util.stream.Stream
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 31 - Oct - 2018
  */
-class AuthenticationBusinessTest {
-    private lateinit var sut: AuthenticationBusiness
+class InhouseAccessTokenBusinessTest {
+    private lateinit var sut: AccessTokenBusiness
     @Mock
     private lateinit var mockAppProperties: AppProperties
     @Mock
@@ -45,7 +47,7 @@ class AuthenticationBusinessTest {
     @BeforeEach
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        this.sut = AuthenticationBusinessImpl(mockAppProperties, mockUserRepository)
+        this.sut = InhouseAccessTokenBusinessImpl(mockAppProperties, mockUserRepository)
     }
 
     @Test
@@ -68,9 +70,9 @@ class AuthenticationBusinessTest {
         val aes256Key = getRandomBytes(32)
 
         // and:
-        (sut as AuthenticationBusinessImpl).accessTokenMode = mode
+        (sut as InhouseAccessTokenBusinessImpl).accessTokenMode = mode
         `when`(mockAppProperties.accessTokenAes256Key).thenReturn(aes256Key)
-        val issuedToken = sut.createAccessToken(user)
+        val issuedToken = sut.create(user)
         user.authIv = issuedToken.iv.toByteArray()
         val issuedRawToken = issuedToken.raw.toByteArray()
         val userToken = Base62.createInstance().encode(issuedRawToken).toString(Charsets.UTF_8)
@@ -78,7 +80,7 @@ class AuthenticationBusinessTest {
                 .thenReturn(Optional.of(user))
 
         // when:
-        val decodedToken = sut.parseAccessToken(userToken)
+        val decodedToken = sut.parse(userToken)
 
         // then:
         assertEquals(issuedToken, decodedToken)
@@ -88,7 +90,7 @@ class AuthenticationBusinessTest {
     @MethodSource("createTamperedAccessTokens")
     fun `Authentication must be failed for tampered access tokens`(token: AccessToken) {
         assertThrows<AuthTokenException> {
-            sut.authenticate(token)
+            sut.validate(token)
         }
     }
 

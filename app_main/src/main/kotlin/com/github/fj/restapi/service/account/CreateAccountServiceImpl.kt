@@ -9,7 +9,7 @@ import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.getRandomCapitalAlphaNumericString
 import com.github.fj.lib.text.isNullOrUnicodeBlank
 import com.github.fj.lib.time.utcNow
-import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
 import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto
 import com.github.fj.restapi.exception.account.AccountAlreadyExistException
@@ -38,8 +38,10 @@ import javax.servlet.http.HttpServletRequest
 @Service
 class CreateAccountServiceImpl @Inject constructor(
         private val userRepo: UserRepository,
-        private val authBusiness: AuthenticationBusiness
+        authBizFactory: AccessTokenBusinessFactory
 ) : CreateAccountService {
+    private val authBusiness = authBizFactory.get()
+
     override fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto {
         val credentialBytes = req.credential.value.toByteArray()
@@ -77,7 +79,7 @@ class CreateAccountServiceImpl @Inject constructor(
             invitedBy = guessInvitedBy(req)
             credential = createCredential(req, credentialBytes)
             member = createMembership(req, now, ipAddr)
-            setAccessToken(authBusiness.createAccessToken(this))
+            setAccessToken(authBusiness.create(this))
         })
 
         return AuthenticationResponseDto.create(user)

@@ -6,6 +6,7 @@ package com.github.fj.restapi.appconfig
 
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.appconfig.AppProperties.Companion.TOKEN_ALIVE_DURATION_SECS
+import com.github.fj.restapi.component.auth.TokenGenerationMethod
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
@@ -23,13 +24,23 @@ import javax.xml.bind.DatatypeConverter
 @AllOpen
 @Component
 @EnableConfigurationProperties
-class AppPropertiesImpl : AppProperties {
+class AppPropertiesImpl(
+        @Value("\${app.authentication.token-generation}")
+        private val _tokenGenMethod: String
+) : AppProperties {
     override lateinit var accessTokenAes256Key: ByteArray
 
     override var accessTokenAliveSecs: Int = TOKEN_ALIVE_DURATION_SECS
 
-    @Value("\${app.cipher.access-token-aes256-key}")
+    override var tokenGenerationMethod: TokenGenerationMethod =
+            TokenGenerationMethod.byMethod(_tokenGenMethod)
+
+    @Value("\${app.authentication.access-token-aes256-key}")
     fun accessTokenAes256Key(keyStr: String) {
+        if (tokenGenerationMethod != TokenGenerationMethod.INHOUSE) {
+            return
+        }
+
         val concatenatedKeyStr = if (keyStr.length == AES256_KEY_HEX_LENGTH) {
             keyStr
         } else {
@@ -52,8 +63,12 @@ class AppPropertiesImpl : AppProperties {
         }
     }
 
-    @Value("\${app.cipher.access-token-alive-seconds}")
+    @Value("\${app.authentication.access-token-alive-seconds}")
     fun accessTokenAliveSecs(durationSecs: Int) {
+        if (tokenGenerationMethod != TokenGenerationMethod.INHOUSE) {
+            return
+        }
+
         if (durationSecs <= 0) {
             throw UnsupportedOperationException(
                     "Access token life time seconds must be larger than 0.")

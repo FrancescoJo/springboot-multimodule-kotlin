@@ -4,7 +4,8 @@
  */
 package com.github.fj.restapi.service.account
 
-import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.entity.User
@@ -27,12 +28,15 @@ class LoginServiceTest {
     @Mock
     private lateinit var mockUserRepo: UserRepository
     @Mock
-    private lateinit var mockAuthBusiness: AuthenticationBusiness
+    private lateinit var mockAuthBusinessFactory: AccessTokenBusinessFactory
+    @Mock
+    private lateinit var mockAuthBusiness: AccessTokenBusiness
 
     @BeforeEach
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        this.sut = LoginServiceImpl(mockUserRepo, mockAuthBusiness)
+        `when`(mockAuthBusinessFactory.get()).thenReturn(mockAuthBusiness)
+        this.sut = LoginServiceImpl(mockUserRepo, mockAuthBusinessFactory)
     }
 
     @Test
@@ -63,15 +67,15 @@ class LoginServiceTest {
         // and:
         `when`(mockUserRepo.findByGuestCredential(token.raw.toByteArray()))
                 .thenReturn(Optional.of(user))
-        `when`(mockAuthBusiness.authenticate(token)).thenThrow(AuthTokenExpiredException())
+        `when`(mockAuthBusiness.validate(token)).thenThrow(AuthTokenExpiredException())
         val newToken = newRandomAccessToken(user)
-        `when`(mockAuthBusiness.createAccessToken(eq(user), any())).thenReturn(newToken)
+        `when`(mockAuthBusiness.create(eq(user), any())).thenReturn(newToken)
 
         // when:
         sut.guestLogin(token, req)
 
         // then:
-        verify(mockAuthBusiness, times(1)).createAccessToken(eq(user), any())
+        verify(mockAuthBusiness, times(1)).create(eq(user), any())
         verify(mockUserRepo, times(1)).save(user)
         verify(mockUserRepo).save<User>(argThat { token.issuedTimestamp == newToken.issuedTimestamp })
     }
@@ -89,12 +93,12 @@ class LoginServiceTest {
                 .thenReturn(savedCredential)
         `when`(mockUserRepo.findByBasicCredential(request.username, savedCredential))
                 .thenReturn(Optional.of(user))
-        `when`(mockAuthBusiness.createAccessToken(eq(user), any())).thenReturn(newAccessToken)
+        `when`(mockAuthBusiness.create(eq(user), any())).thenReturn(newAccessToken)
 
         // when:
         sut.basicLogin(request)
 
         // then:
-        verify(mockAuthBusiness, times(1)).createAccessToken(eq(user), any())
+        verify(mockAuthBusiness, times(1)).create(eq(user), any())
     }
 }

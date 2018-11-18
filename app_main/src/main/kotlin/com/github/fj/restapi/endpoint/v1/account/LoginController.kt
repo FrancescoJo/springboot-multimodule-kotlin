@@ -5,7 +5,7 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.lib.annotation.AllOpen
-import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
 import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
@@ -25,16 +25,18 @@ import javax.servlet.http.HttpServletRequest
 @AllOpen
 @RestController
 class LoginController @Inject constructor(
-        private val authBusiness: AuthenticationBusiness,
+        authBizFactory: AccessTokenBusinessFactory,
         private val loginService: LoginService
 ) : ILoginController {
+    private val authBusiness = authBizFactory.get()
+
     override fun onPatch(request: LoginRequestDto, httpRequest: HttpServletRequest):
             AuthenticationResponseDto {
         LOG.debug("Login request: {}", request)
 
         return when (request.loginType) {
             LoginType.GUEST -> {
-                val accessToken = authBusiness.findAccessTokenFrom(httpRequest)
+                val accessToken = authBusiness.findFromRequest(httpRequest)
                 if (accessToken == null) {
                     throw UnknownAuthTokenException("No access token was found for GUEST login.")
                 } else {

@@ -9,7 +9,7 @@ import com.github.fj.lib.annotation.VisibleForTesting
 import com.github.fj.lib.net.InetAddressExtensions
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.aop.LoggedActivity
-import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
+import com.github.fj.restapi.component.auth.AuthenticationObjectImpl
 import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.UserActivity
 import com.github.fj.restapi.persistence.entity.AccessLog
@@ -18,7 +18,6 @@ import com.github.fj.restapi.util.extractInetAddress
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.AfterReturning
 import org.aspectj.lang.annotation.AfterThrowing
-import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.aspectj.lang.reflect.MethodSignature
 import org.springframework.security.core.context.SecurityContextHolder
@@ -53,7 +52,7 @@ import java.net.InetAddress
  * @see <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html#production-ready-endpoints">Spring boot Actuator: <code>/httptrace</code> </a>
  */
 @AllOpen
-@Aspect
+// @org.aspectj.lang.annotation.Aspect.Aspect   // Not preferrable on slower machines
 class EndpointAccessLogAspect(private val logRepo: AccessLogRepository) {
     @Before("within(com.github.fj.restapi.endpoint.${ApiPaths.CURRENT_VERSION}..*)")
     fun logBeforeEndpoint(p: JoinPoint) {

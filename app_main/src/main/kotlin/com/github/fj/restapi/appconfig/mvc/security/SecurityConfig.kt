@@ -10,8 +10,8 @@ import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationFailu
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpAuthorizationTokenAuthenticationProvider
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.appconfig.mvc.security.internal.SavedRequestAwareAuthenticationSuccessHandler
-import com.github.fj.restapi.appconfig.mvc.security.spel.PreAuthorizeSpelInterceptor
-import com.github.fj.restapi.component.account.AuthenticationBusiness
+import com.github.fj.restapi.component.auth.spel.PreAuthorizeSpelInterceptor
+import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.endpoint.ApiPaths
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
@@ -39,12 +39,12 @@ import javax.inject.Inject
 @Configuration
 @EnableWebSecurity
 class SecurityConfig @Inject constructor(
-        private val authBusiness: AuthenticationBusiness,
+        private val authBizFactory: AccessTokenBusinessFactory,
         private val successHandler: SavedRequestAwareAuthenticationSuccessHandler,
         private val failureHandler: AuthenticationFailureHandler
 ) : WebSecurityConfigurerAdapter(), WebMvcConfigurer {
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.authenticationProvider(HttpAuthorizationTokenAuthenticationProvider(LOG, authBusiness))
+        auth.authenticationProvider(tokenAuthProvider())
     }
 
     override fun configure(http: HttpSecurity) {
@@ -83,7 +83,7 @@ class SecurityConfig @Inject constructor(
 
     @Bean
     fun tokenAuthProvider(): AuthenticationProvider =
-            HttpAuthorizationTokenAuthenticationProvider(LOG, authBusiness)
+            HttpAuthorizationTokenAuthenticationProvider(authBizFactory, LOG)
 
     /**
      * A reinvented wheel version of [org.springframework.security.access.expression.method.MethodSecurityExpressionRoot]

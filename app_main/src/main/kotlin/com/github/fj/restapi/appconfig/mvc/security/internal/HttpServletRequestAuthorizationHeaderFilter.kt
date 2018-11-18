@@ -5,7 +5,8 @@
 package com.github.fj.restapi.appconfig.mvc.security.internal
 
 import com.github.fj.lib.text.matchesIn
-import com.github.fj.restapi.appconfig.mvc.security.HttpAuthScheme
+import com.github.fj.restapi.component.auth.HttpAuthorizationToken
+import com.github.fj.restapi.component.auth.HttpAuthScheme
 import org.slf4j.Logger
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.util.matcher.RequestMatcher

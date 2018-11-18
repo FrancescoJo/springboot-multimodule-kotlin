@@ -2,9 +2,9 @@
  * springboot-multimodule-kotlin skeleton.
  * Under no licences and warranty.
  */
-package com.github.fj.restapi.appconfig.mvc.security.spel
+package com.github.fj.restapi.component.auth.spel
 
-import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationObjectImpl
+import com.github.fj.restapi.component.auth.AuthenticationObjectImpl
 import com.github.fj.restapi.persistence.consts.account.Role
 import org.springframework.context.ApplicationContext
 import org.springframework.security.config.core.GrantedAuthorityDefaults
