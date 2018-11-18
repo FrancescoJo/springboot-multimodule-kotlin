@@ -120,12 +120,7 @@ class InHouseAccessTokenBusinessTest {
 
         // expect:
         assertThrows<AuthTokenException> {
-            try {
-                sut.validate(token)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw e
-            }
+            sut.validate(token)
         }
     }
 
@@ -145,7 +140,7 @@ class InHouseAccessTokenBusinessTest {
 
             // and:
             `when`(mockAppProps.accessTokenAes256Key).thenReturn(aes256Key)
-            val mockedSut =  InhouseAccessTokenBusinessImpl(mockAppProps, mockUserRepo).apply {
+            val mockedSut = InhouseAccessTokenBusinessImpl(mockAppProps, mockUserRepo).apply {
                 accessTokenMode = FORWARD
             }
 

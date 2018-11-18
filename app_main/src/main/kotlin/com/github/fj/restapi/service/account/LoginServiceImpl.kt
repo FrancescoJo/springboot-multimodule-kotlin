@@ -40,6 +40,7 @@ class LoginServiceImpl @Inject constructor(
         } catch (e: AuthTokenExpiredException) {
             newToken = tokenBusiness.create(user)
             LOG.trace("User's access token is expired and issued a new one.")
+            user.credential = newToken.toByteArray()
             userRepo.save(user)
         }
 

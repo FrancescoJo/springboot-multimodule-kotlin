@@ -10,10 +10,8 @@ import com.github.fj.lib.text.StringUtilsKt;
 import com.github.fj.lib.util.ProtectedProperty;
 import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto;
 import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto;
-import com.github.fj.restapi.persistence.consts.account.LoginType;
-import com.github.fj.restapi.persistence.consts.account.PlatformType;
-import com.github.fj.restapi.persistence.consts.account.Role;
-import com.github.fj.restapi.persistence.consts.account.Status;
+import com.github.fj.restapi.persistence.consts.account.*;
+import com.github.fj.restapi.persistence.entity.Membership;
 import com.github.fj.restapi.persistence.entity.User;
 import org.springframework.data.util.Pair;
 import test.com.github.fj.lib.RandomHelper;
@@ -72,6 +70,13 @@ public final class AccountRequestUtils {
         u.setPushToken(StringUtilsKt.getRandomAlphaNumericString(63));
         u.setCredential(ArrayUtilsKt.getRandomBytes(56));
 
+        final Membership m = new Membership();
+        m.setId(u.getId());
+        m.setNickname(StringUtilsKt.getRandomAlphaNumericString(16));
+        m.setGender(RandomHelper.randomEnumConst(Gender.class));
+        m.setLastActiveTimestamp(LocalDateTime.now());
+        u.setMember(m);
+
         return u;
     }
 
@@ -91,6 +96,13 @@ public final class AccountRequestUtils {
         u.setCreatedIp(originalUser.getCreatedIp());
         u.setPushToken(originalUser.getPushToken());
         u.setCredential(originalUser.getCredential());
+
+        final Membership m = new Membership();
+        m.setId(u.getMember().getId());
+        m.setNickname(u.getMember().getNickname());
+        m.setGender(u.getMember().getGender());
+        m.setLastActiveTimestamp(u.getMember().getLastActiveTimestamp());
+        u.setMember(m);
 
         return u;
     }
