@@ -21,10 +21,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   COMMENT 'User id of invitation host.',
   `credential`        VARBINARY(254) NOT NULL
   COMMENT 'Security credential, usually a password, 3rdparty access token, etc.',
-  `auth_encoding`     VARCHAR(4)     NOT NULL,
-  `auth_iv`           VARBINARY(16)  NOT NULL,
-  `access_token`      VARBINARY(127) NOT NULL UNIQUE,
-  `token_issued_date` DATETIME       NOT NULL,
 
   UNIQUE KEY UK_Users_Identity(`id`, `id_token`),
   UNIQUE KEY UK_Users_Status(`id`, `status`),

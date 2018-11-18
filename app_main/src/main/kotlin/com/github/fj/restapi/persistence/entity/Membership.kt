@@ -28,7 +28,6 @@ import javax.persistence.Table
 @Table(name = "members")
 class Membership : Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0L
 
     @Column(length = 63, nullable = false)

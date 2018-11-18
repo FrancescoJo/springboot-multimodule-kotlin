@@ -63,6 +63,6 @@ app:
 
   authentication:
     token-generation: default
-    access-token-aes256-key: C4 9B 24 54 5F 6C 74 FF 0C C7 62 EA 4B 3D 75 1C
-                             5A 5C 15 F1 6A 95 3F 7C 4C B7 9B EB 53 FE CC 7B
     access-token-alive-seconds: 86400
+    inhouse-token-aes256-key: C4 9B 24 54 5F 6C 74 FF 0C C7 62 EA 4B 3D 75 1C
+                              5A 5C 15 F1 6A 95 3F 7C 4C B7 9B EB 53 FE CC 7B

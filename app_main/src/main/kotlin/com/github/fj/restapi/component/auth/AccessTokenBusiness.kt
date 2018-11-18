@@ -8,7 +8,6 @@ import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
-import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.security.core.Authentication
 import java.time.LocalDateTime
 import javax.servlet.http.HttpServletRequest
@@ -23,19 +22,12 @@ interface AccessTokenBusiness {
             com.google.common.hash.Hashing.goodFastHash(data.size * BITS_PER_BYTE)
                     .hashBytes(data).asBytes()
 
-    fun findFromRequest(httpRequest: HttpServletRequest): AccessToken?
+    fun findFromRequest(httpRequest: HttpServletRequest): String
 
-    fun create(user: User, timestamp: LocalDateTime = utcNow()): AccessToken
-
-    /**
-     * @param token Base62 encoded access token.
-     * @throws UnknownAuthTokenException if access token is malformed or not issued.
-     */
-    @Throws(UnknownAuthTokenException::class)
-    fun parse(token: String): AccessToken
+    fun create(user: User, timestamp: LocalDateTime = utcNow()): String
 
     @Throws(AuthTokenException::class)
-    fun validate(token: AccessToken): Authentication
+    fun validate(token: String): Authentication
 
     companion object {
         private const val BITS_PER_BYTE = 8

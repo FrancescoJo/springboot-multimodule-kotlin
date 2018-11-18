@@ -13,7 +13,6 @@ import com.github.fj.restapi.persistence.consts.account.Gender
 import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.Status
 import com.github.fj.restapi.persistence.entity.User
-import io.seruco.encoding.base62.Base62
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
@@ -79,15 +78,14 @@ data class AuthenticationResponseDto(
         val suspendedUntil: LocalDateTime?
 ) {
     companion object {
-        fun create(user: User) = AuthenticationResponseDto(
+        fun create(user: User, accessToken: String) = AuthenticationResponseDto(
                 loginType = user.loginType,
                 id = user.idToken,
                 nickname = user.member.nickname,
                 gender = user.member.gender,
                 status = user.status,
                 lastActive = user.member.lastActiveTimestamp ?: LOCAL_DATE_TIME_MIN,
-                accessToken = ProtectedProperty(Base62.createInstance().encode(user.rawAccessToken)
-                        .toString(Charsets.UTF_8)),
+                accessToken = ProtectedProperty(accessToken),
                 suspendedOn = user.member.suspendedOn,
                 suspendedUntil = user.member.suspendedUntil
         )

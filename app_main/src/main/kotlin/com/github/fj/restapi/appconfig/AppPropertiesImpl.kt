@@ -8,7 +8,7 @@ import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.appconfig.AppProperties.Companion.TOKEN_ALIVE_DURATION_SECS
 import com.github.fj.restapi.component.auth.TokenGenerationMethod
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import javax.xml.bind.DatatypeConverter
 
@@ -23,9 +23,9 @@ import javax.xml.bind.DatatypeConverter
  */
 @AllOpen
 @Component
-@EnableConfigurationProperties
+@ConfigurationProperties(prefix = "app")
 class AppPropertiesImpl(
-        @Value("\${app.authentication.token-generation}")
+        @Value("\${authentication.token-generation}")
         private val _tokenGenMethod: String
 ) : AppProperties {
     override lateinit var accessTokenAes256Key: ByteArray
@@ -35,9 +35,9 @@ class AppPropertiesImpl(
     override var tokenGenerationMethod: TokenGenerationMethod =
             TokenGenerationMethod.byMethod(_tokenGenMethod)
 
-    @Value("\${app.authentication.access-token-aes256-key}")
+    @Value("\${authentication.inhouse-token-aes256-key}")
     fun accessTokenAes256Key(keyStr: String) {
-        if (tokenGenerationMethod != TokenGenerationMethod.INHOUSE) {
+        if (tokenGenerationMethod != TokenGenerationMethod.IN_HOUSE) {
             return
         }
 
@@ -63,9 +63,9 @@ class AppPropertiesImpl(
         }
     }
 
-    @Value("\${app.authentication.access-token-alive-seconds}")
+    @Value("\${authentication.token-alive-seconds}")
     fun accessTokenAliveSecs(durationSecs: Int) {
-        if (tokenGenerationMethod != TokenGenerationMethod.INHOUSE) {
+        if (tokenGenerationMethod != TokenGenerationMethod.IN_HOUSE) {
             return
         }
 

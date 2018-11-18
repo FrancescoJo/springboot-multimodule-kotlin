@@ -7,11 +7,7 @@ package test.com.github.fj.restapi.account;
 import com.github.fj.lib.collection.ArrayUtilsKt;
 import com.github.fj.lib.text.SemanticVersion;
 import com.github.fj.lib.text.StringUtilsKt;
-import com.github.fj.lib.time.DateTimeUtilsKt;
 import com.github.fj.lib.util.ProtectedProperty;
-import com.github.fj.restapi.appconfig.AppProperties;
-import com.github.fj.restapi.component.auth.AccessTokenBusiness;
-import com.github.fj.restapi.component.auth.inhouse.InhouseAccessTokenBusinessImpl;
 import com.github.fj.restapi.endpoint.v1.account.dto.CreateAccountRequestDto;
 import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto;
 import com.github.fj.restapi.persistence.consts.account.LoginType;
@@ -19,17 +15,12 @@ import com.github.fj.restapi.persistence.consts.account.PlatformType;
 import com.github.fj.restapi.persistence.consts.account.Role;
 import com.github.fj.restapi.persistence.consts.account.Status;
 import com.github.fj.restapi.persistence.entity.User;
-import com.github.fj.restapi.persistence.repository.UserRepository;
-import com.github.fj.restapi.vo.account.AccessToken;
 import org.springframework.data.util.Pair;
 import test.com.github.fj.lib.RandomHelper;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.Random;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -84,22 +75,24 @@ public final class AccountRequestUtils {
         return u;
     }
 
-    public static AccessToken newRandomAccessToken(final User user) {
-        return newRandomAccessToken(user, DateTimeUtilsKt.utcNow());
-    }
+    public static User copyOf(final User originalUser) {
+        final User u = new User();
+        u.setId(originalUser.getId());
+        u.setIdToken(originalUser.getIdToken());
+        u.setStatus(originalUser.getStatus());
+        u.setRole(originalUser.getRole());
+        u.setName(originalUser.getName());
+        u.setLoginType(originalUser.getLoginType());
+        u.setPlatformType(originalUser.getPlatformType());
+        u.setPlatformVersion(originalUser.getPlatformVersion());
+        u.setAppVersion(originalUser.getAppVersion());
+        u.setEmail(originalUser.getEmail());
+        u.setCreatedDate(originalUser.getCreatedDate());
+        u.setCreatedIp(originalUser.getCreatedIp());
+        u.setPushToken(originalUser.getPushToken());
+        u.setCredential(originalUser.getCredential());
 
-    public static AccessToken newRandomAccessToken(final User user,
-                                                   final LocalDateTime timestamp) {
-        final AppProperties appProperties = mock(AppProperties.class);
-        final UserRepository userRepository = mock(UserRepository.class);
-        // AES256 is assumed
-        final byte[] keyPass = ArrayUtilsKt.getRandomBytes(32);
-        when(appProperties.getAccessTokenAes256Key()).thenReturn(keyPass);
-
-        final AccessTokenBusiness tokenCreator
-                = new InhouseAccessTokenBusinessImpl(appProperties, userRepository);
-
-        return tokenCreator.create(user, timestamp);
+        return u;
     }
 
     public static LoginRequestDto newRandomLoginRequest(final LoginType loginType) {

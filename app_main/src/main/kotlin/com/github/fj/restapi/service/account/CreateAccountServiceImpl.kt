@@ -29,6 +29,7 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
+import javax.transaction.Transactional
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -38,17 +39,18 @@ import javax.servlet.http.HttpServletRequest
 @Service
 class CreateAccountServiceImpl @Inject constructor(
         private val userRepo: UserRepository,
-        authBizFactory: AccessTokenBusinessFactory
+        accessTokenBizFactory: AccessTokenBusinessFactory
 ) : CreateAccountService {
-    private val authBusiness = authBizFactory.get()
+    private val tokenBusiness = accessTokenBizFactory.get()
 
+    @Transactional
     override fun createAccount(req: CreateAccountRequestDto, httpReq: HttpServletRequest):
             AuthenticationResponseDto {
         val credentialBytes = req.credential.value.toByteArray()
         val maybeUser = when (req.loginType) {
             LoginType.GUEST -> Optional.empty()
             LoginType.BASIC -> {
-                val hashedCredential = authBusiness.hash(credentialBytes)
+                val hashedCredential = tokenBusiness.hash(credentialBytes)
                 userRepo.findByBasicCredential(requireNotNull(req.username), hashedCredential)
             }
             else -> throw HttpMessageNotReadableException("${req.loginType} login is " +
@@ -59,7 +61,7 @@ class CreateAccountServiceImpl @Inject constructor(
             throw AccountAlreadyExistException("Account already exists.")
         }
 
-        val user = userRepo.save(User().apply {
+        User().apply {
             val now = utcNow()
             val ipAddr = httpReq.extractInetAddress()
             val newIdToken = issueNewIdToken()
@@ -67,7 +69,7 @@ class CreateAccountServiceImpl @Inject constructor(
             idToken = newIdToken
             status = Status.NORMAL
             role = Role.USER
-            name = createUserName(req, idToken)
+            name = createUserName(req)
             loginType = req.loginType
             platformType = req.platformType
             platformVersion = req.platformVersion
@@ -77,12 +79,17 @@ class CreateAccountServiceImpl @Inject constructor(
             createdIp = ipAddr
             pushToken = req.pushToken.value
             invitedBy = guessInvitedBy(req)
-            credential = createCredential(req, credentialBytes)
             member = createMembership(req, now, ipAddr)
-            setAccessToken(authBusiness.create(this))
-        })
 
-        return AuthenticationResponseDto.create(user)
+            val accessToken = tokenBusiness.create(this)
+            credential = when (req.loginType) {
+                LoginType.GUEST -> accessToken.toByteArray()
+                LoginType.BASIC -> tokenBusiness.hash(credentialBytes)
+                else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
+            }
+
+            return AuthenticationResponseDto.create(userRepo.save(this), accessToken)
+        }
     }
 
     private fun issueNewIdToken(): String {
@@ -96,9 +103,9 @@ class CreateAccountServiceImpl @Inject constructor(
         return newIdToken
     }
 
-    private fun createUserName(req: CreateAccountRequestDto, idToken: String): String {
+    private fun createUserName(req: CreateAccountRequestDto): String {
         return when (req.loginType) {
-            LoginType.GUEST -> "$idToken@GUEST"
+            LoginType.GUEST -> ""
             LoginType.BASIC -> requireNotNull(req.username)
             else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
         }
@@ -116,15 +123,6 @@ class CreateAccountServiceImpl @Inject constructor(
                     0
                 }
             }
-
-    private fun createCredential(req: CreateAccountRequestDto, credentialBytes: ByteArray):
-            ByteArray {
-        return when (req.loginType) {
-            LoginType.GUEST -> ByteArray(0)
-            LoginType.BASIC -> authBusiness.hash(credentialBytes)
-            else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
-        }
-    }
 
     private fun createMembership(req: CreateAccountRequestDto, now: LocalDateTime,
                                  ipAddr: InetAddress) =

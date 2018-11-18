@@ -6,7 +6,6 @@ package com.github.fj.restapi.component.auth.jwt
 
 import com.github.fj.restapi.component.auth.AccessTokenBusiness
 import com.github.fj.restapi.persistence.entity.User
-import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.security.core.Authentication
 import java.time.LocalDateTime
 import javax.servlet.http.HttpServletRequest
@@ -18,21 +17,17 @@ import javax.servlet.http.HttpServletRequest
 class JwtAccessTokenBusinessImpl(
 
 ) : AccessTokenBusiness {
-    override fun findFromRequest(httpRequest: HttpServletRequest): AccessToken? {
+    override fun findFromRequest(httpRequest: HttpServletRequest): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun create(user: User, timestamp: LocalDateTime): AccessToken {
+    override fun create(user: User, timestamp: LocalDateTime): String {
 
 
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun parse(token: String): AccessToken {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun validate(token: AccessToken): Authentication {
+    override fun validate(token: String): Authentication {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

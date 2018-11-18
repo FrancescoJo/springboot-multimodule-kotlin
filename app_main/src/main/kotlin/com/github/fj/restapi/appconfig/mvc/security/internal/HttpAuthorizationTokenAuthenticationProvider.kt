@@ -4,8 +4,6 @@
  */
 package com.github.fj.restapi.appconfig.mvc.security.internal
 
-import com.github.fj.restapi.component.auth.HttpAuthorizationToken
-import com.github.fj.restapi.component.auth.HttpAuthScheme
 import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.exception.AuthTokenException
 import org.slf4j.Logger
@@ -37,10 +35,8 @@ class HttpAuthorizationTokenAuthenticationProvider(
     }
 
     private fun getAuthentication(authentication: HttpAuthorizationToken): Authentication? {
-        val authenticator = accessTokenBizFactory.get()
-        val accessToken = authenticator.parse(authentication.token)
         val ourAuthentication = try {
-            authenticator.validate(accessToken)
+            accessTokenBizFactory.get().validate(authentication.token)
         } catch (e: AuthTokenException) {
             throw AuthenticationCredentialsNotFoundException(e.message, e)
         }

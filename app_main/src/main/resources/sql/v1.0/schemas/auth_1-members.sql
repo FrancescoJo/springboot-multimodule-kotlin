@@ -1,6 +1,6 @@
 /* MariaDB SQL */
 CREATE TABLE IF NOT EXISTS `members` (
-  `id`                    BIGINT        NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id`                    BIGINT        NOT NULL PRIMARY KEY,
   `nickname`              VARCHAR(63)   NOT NULL,
   `gender`                VARCHAR(4)    NOT NULL DEFAULT '',
   `last_active_timestamp` DATETIME               DEFAULT CURRENT_TIMESTAMP,

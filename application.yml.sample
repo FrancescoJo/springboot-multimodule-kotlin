@@ -73,9 +73,11 @@ app:
   authentication:
     # default/jwt, inhouse (personal implementation)
     token-generation: default
+    # This value is for key spinning. Setting too small value will impact on performance -
+    # a value more than at least 1 hour is preferable.
+    token-alive-seconds: 86400
     # Please provide 32 digit HEX presented your encryption key, for example:
-    # access-token-aes256-key: C4 9B 24 54 5F 6C 74 FF 0C C7 62 EA 4B 3D 75 1C
-    #                          5A 5C 15 F1 6A 95 3F 7C 4C B7 9B EB 53 FE CC 7B
+    # inhouse-token-aes256-key: C4 9B 24 54 5F 6C 74 FF 0C C7 62 EA 4B 3D 75 1C
+    #                           5A 5C 15 F1 6A 95 3F 7C 4C B7 9B EB 53 FE CC 7B
     # or useless if token generation mode is selected as jwt (by default).
-    access-token-aes256-key:
-    access-token-alive-seconds: 86400
+    inhouse-token-aes256-key:

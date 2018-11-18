@@ -21,6 +21,10 @@ interface AppProperties {
     val tokenGenerationMethod: TokenGenerationMethod
 
     companion object {
+        /**
+         * This value is for key spinning. Setting too small value will impact on performance -
+         * a value more than at least 1 hour is preferable.
+         */
         const val TOKEN_ALIVE_DURATION_SECS = 60 * 60 * 24
     }
 }

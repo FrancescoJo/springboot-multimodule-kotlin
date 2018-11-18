@@ -10,7 +10,7 @@ package com.github.fj.restapi.component.auth
  */
 enum class TokenGenerationMethod(private val method: String) {
     JWT("jwt"),
-    INHOUSE("inhouse"),
+    IN_HOUSE("inhouse"),
     DEFAULT("default");
 
     companion object {

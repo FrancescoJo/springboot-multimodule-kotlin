@@ -13,13 +13,11 @@ import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.consts.account.PlatformType
 import com.github.fj.restapi.persistence.consts.account.Role
 import com.github.fj.restapi.persistence.consts.account.Status
-import com.github.fj.restapi.persistence.converter.entity.AccessTokenEncodingConverter
 import com.github.fj.restapi.persistence.converter.entity.ByteArrayInetAddressConverter
 import com.github.fj.restapi.persistence.converter.entity.LoginTypeConverter
 import com.github.fj.restapi.persistence.converter.entity.MemberStatusConverter
 import com.github.fj.restapi.persistence.converter.entity.PlatformTypeConverter
 import com.github.fj.restapi.persistence.converter.entity.SemanticVersionConverter
-import com.github.fj.restapi.vo.account.AccessToken
 import java.io.Serializable
 import java.net.InetAddress
 import java.time.LocalDateTime
@@ -106,20 +104,6 @@ class User : Serializable {
     @Column(columnDefinition = "VARBINARY(254)", nullable = false)
     var credential: ByteArray = ByteArray(0)
 
-    @Convert(converter = AccessTokenEncodingConverter::class)
-    @Column(name = "auth_encoding", length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
-    var authEncoding: AccessToken.Encoded = AccessToken.Encoded.UNDEFINED
-
-    @Column(name = "auth_iv", length = 16, nullable = false, columnDefinition = "VARBINARY(16)")
-    var authIv: ByteArray = ByteArray(0)
-
-    @Column(name = "access_token", length = 127, unique = true, nullable = false,
-            columnDefinition = "VARBINARY(127)")
-    var rawAccessToken: ByteArray = ByteArray(0)
-
-    @Column(name = "token_issued_date", nullable = true)
-    var tokenIssuedDate: LocalDateTime? = null
-
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", nullable = false)
     var member: Membership = Membership.EMPTY
@@ -140,19 +124,8 @@ class User : Serializable {
                 "  pushToken='$pushToken',\n" +
                 "  invitedBy=$invitedBy,\n" +
                 "  credential=${Arrays.toString(credential)},\n" +
-                "  authEncoding=$authEncoding,\n" +
-                "  authIv=${Arrays.toString(authIv)},\n" +
-                "  rawAccessToken=${Arrays.toString(rawAccessToken)},\n" +
-                "  tokenIssuedDate=$tokenIssuedDate,\n" +
                 "  member=${indentToString(member)}" +
                 ")"
-    }
-
-    fun setAccessToken(token: AccessToken) {
-        authEncoding = token.mode
-        authIv = token.iv.toByteArray()
-        rawAccessToken = token.raw.toByteArray()
-        tokenIssuedDate = token.issuedTimestamp
     }
 
     companion object : EmptyObject<User> {

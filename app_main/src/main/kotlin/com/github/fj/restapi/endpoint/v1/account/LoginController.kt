@@ -25,10 +25,10 @@ import javax.servlet.http.HttpServletRequest
 @AllOpen
 @RestController
 class LoginController @Inject constructor(
-        authBizFactory: AccessTokenBusinessFactory,
+        accessTokenBizFactory: AccessTokenBusinessFactory,
         private val loginService: LoginService
 ) : ILoginController {
-    private val authBusiness = authBizFactory.get()
+    private val tokenBusiness = accessTokenBizFactory.get()
 
     override fun onPatch(request: LoginRequestDto, httpRequest: HttpServletRequest):
             AuthenticationResponseDto {
@@ -36,8 +36,8 @@ class LoginController @Inject constructor(
 
         return when (request.loginType) {
             LoginType.GUEST -> {
-                val accessToken = authBusiness.findFromRequest(httpRequest)
-                if (accessToken == null) {
+                val accessToken = tokenBusiness.findFromRequest(httpRequest)
+                if (accessToken.isEmpty()) {
                     throw UnknownAuthTokenException("No access token was found for GUEST login.")
                 } else {
                     loginService.guestLogin(accessToken, request)

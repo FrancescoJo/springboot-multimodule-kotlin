@@ -5,7 +5,6 @@
 package com.github.fj.restapi.component.auth
 
 import com.github.fj.restapi.persistence.entity.User
-import com.github.fj.restapi.vo.account.AccessToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import java.util.*
@@ -16,7 +15,7 @@ import java.util.*
  */
 class AuthenticationObjectImpl(
         private val user: User,
-        private val token: AccessToken
+        private val token: String
 ) : Authentication {
     private var isAuthenticated = false
 
@@ -26,7 +25,7 @@ class AuthenticationObjectImpl(
 
     override fun getCredentials(): Any = user.credential
 
-    override fun getPrincipal(): AccessToken = token
+    override fun getPrincipal(): String = token
 
     override fun getDetails(): User = user
 
