@@ -5,6 +5,7 @@
 package com.github.fj.restapi.component.auth
 
 import com.github.fj.lib.time.utcNow
+import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
@@ -22,7 +23,9 @@ interface AccessTokenBusiness {
             com.google.common.hash.Hashing.goodFastHash(data.size * BITS_PER_BYTE)
                     .hashBytes(data).asBytes()
 
-    fun findFromRequest(httpRequest: HttpServletRequest): String
+    fun findFromRequest(httpRequest: HttpServletRequest): String =
+            HttpServletRequestAuthorizationHeaderFilter
+                    .findAuthorizationHeader(httpRequest)?.token ?: ""
 
     fun create(user: User, timestamp: LocalDateTime = utcNow()): String
 

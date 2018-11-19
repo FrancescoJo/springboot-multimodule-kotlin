@@ -5,8 +5,10 @@
 package com.github.fj.restapi
 
 import com.google.common.base.Joiner
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
+import java.security.Security
 
 /**
  * Spring boot startup class
@@ -22,6 +24,8 @@ open class Application {
 
         @JvmStatic
         fun main(args: Array<String>) {
+            Security.addProvider(BouncyCastleProvider())
+
             @Suppress("SpreadOperator") // This logic is called only once.
             SpringApplicationBuilder(Application::class.java)
                     .properties("spring.config.name:" +

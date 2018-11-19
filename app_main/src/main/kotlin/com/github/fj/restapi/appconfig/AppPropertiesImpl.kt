@@ -35,6 +35,8 @@ class AppPropertiesImpl(
     override var tokenGenerationMethod: TokenGenerationMethod =
             TokenGenerationMethod.byMethod(_tokenGenMethod)
 
+    override var jwtIssuer: String = ""
+
     @Value("\${authentication.inhouse-token-aes256-key}")
     fun accessTokenAes256Key(keyStr: String) {
         if (tokenGenerationMethod != TokenGenerationMethod.IN_HOUSE) {
@@ -75,6 +77,20 @@ class AppPropertiesImpl(
         }
 
         this.accessTokenAliveSecs = durationSecs
+    }
+
+    @Value("\${authentication.jwt-issuer}")
+    fun jwtIssuer(issuer: String) {
+        if (tokenGenerationMethod != TokenGenerationMethod.JWT &&
+                tokenGenerationMethod != TokenGenerationMethod.DEFAULT) {
+            return
+        }
+
+        if (issuer.isEmpty()) {
+            throw UnsupportedOperationException("JWT Issuer name must not be empty.")
+        }
+
+        this.jwtIssuer = issuer
     }
 
     companion object {

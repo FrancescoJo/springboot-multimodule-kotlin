@@ -34,10 +34,15 @@ import javax.servlet.http.HttpServletRequest
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 30 - Oct - 2018
  */
-class InhouseAccessTokenBusinessImpl(
+internal class InhouseAccessTokenBusinessImpl(
         private val appProperties: AppProperties,
         private val userRepository: UserRepository
 ) : AccessTokenBusiness {
+    // TODO: Add force expire functionality (Utilise RSAKeyStore)
+    //       Structure: KeyId(UUID 16) - Payload
+    // Doing so, we can get:
+    //     1. Key spinning. Cause a huge headache to attackers
+    //     2. Force token expiration feature.
     var accessTokenMode = Encoding.RANDOM
 
     private val aes256CipherKey: Key
@@ -45,10 +50,6 @@ class InhouseAccessTokenBusinessImpl(
 
     private val accessTokenLifeSeconds: Long
         get() = appProperties.accessTokenAliveSecs.toLong()
-
-    override fun findFromRequest(httpRequest: HttpServletRequest) =
-            HttpServletRequestAuthorizationHeaderFilter
-                    .findAuthorizationHeader(httpRequest)?.token ?: ""
 
     /**
      * This access token creation is implemented in a naïve way. It just focuses on "randomness"

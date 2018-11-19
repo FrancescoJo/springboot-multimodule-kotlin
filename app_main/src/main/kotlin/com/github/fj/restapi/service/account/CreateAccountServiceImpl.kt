@@ -37,7 +37,7 @@ import javax.transaction.Transactional
  */
 @AllOpen
 @Service
-class CreateAccountServiceImpl @Inject constructor(
+internal class CreateAccountServiceImpl @Inject constructor(
         private val userRepo: UserRepository,
         accessTokenBizFactory: AccessTokenBusinessFactory
 ) : CreateAccountService {

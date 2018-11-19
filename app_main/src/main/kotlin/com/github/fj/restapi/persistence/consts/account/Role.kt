@@ -25,26 +25,26 @@ import java.util.*
  */
 @Suppress("MagicNumber")    // Numbers here are self documenting.
 @UndefinableEnum
-enum class Role(val key: Int, val authorities: Collection<GrantedAuthority>) {
-    ANONYMOUS(1, Collections.singleton(AUTHORITY_ANONYMOUS)),
-    USER(10, Collections.singleton(AUTHORITY_USER)),
-    PREMIUM_USER(20, Collections.unmodifiableCollection(
+enum class Role(val key: Int, val roleName: String, val authorities: Collection<GrantedAuthority>) {
+    ANONYMOUS(1, "Anonymous user", Collections.singleton(AUTHORITY_ANONYMOUS)),
+    USER(10, "Normal user", Collections.singleton(AUTHORITY_USER)),
+    PREMIUM_USER(20, "Premium user", Collections.unmodifiableCollection(
             setOf(AUTHORITY_USER, AUTHORITY_PREMIUM_USER))
     ),
-    MODERATOR(30, Collections.unmodifiableCollection(
+    MODERATOR(30, "Moderator", Collections.unmodifiableCollection(
             setOf(AUTHORITY_USER, AUTHORITY_MODERATOR))
     ),
-    ADMINISTRATOR(100, Collections.unmodifiableCollection(
+    ADMINISTRATOR(100, "Administrator", Collections.unmodifiableCollection(
             setOf(AUTHORITY_USER, AUTHORITY_MODERATOR, AUTHORITY_ADMIN))
     ),
-    UNDEFINED(-1, Collections.emptyList());
+    UNDEFINED(-1, "", Collections.emptyList());
 
     fun isAnonymous(): Boolean = this == ANONYMOUS
 
     @JsonValue
     @Suppress("unused") // Used by Jackson upon serialising @JsonSerialize annotated classes
-    fun toValue(): Int {
-        return key
+    fun toValue(): String {
+        return roleName
     }
 
     companion object {
@@ -57,8 +57,11 @@ enum class Role(val key: Int, val authorities: Collection<GrantedAuthority>) {
         fun getAuthorityOf(authority: String): GrantedAuthority =
                 AUTHORITY_BY_ROLE[authority] ?: AUTHORITY_ANONYMOUS
 
+        fun byKey(key: Int?) = Role.values().firstOrNull { it.key == key } ?: UNDEFINED
+
         @JsonCreator
         @JvmStatic
-        fun byKey(key: Int?) = Role.values().firstOrNull { it.key == key } ?: UNDEFINED
+        fun byRoleName(name: String?) = Role.values().firstOrNull { it.roleName == name }
+                ?: UNDEFINED
     }
 }

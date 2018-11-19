@@ -4,28 +4,38 @@
  */
 package com.github.fj.restapi.component.auth.jwt
 
+import com.github.fj.restapi.persistence.consts.account.Role
 import java.time.LocalDateTime
+import java.util.*
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 18 - Nov - 2018
  */
 data class JwtObject(
-        /* issuer */
+        val issuer: String,
 
-        /* subject */
+        val subject: Role,
 
-        /* audience */
-        val uidToken: String,
+        /* Collection of uIdTokens */
+        val audience: Collection<String>,
 
-        /* expiration */
+        /* Must be serialised as UNIX epoch time */
+        val expiration: LocalDateTime,
 
-        /* not before */
-        /* issued at */
-        val issuedTimestamp: LocalDateTime
+        /* Must be serialised as UNIX epoch time */
+        val notBefore: LocalDateTime,
 
-        /* jwt ID: the simplest: UUID.randomUUID().toString(); */
+        /* Must be serialised as UNIX epoch time */
+        val issuedAt: LocalDateTime,
+
+        /* Some unique identifier: UUID is the easist */
+        val id: String = UUID.randomUUID().toString()
 ) {
+    fun toJsonObject(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     /**
      * These registered JWT claim names implementation follows RFC-7519. See
      * [JSON Web Token(JWT)](https://tools.ietf.org/html/rfc7519#section-4.2)

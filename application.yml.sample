@@ -81,3 +81,4 @@ app:
     #                           5A 5C 15 F1 6A 95 3F 7C 4C B7 9B EB 53 FE CC 7B
     # or useless if token generation mode is selected as jwt (by default).
     inhouse-token-aes256-key:
+    jwt-issuer: com.github.fj

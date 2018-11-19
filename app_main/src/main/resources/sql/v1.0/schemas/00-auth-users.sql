@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   COMMENT 'Firebase Cloud Messaging push token',
   `invited_by`        BIGINT         NOT NULL DEFAULT 0
   COMMENT 'User id of invitation host.',
-  `credential`        VARBINARY(254) NOT NULL
+  `credential`        VARBINARY(511) NOT NULL
   COMMENT 'Security credential, usually a password, 3rdparty access token, etc.',
 
   UNIQUE KEY UK_Users_Identity(`id`, `id_token`),

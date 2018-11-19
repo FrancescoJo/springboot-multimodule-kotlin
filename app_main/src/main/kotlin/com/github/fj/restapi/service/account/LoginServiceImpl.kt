@@ -22,7 +22,7 @@ import javax.inject.Inject
  */
 @AllOpen
 @Service
-class LoginServiceImpl @Inject constructor(
+internal class LoginServiceImpl @Inject constructor(
         private val userRepo: UserRepository,
         tokenBizFactory: AccessTokenBusinessFactory
 ) : LoginService {

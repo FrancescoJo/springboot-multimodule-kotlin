@@ -20,6 +20,8 @@ interface AppProperties {
 
     val tokenGenerationMethod: TokenGenerationMethod
 
+    val jwtIssuer: String
+
     companion object {
         /**
          * This value is for key spinning. Setting too small value will impact on performance -

@@ -17,6 +17,7 @@ import com.github.fj.restapi.persistence.converter.entity.ByteArrayInetAddressCo
 import com.github.fj.restapi.persistence.converter.entity.LoginTypeConverter
 import com.github.fj.restapi.persistence.converter.entity.MemberStatusConverter
 import com.github.fj.restapi.persistence.converter.entity.PlatformTypeConverter
+import com.github.fj.restapi.persistence.converter.entity.RoleConverter
 import com.github.fj.restapi.persistence.converter.entity.SemanticVersionConverter
 import java.io.Serializable
 import java.net.InetAddress
@@ -64,6 +65,7 @@ class User : Serializable {
     @Column(length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
     var status: Status = Status.UNDEFINED
 
+    @Convert(converter = RoleConverter::class)
     @Column(nullable = false, columnDefinition = "INT")
     var role: Role = Role.UNDEFINED
 
@@ -101,7 +103,7 @@ class User : Serializable {
     @Column(name = "invited_by", nullable = false)
     var invitedBy: Long = 0L
 
-    @Column(columnDefinition = "VARBINARY(254)", nullable = false)
+    @Column(columnDefinition = "VARBINARY(511)", nullable = false)
     var credential: ByteArray = ByteArray(0)
 
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
