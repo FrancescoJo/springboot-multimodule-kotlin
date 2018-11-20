@@ -4,9 +4,10 @@
  */
 package com.github.fj.restapi.component.auth.jwt
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.restapi.persistence.consts.account.Role
 import java.time.LocalDateTime
-import java.util.*
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -29,13 +30,9 @@ data class JwtObject(
         /* Must be serialised as UNIX epoch time */
         val issuedAt: LocalDateTime,
 
-        /* Some unique identifier: UUID is the easist */
-        val id: String = UUID.randomUUID().toString()
+        /* Some unique identifier to prevent replay attacks */
+        val nonce: String = ""
 ) {
-    fun toJsonObject(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     /**
      * These registered JWT claim names implementation follows RFC-7519. See
      * [JSON Web Token(JWT)](https://tools.ietf.org/html/rfc7519#section-4.2)
@@ -114,5 +111,31 @@ data class JwtObject(
          * Use of this claim is OPTIONAL.
          */
         private const val JWT_ID = "jti"
+
+        private val mapper = ObjectMapper()
+
+        fun toJsonString(jwt: JwtObject): String = mapper.writeValueAsString(
+                mapper.createObjectNode().apply {
+                    put(ISSUER, jwt.issuer)
+                    put(SUBJECT, jwt.subject.toValue())
+
+                    if (jwt.audience.size == 1) {
+                        put(AUDIENCE, jwt.audience.first())
+                    } else {
+                        putPOJO(AUDIENCE, mapper.createArrayNode().apply {
+                            jwt.audience.forEach {
+                                add(it)
+                            }
+                        })
+                    }
+
+                    put(EXPIRATION, jwt.expiration.utcEpochSecond())
+                    put(NOT_BEFORE, jwt.notBefore.utcEpochSecond())
+                    put(ISSUED_AT, jwt.issuedAt.utcEpochSecond())
+                })
+
+        fun fromJsonString(jsonStr: String): JwtObject {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
     }
 }

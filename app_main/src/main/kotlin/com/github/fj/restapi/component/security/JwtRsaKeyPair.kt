@@ -6,15 +6,13 @@ package com.github.fj.restapi.component.security
 
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.crypto.RSASSAVerifier
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
  * @since 19 - Nov - 2018
  */
-data class RsaKeyPairEntry(
+data class JwtRsaKeyPair(
         val keyId: String,
 
         /** Must be derived from public key */

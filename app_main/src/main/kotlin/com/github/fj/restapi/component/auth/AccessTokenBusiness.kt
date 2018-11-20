@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest
 interface AccessTokenBusiness {
     @Suppress("UnstableApiUsage")
     fun hash(data: ByteArray): ByteArray =
-            com.google.common.hash.Hashing.goodFastHash(data.size * BITS_PER_BYTE)
+            com.google.common.hash.Hashing.goodFastHash(User.CREDENTIAL_LENGTH * BITS_PER_BYTE)
                     .hashBytes(data).asBytes()
 
     fun findFromRequest(httpRequest: HttpServletRequest): String =

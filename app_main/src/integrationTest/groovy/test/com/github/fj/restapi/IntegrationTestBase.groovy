@@ -9,6 +9,7 @@ import com.github.fj.restapi.Application
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpAuthScheme
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.endpoint.AbstractResponseDto
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
@@ -23,6 +24,7 @@ import test.com.github.fj.restapi.appconfig.ApplicationContextHolder
 import test.com.github.fj.restapi.appconfig.IntegrationTestConfigurations
 
 import javax.annotation.Nonnull
+import java.security.Security
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT
 
@@ -36,6 +38,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         IntegrationTestConfigurations.class])
 @AutoConfigureWebClient
 abstract class IntegrationTestBase extends Specification {
+    static {
+        Security.addProvider(new BouncyCastleProvider())
+    }
+
     @Value("\${server.port}")
     private int portValue
 

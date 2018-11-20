@@ -36,6 +36,8 @@ internal class JwtAccessTokenBusinessImpl(
             tokenLifespan = accessTokenAliveSecs.toLong()
         }
 
+        val entry = rsaKeyPairManager.getLatest()
+
         val jwtObject = JwtObject(
                 issuer = issuer,
                 subject = user.role,
@@ -45,11 +47,9 @@ internal class JwtAccessTokenBusinessImpl(
                 issuedAt = now
         )
 
-        val entry = rsaKeyPairManager.getLatest()
         val jwsHeader = JWSHeader.Builder(JWSAlgorithm.RS256).type(JOSEObjectType.JWT)
                 .keyID(entry.keyId).build()
-
-        JWSObject(jwsHeader, Payload(jwtObject.toJsonObject())).run {
+        JWSObject(jwsHeader, Payload(JwtObject.toJsonString(jwtObject))).run {
             sign(entry.rsaSigner)
             return serialize()
         }

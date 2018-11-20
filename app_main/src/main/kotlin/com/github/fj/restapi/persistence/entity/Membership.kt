@@ -15,9 +15,13 @@ import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.MapsId
+import javax.persistence.OneToOne
 import javax.persistence.Table
 
 /**
@@ -28,7 +32,14 @@ import javax.persistence.Table
 @Table(name = "members")
 class Membership : Serializable {
     @Id
+    @Column(name = "user_id")
     var id: Long = 0L
+
+    // This is the JPA aspect that I most hate in - forced bidirectional relation!
+    // Using @SecondaryTable on parent side is clumsy as well.
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    var user: User = User.EMPTY
 
     @Column(length = 63, nullable = false)
     var nickname: String = ""

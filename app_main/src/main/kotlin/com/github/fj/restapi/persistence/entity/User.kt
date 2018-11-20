@@ -44,10 +44,10 @@ import javax.persistence.UniqueConstraint
  */
 @Entity
 @Table(name = "users", uniqueConstraints = [
-    UniqueConstraint(name = "UK_Users_Identity", columnNames = arrayOf("id", "id_token", "name")),
+    UniqueConstraint(name = "UK_Users_Identity", columnNames = arrayOf("id", "id_token")),
     UniqueConstraint(name = "UK_Users_Status", columnNames = arrayOf("id", "status")),
     UniqueConstraint(name = "UK_Users_Credential",
-            columnNames = arrayOf("name", "login_type", "email", "credential")
+            columnNames = arrayOf("name", "login_type", "credential")
     )
 ])
 class User : Serializable {
@@ -69,7 +69,7 @@ class User : Serializable {
     @Column(nullable = false, columnDefinition = "INT")
     var role: Role = Role.UNDEFINED
 
-    @Column(name = "name", length = 31, unique = true, nullable = false)
+    @Column(name = "name", length = 32, unique = true, nullable = false)
     var name: String = ""
 
     @Convert(converter = LoginTypeConverter::class)
@@ -80,11 +80,11 @@ class User : Serializable {
     @Column(name = "platform_type", length = 4, nullable = false, columnDefinition = "VARCHAR(4)")
     var platformType: PlatformType = PlatformType.UNDEFINED
 
-    @Column(name = "platform_version", length = 127, nullable = false)
+    @Column(name = "platform_version", length = 64, nullable = false)
     var platformVersion: String = ""
 
     @Convert(converter = SemanticVersionConverter::class)
-    @Column(name = "app_version", length = 4, nullable = false, columnDefinition = "VARCHAR(31)")
+    @Column(name = "app_version", length = 32, nullable = false, columnDefinition = "VARCHAR(32)")
     var appVersion: SemanticVersion = SemanticVersion.EMPTY
 
     @Column(length = EMAIL_LENGTH, nullable = false)
@@ -103,11 +103,11 @@ class User : Serializable {
     @Column(name = "invited_by", nullable = false)
     var invitedBy: Long = 0L
 
-    @Column(columnDefinition = "VARBINARY(511)", nullable = false)
+    @Column(length = CREDENTIAL_LENGTH, nullable = false)
     var credential: ByteArray = ByteArray(0)
 
     @OneToOne(cascade = [CascadeType.ALL], optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "id")
     var member: Membership = Membership.EMPTY
 
     override fun toString(): String {
@@ -133,10 +133,11 @@ class User : Serializable {
     companion object : EmptyObject<User> {
         override val EMPTY = User()
 
+        const val CREDENTIAL_LENGTH = 64
         const val MINIMUM_NAME_LENGTH = 6
         const val MAXIMUM_NAME_LENGTH = 16
 
         // Originally could be maximum 254 but due to database restrictions
-        const val EMAIL_LENGTH = 127
+        const val EMAIL_LENGTH = 64
     }
 }

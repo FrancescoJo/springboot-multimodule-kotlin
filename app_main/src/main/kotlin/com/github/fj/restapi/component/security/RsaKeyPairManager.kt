@@ -9,7 +9,9 @@ package com.github.fj.restapi.component.security
  * @since 19 - Nov - 2018
  */
 interface RsaKeyPairManager {
-    fun getLatest(): RsaKeyPairEntry
+    fun getLatest(): JwtRsaKeyPair
 
-    fun getById(id: Long): RsaKeyPairEntry
+    fun getById(id: String): JwtRsaKeyPair
+
+    fun invalidate(id: String)
 }

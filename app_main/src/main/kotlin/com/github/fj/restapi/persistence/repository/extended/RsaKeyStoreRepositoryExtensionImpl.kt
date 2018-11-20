@@ -22,15 +22,22 @@ internal class RsaKeyStoreRepositoryExtensionImpl : RsaKeyStoreRepositoryExtensi
     @PersistenceContext
     private lateinit var em: EntityManager
 
-    override fun findLatestOneYoungerThan(timeLimit: LocalDateTime) = Optional.ofNullable(
-            em.createQuery("""
+    override fun findLatestOneYoungerThan(timeLimit: LocalDateTime): Optional<RsaKeyPair> {
+        val resultList = em.createQuery("""
                 SELECT kp
                 FROM RsaKeyPair kp
                 WHERE kp.isEnabled = true
                     AND kp.issuedAt >= :timeLimit
                 ORDER BY kp.issuedAt DESC
             """.trimIndent(), RsaKeyPair::class.java)
-                    .setParameter("timeLimit", timeLimit)
-                    .setMaxResults(1)
-                    .singleResult)
+                .setParameter("timeLimit", timeLimit)
+                .setMaxResults(1)
+                .resultList
+
+        return if (resultList.isEmpty()) {
+            Optional.empty()
+        } else {
+            Optional.of(resultList.first())
+        }
+    }
 }

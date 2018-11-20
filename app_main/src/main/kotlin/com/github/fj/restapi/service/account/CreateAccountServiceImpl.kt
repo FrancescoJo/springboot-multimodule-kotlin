@@ -8,6 +8,7 @@ import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.lib.text.SemanticVersion
 import com.github.fj.lib.text.getRandomCapitalAlphaNumericString
 import com.github.fj.lib.text.isNullOrUnicodeBlank
+import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
@@ -25,6 +26,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.stereotype.Service
 import java.net.InetAddress
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
@@ -69,7 +71,7 @@ internal class CreateAccountServiceImpl @Inject constructor(
             idToken = newIdToken
             status = Status.NORMAL
             role = Role.USER
-            name = createUserName(req)
+            name = createUserName(now, req)
             loginType = req.loginType
             platformType = req.platformType
             platformVersion = req.platformVersion
@@ -82,11 +84,12 @@ internal class CreateAccountServiceImpl @Inject constructor(
             member = createMembership(req, now, ipAddr)
 
             val accessToken = tokenBusiness.create(this)
-            credential = when (req.loginType) {
+            val hashed = tokenBusiness.hash(when (req.loginType) {
                 LoginType.GUEST -> accessToken.toByteArray()
-                LoginType.BASIC -> tokenBusiness.hash(credentialBytes)
-                else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
-            }
+                LoginType.BASIC -> credentialBytes
+                else -> throw UnsupportedOperationException("$loginType login is not supported.")
+            })
+            credential = hashed
 
             return AuthenticationResponseDto.create(userRepo.save(this), accessToken)
         }
@@ -103,9 +106,9 @@ internal class CreateAccountServiceImpl @Inject constructor(
         return newIdToken
     }
 
-    private fun createUserName(req: CreateAccountRequestDto): String {
+    private fun createUserName(time: LocalDateTime, req: CreateAccountRequestDto): String {
         return when (req.loginType) {
-            LoginType.GUEST -> ""
+            LoginType.GUEST -> "${time.utcEpochSecond()}@GUEST"
             LoginType.BASIC -> requireNotNull(req.username)
             else -> throw UnsupportedOperationException("${req.loginType} login is not supported.")
         }
