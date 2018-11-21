@@ -13,7 +13,7 @@ jar {
 }
 
 dependencies {
-    compile "com.github.FrancescoJo:kotlin-jvmlib:1.0.1"
+    compile "com.github.FrancescoJo:kotlin-jvmlib:1.0.2"
 
     // The production code uses the SLF4J logging API at compile time
     compile "org.slf4j:slf4j-api:$version_slf4j"

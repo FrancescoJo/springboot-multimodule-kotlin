@@ -9,13 +9,16 @@ import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
 import com.github.fj.restapi.component.auth.AccessTokenBusiness
 import com.github.fj.restapi.component.security.RsaKeyPairManager
+import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.persistence.entity.User
+import com.nimbusds.jose.JOSEException
 import com.nimbusds.jose.JOSEObjectType
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.JWSObject
 import com.nimbusds.jose.Payload
 import org.springframework.security.core.Authentication
+import java.text.ParseException
 import java.time.LocalDateTime
 import java.util.*
 
@@ -41,7 +44,7 @@ internal class JwtAccessTokenBusinessImpl(
         val jwtObject = JwtObject(
                 issuer = issuer,
                 subject = user.role,
-                audience = Collections.singleton(user.idToken),
+                audience = user.idToken,
                 expiration = now.plusSeconds(tokenLifespan),
                 notBefore = LOCAL_DATE_TIME_MIN,
                 issuedAt = now
@@ -56,6 +59,29 @@ internal class JwtAccessTokenBusinessImpl(
     }
 
     override fun validate(token: String): Authentication {
+        val jwtObject = try {
+            with(JWSObject.parse(token)) {
+                rsaKeyPairManager.getById(header.keyID).let {
+                    if (!verify(it.rsaVerifier)) {
+                        throw AuthTokenException("Not a genuine jwt token.")
+                    }
+                }
+
+                return@with JwtObject.fromJsonString(payload.toString())
+            }
+        } catch (e: ParseException) {
+            throw AuthTokenException("Error while parsing token.", e)
+        } catch (e: JOSEException) {
+            throw AuthTokenException("Cannot verify given token.", e)
+        }
+
+        println(jwtObject)
+
+        // verify info of jwtObject
+        // TODO catch exceptions -> AuthTokenException or AuthTokenExpiredException
+
+        // AuthenticationObjectImpl: User, Token
+
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

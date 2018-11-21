@@ -8,6 +8,7 @@ import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
 import com.github.fj.restapi.endpoint.v1.account.dto.AuthenticationResponseDto
 import com.github.fj.restapi.endpoint.v1.account.dto.LoginRequestDto
+import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.exception.account.UserNotFoundException
 import com.github.fj.restapi.persistence.entity.User
@@ -30,18 +31,22 @@ internal class LoginServiceImpl @Inject constructor(
 
     override fun guestLogin(accessToken: String, request: LoginRequestDto):
             AuthenticationResponseDto {
-        val user = ensureUser("", accessToken.toByteArray())
-
+        var user: User
         var newToken: String
         try {
-            tokenBusiness.validate(accessToken)
+            user = tokenBusiness.validate(accessToken).details as User
             LOG.trace("User's access token is not expired and no renewal is needed.")
             newToken = accessToken
         } catch (e: AuthTokenExpiredException) {
-            newToken = tokenBusiness.create(user)
-            LOG.trace("User's access token is expired and issued a new one.")
-            user.credential = newToken.toByteArray()
-            userRepo.save(user)
+            user = with(ensureGuestUser(accessToken.toByteArray())) {
+                newToken = tokenBusiness.create(this)
+                LOG.trace("User's access token is expired and issued a new one.")
+                this.credential = tokenBusiness.hash(newToken.toByteArray())
+                return@with userRepo.save(this)
+            }
+        } catch (e: AuthTokenException) {
+            LOG.trace("User not found for given access token.")
+            throw UserNotFoundException("User is not found.", e)
         }
 
         return AuthenticationResponseDto.create(user, newToken)
@@ -49,7 +54,7 @@ internal class LoginServiceImpl @Inject constructor(
 
     override fun basicLogin(request: LoginRequestDto): AuthenticationResponseDto {
         val user = ensureUser(requireNotNull(request.username),
-                tokenBusiness.hash(request.credential.value.toByteArray()))
+                request.credential.value.toByteArray())
 
         /*
          * Because user is already authenticated so just issuing a new Access Token is cheaper
@@ -58,8 +63,14 @@ internal class LoginServiceImpl @Inject constructor(
         return AuthenticationResponseDto.create(user, tokenBusiness.create(user))
     }
 
+    private fun ensureGuestUser(credential: ByteArray): User {
+        return userRepo.findByGuestCredential(tokenBusiness.hash(credential))
+                .takeIf { it.isPresent }?.get()
+                ?: throw UserNotFoundException("User is not found.")
+    }
+
     private fun ensureUser(username: String, credential: ByteArray): User {
-        return userRepo.findByBasicCredential(username, credential)
+        return userRepo.findByBasicCredential(username, tokenBusiness.hash(credential))
                 .takeIf { it.isPresent }?.get()
                 ?: throw UserNotFoundException("User is not found.")
     }

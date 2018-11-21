@@ -55,19 +55,19 @@ class HttpServletRequestAuthorizationHeaderFilter(
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
         const val HEADER_AUTHORIZATION = "Authorization"
 
-        private val AUTHORIZATION_SYNTAX = Pattern.compile("[A-Za-z]+ [A-Za-z0-9]+")
+        private val AUTHORIZATION_SYNTAX = Pattern.compile("[A-Za-z]+ [A-Za-z0-9.+_-]+")
 
         fun findAuthorizationHeader(req: HttpServletRequest, log: Logger? = null):
                 HttpAuthorizationToken? {
             req.getHeader(HEADER_AUTHORIZATION).let { h ->
                 when {
-                    h.isNullOrEmpty() -> log?.t(
-                            "No {} header in the request.", HEADER_AUTHORIZATION)
-                    !h.matchesIn(AUTHORIZATION_SYNTAX) -> log?.t(
-                            "{} header does not match the syntax: '{}'", HEADER_AUTHORIZATION, h)
-                    else -> return h.split(" ").let {
+                    h.matchesIn(AUTHORIZATION_SYNTAX) -> return h.split(" ").let {
                         HttpAuthorizationToken(HttpAuthScheme.byTypeValue(it[0]), it[1])
                     }
+                    h.isNullOrEmpty() -> log?.t(
+                            "No {} header in the request.", HEADER_AUTHORIZATION)
+                    else -> log?.t("{} header does not match the syntax: '{}'",
+                            HEADER_AUTHORIZATION, h)
                 }
                 return null
             }

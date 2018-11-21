@@ -10,6 +10,7 @@ import com.github.fj.restapi.exception.AuthTokenException
 import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
 import org.springframework.security.core.Authentication
+import java.security.MessageDigest
 import java.time.LocalDateTime
 import javax.servlet.http.HttpServletRequest
 
@@ -18,10 +19,8 @@ import javax.servlet.http.HttpServletRequest
  * @since 30 - Oct - 2018
  */
 interface AccessTokenBusiness {
-    @Suppress("UnstableApiUsage")
-    fun hash(data: ByteArray): ByteArray =
-            com.google.common.hash.Hashing.goodFastHash(User.CREDENTIAL_LENGTH * BITS_PER_BYTE)
-                    .hashBytes(data).asBytes()
+    fun hash(data: ByteArray): ByteArray = MessageDigest.getInstance("SHA-1")
+            .apply { update(data) }.run { digest() }
 
     fun findFromRequest(httpRequest: HttpServletRequest): String =
             HttpServletRequestAuthorizationHeaderFilter
@@ -31,8 +30,4 @@ interface AccessTokenBusiness {
 
     @Throws(AuthTokenException::class)
     fun validate(token: String): Authentication
-
-    companion object {
-        private const val BITS_PER_BYTE = 8
-    }
 }

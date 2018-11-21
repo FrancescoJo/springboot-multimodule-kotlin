@@ -25,9 +25,9 @@ import java.util.Random;
  * @since 27 - Oct - 2018
  */
 public final class AccountRequestUtils {
-    private static final String DEFAULT_PLATFORM_VERSION = "Platform-1.0";
-    private static final String DEFAULT_APP_VERSION = "0.0.1";
-    private static final String DEFAULT_EMAIL = "tester@testcompany.com";
+    public static final String DEFAULT_PLATFORM_VERSION = "Platform-1.0";
+    public static final String DEFAULT_APP_VERSION = "0.0.1";
+    public static final String DEFAULT_EMAIL = "tester@testcompany.com";
 
     public static CreateAccountRequestDto newRandomCreateAccountRequest() {
         return newRandomCreateAccountRequest(RandomHelper.randomEnumConst(LoginType.class));

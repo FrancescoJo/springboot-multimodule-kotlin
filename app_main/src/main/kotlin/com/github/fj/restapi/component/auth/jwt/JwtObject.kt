@@ -4,8 +4,10 @@
  */
 package com.github.fj.restapi.component.auth.jwt
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fj.lib.time.utcEpochSecond
+import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.restapi.persistence.consts.account.Role
 import java.time.LocalDateTime
 
@@ -18,8 +20,8 @@ data class JwtObject(
 
         val subject: Role,
 
-        /* Collection of uIdTokens */
-        val audience: Collection<String>,
+        /* Store uIdTokens */
+        val audience: String,
 
         /* Must be serialised as UNIX epoch time */
         val expiration: LocalDateTime,
@@ -119,23 +121,24 @@ data class JwtObject(
                     put(ISSUER, jwt.issuer)
                     put(SUBJECT, jwt.subject.toValue())
 
-                    if (jwt.audience.size == 1) {
-                        put(AUDIENCE, jwt.audience.first())
-                    } else {
-                        putPOJO(AUDIENCE, mapper.createArrayNode().apply {
-                            jwt.audience.forEach {
-                                add(it)
-                            }
-                        })
-                    }
-
+                    put(AUDIENCE, jwt.audience)
                     put(EXPIRATION, jwt.expiration.utcEpochSecond())
                     put(NOT_BEFORE, jwt.notBefore.utcEpochSecond())
                     put(ISSUED_AT, jwt.issuedAt.utcEpochSecond())
                 })
 
         fun fromJsonString(jsonStr: String): JwtObject {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val mapTypeRef = object : TypeReference<Map<String, Any>>() {}
+
+            return mapper.readValue<Map<String, Any>>(jsonStr, mapTypeRef).run {
+                JwtObject(issuer = get(ISSUER) as String,
+                        subject = Role.byRoleName(get(SUBJECT) as String),
+                        audience = get(AUDIENCE) as String,
+                        expiration = utcLocalDateTimeOf(get(EXPIRATION) as Number),
+                        notBefore = utcLocalDateTimeOf(get(NOT_BEFORE) as Number),
+                        issuedAt = utcLocalDateTimeOf(get(ISSUED_AT) as Number)
+                )
+            }
         }
     }
 }
