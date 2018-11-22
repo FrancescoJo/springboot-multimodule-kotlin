@@ -7,10 +7,10 @@ package com.github.fj.restapi.component.security
 import com.github.fj.lib.annotation.AllOpen
 import com.github.fj.lib.annotation.VisibleForTesting
 import com.github.fj.lib.time.utcNow
+import com.github.fj.lib.util.FastCollectedLruCache
 import com.github.fj.restapi.appconfig.AppProperties
 import com.github.fj.restapi.persistence.entity.RsaKeyPair
 import com.github.fj.restapi.persistence.repository.RsaKeyStoreRepository
-import com.github.fj.restapi.util.FastCollectedLruCache
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.crypto.RSASSAVerifier
 import org.springframework.stereotype.Component

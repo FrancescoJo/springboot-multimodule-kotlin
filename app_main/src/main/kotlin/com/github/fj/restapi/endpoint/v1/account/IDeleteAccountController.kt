@@ -5,9 +5,9 @@
 package com.github.fj.restapi.endpoint.v1.account
 
 import com.github.fj.restapi.appconfig.aop.LoggedActivity
+import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.endpoint.v1.account.dto.DeleteAccountRequestDto
 import com.github.fj.restapi.endpoint.v1.account.dto.DeleteAccountResponseDto
-import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.persistence.consts.UserActivity
 import com.github.fj.restapi.persistence.entity.User
 import io.swagger.annotations.Api

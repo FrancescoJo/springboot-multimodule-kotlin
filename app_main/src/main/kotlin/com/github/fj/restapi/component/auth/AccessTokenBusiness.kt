@@ -7,8 +7,9 @@ package com.github.fj.restapi.component.auth
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.exception.AuthTokenException
-import com.github.fj.restapi.exception.account.UnknownAuthTokenException
 import com.github.fj.restapi.persistence.entity.User
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import java.security.MessageDigest
 import java.time.LocalDateTime
@@ -30,4 +31,8 @@ interface AccessTokenBusiness {
 
     @Throws(AuthTokenException::class)
     fun validate(token: String): Authentication
+
+    companion object {
+        val LOG: Logger = LoggerFactory.getLogger(AccessTokenBusiness::class.java)
+    }
 }

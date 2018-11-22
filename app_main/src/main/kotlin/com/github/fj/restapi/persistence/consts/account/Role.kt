@@ -14,7 +14,6 @@ import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTH
 import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_PREMIUM_USER
 import com.github.fj.restapi.persistence.consts.account.Authority.Companion.AUTHORITY_USER
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import java.util.*
 
 /**

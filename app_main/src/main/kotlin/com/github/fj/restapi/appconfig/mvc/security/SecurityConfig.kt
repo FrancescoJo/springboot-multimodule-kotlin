@@ -10,8 +10,8 @@ import com.github.fj.restapi.appconfig.mvc.security.internal.AuthenticationFailu
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpAuthorizationTokenAuthenticationProvider
 import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.appconfig.mvc.security.internal.SavedRequestAwareAuthenticationSuccessHandler
-import com.github.fj.restapi.component.auth.spel.PreAuthorizeSpelInterceptor
 import com.github.fj.restapi.component.auth.AccessTokenBusinessFactory
+import com.github.fj.restapi.component.auth.spel.PreAuthorizeSpelInterceptor
 import com.github.fj.restapi.endpoint.ApiPaths
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean

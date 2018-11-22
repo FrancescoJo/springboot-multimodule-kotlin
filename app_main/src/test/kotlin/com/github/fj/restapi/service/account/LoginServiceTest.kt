@@ -12,12 +12,14 @@ import com.github.fj.restapi.persistence.consts.account.LoginType
 import com.github.fj.restapi.persistence.entity.User
 import com.github.fj.restapi.persistence.repository.UserRepository
 import com.nhaarman.mockitokotlin2.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import test.com.github.fj.restapi.account.AccountRequestUtils.*
+import test.com.github.fj.restapi.account.MockAuthentication
 import java.util.*
 
 /**
@@ -31,12 +33,12 @@ class LoginServiceTest {
     @Mock
     private lateinit var mockAccessTokenBusinessFactory: AccessTokenBusinessFactory
     @Mock
-    private lateinit var mockAccessTokenBusiness: AccessTokenBusiness
+    private lateinit var mockTokenBusiness: AccessTokenBusiness
 
     @BeforeEach
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        `when`(mockAccessTokenBusinessFactory.get()).thenReturn(mockAccessTokenBusiness)
+        `when`(mockAccessTokenBusinessFactory.get()).thenReturn(mockTokenBusiness)
         this.sut = LoginServiceImpl(mockUserRepo, mockAccessTokenBusinessFactory)
     }
 
@@ -46,9 +48,12 @@ class LoginServiceTest {
         val user = newRandomUser()
         val token = newRandomAccessToken()
         val req = newRandomLoginRequest(LoginType.GUEST)
+        val mockAuthentication = MockAuthentication().apply {
+            details = user
+        }
 
         // and:
-        `when`(mockUserRepo.findByBasicCredential(any(), any())).thenReturn(Optional.of(user))
+        `when`(mockTokenBusiness.validate(any())).thenReturn(mockAuthentication)
 
         // when:
         sut.guestLogin(token, req)
@@ -63,22 +68,25 @@ class LoginServiceTest {
         val user = newRandomUser()
         val token = newRandomAccessToken()
         val req = newRandomLoginRequest(LoginType.GUEST)
+        val hashedCredential = ByteArray(0)
 
         // and:
-        `when`(mockUserRepo.findByBasicCredential(any(), any())).thenReturn(Optional.of(user))
-        `when`(mockAccessTokenBusiness.validate(token)).thenThrow(AuthTokenExpiredException())
-
+        `when`(mockTokenBusiness.validate(token)).thenThrow(AuthTokenExpiredException())
+        `when`(mockTokenBusiness.hash(token.toByteArray())).thenReturn(hashedCredential)
+        `when`(mockUserRepo.findByGuestCredential(any())).thenReturn(Optional.of(user))
         val newToken = newRandomAccessToken()
-        `when`(mockAccessTokenBusiness.create(eq(user), any())).thenReturn(newToken)
+        `when`(mockTokenBusiness.create(eq(user), any())).thenReturn(newToken)
+        `when`(mockTokenBusiness.hash(newToken.toByteArray())).thenReturn(hashedCredential)
+        `when`(mockUserRepo.save(user)).thenReturn(user)
 
         // when:
         sut.guestLogin(token, req)
 
         // then:
-        verify(mockAccessTokenBusiness, times(1)).create(eq(user), any())
+        verify(mockTokenBusiness, times(1)).create(eq(user), any())
         verify(mockUserRepo, times(1)).save(user)
         verify(mockUserRepo).save<User>(argThat {
-            credential.contentEquals(newToken.toByteArray())
+            credential.contentEquals(hashedCredential)
         })
     }
 
@@ -87,21 +95,22 @@ class LoginServiceTest {
         // given:
         val user = newRandomUser()
         val request = newRandomLoginRequest(LoginType.BASIC)
-        val savedCredential = ByteArray(0)
         val newAccessToken = newRandomAccessToken()
+        val hashedCredential = ByteArray(0)
 
         // and:
-        `when`(mockAccessTokenBusiness.hash(request.credential.value.toByteArray()))
-                .thenReturn(savedCredential)
-        `when`(mockUserRepo.findByBasicCredential(request.username, savedCredential))
+        `when`(mockTokenBusiness.hash(request.credential.value.toByteArray()))
+                .thenReturn(hashedCredential)
+        `when`(mockUserRepo.findByBasicCredential(request.username, hashedCredential))
                 .thenReturn(Optional.of(user))
-        `when`(mockAccessTokenBusiness.create(eq(user), any())).thenReturn(newAccessToken)
+        `when`(mockTokenBusiness.create(eq(user), any())).thenReturn(newAccessToken)
 
         // when:
-        sut.basicLogin(request)
+        val result = sut.basicLogin(request)
 
         // then:
-        verify(mockAccessTokenBusiness, times(1)).create(eq(user), any())
+        verify(mockTokenBusiness, times(1)).create(eq(user), any())
+        assertEquals(newAccessToken, result.accessToken.value)
     }
 
     private fun newRandomAccessToken(): String = getRandomAlphaNumericString(84)

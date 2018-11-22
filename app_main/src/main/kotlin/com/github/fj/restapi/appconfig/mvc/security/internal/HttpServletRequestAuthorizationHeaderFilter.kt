@@ -9,7 +9,7 @@ import org.slf4j.Logger
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.util.matcher.RequestMatcher
 import org.springframework.web.filter.GenericFilterBean
-import java.util.regex.Pattern
+import java.util.regex.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse

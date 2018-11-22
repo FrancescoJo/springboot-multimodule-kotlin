@@ -26,7 +26,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.stereotype.Service
 import java.net.InetAddress
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
@@ -82,6 +81,7 @@ internal class CreateAccountServiceImpl @Inject constructor(
             pushToken = req.pushToken.value
             invitedBy = guessInvitedBy(req)
             member = createMembership(req, now, ipAddr)
+            member.user = this
 
             val accessToken = tokenBusiness.create(this)
             val hashed = tokenBusiness.hash(when (req.loginType) {

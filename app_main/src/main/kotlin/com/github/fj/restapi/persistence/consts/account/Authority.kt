@@ -6,7 +6,7 @@ package com.github.fj.restapi.persistence.consts.account
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import java.util.HashMap
+import java.util.*
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)

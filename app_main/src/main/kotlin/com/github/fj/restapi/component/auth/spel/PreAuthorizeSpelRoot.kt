@@ -9,8 +9,8 @@ import com.github.fj.restapi.persistence.consts.account.Role
 import org.springframework.context.ApplicationContext
 import org.springframework.security.config.core.GrantedAuthorityDefaults
 import org.springframework.security.web.util.matcher.IpAddressMatcher
-import org.springframework.web.context.request.ServletRequestAttributes
 import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 
 /**
  * A reinvented wheel version of [org.springframework.security.access.expression.method.MethodSecurityExpressionRoot].

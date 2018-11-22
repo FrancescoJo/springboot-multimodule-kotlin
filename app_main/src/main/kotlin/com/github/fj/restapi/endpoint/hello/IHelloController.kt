@@ -4,9 +4,9 @@
  */
 package com.github.fj.restapi.endpoint.hello
 
+import com.github.fj.restapi.endpoint.ApiPaths
 import com.github.fj.restapi.endpoint.hello.dto.HelloRequestDto
 import com.github.fj.restapi.endpoint.hello.dto.HelloResponseDto
-import com.github.fj.restapi.endpoint.ApiPaths
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse

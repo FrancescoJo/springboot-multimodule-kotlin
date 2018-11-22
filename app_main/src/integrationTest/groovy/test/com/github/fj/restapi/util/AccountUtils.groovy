@@ -42,6 +42,17 @@ class AccountUtils {
         return HttpTransportUtils.expect2xxBody(responseSpec, AuthenticationResponseDto.class)
     }
 
+    static AuthenticationResponseDto createAccount(final IntegrationTestBase testContext,
+                                                   final CreateAccountRequestDto request) {
+        final WebTestClient.ResponseSpec responseSpec = testContext.testClient()
+                .post()
+                .uri(ApiPaths.API_V1_ACCOUNT)
+                .body(BodyInserters.fromObject(request))
+                .exchange()
+
+        return HttpTransportUtils.expect2xxBody(responseSpec, AuthenticationResponseDto.class)
+    }
+
     static void deleteAllAccounts() {
         final userRepo = ApplicationContextHolder.getBean(UserRepository.class)
         final membersRepo = ApplicationContextHolder.getBean(MembershipRepository.class)

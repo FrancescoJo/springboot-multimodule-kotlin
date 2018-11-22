@@ -9,7 +9,6 @@ import com.github.fj.lib.time.utcEpochSecond
 import com.github.fj.lib.time.utcLocalDateTimeOf
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
-import com.github.fj.restapi.appconfig.mvc.security.internal.HttpServletRequestAuthorizationHeaderFilter
 import com.github.fj.restapi.component.auth.AccessTokenBusiness
 import com.github.fj.restapi.component.auth.AuthenticationObjectImpl
 import com.github.fj.restapi.exception.AuthTokenException
@@ -28,7 +27,6 @@ import java.util.concurrent.*
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import javax.servlet.http.HttpServletRequest
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)

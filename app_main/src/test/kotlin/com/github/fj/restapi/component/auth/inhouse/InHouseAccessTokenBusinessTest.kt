@@ -107,7 +107,6 @@ class InHouseAccessTokenBusinessTest {
         }
     }
 
-
     @ParameterizedTest
     @MethodSource("createTamperedAccessTokens")
     fun `Authentication must be failed for tampered access tokens`(key: ByteArray, expectedUser: User, token: String) {

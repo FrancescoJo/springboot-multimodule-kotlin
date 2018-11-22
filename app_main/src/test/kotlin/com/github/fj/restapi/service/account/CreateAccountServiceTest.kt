@@ -94,7 +94,7 @@ class CreateAccountServiceTest {
         // and:
         `when`(mockUserRepo.findByBasicCredential(req.username, credentialArray))
                 .thenReturn(Optional.empty())
-        `when`(mockTokenBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
+        `when`(mockTokenBusiness.hash(any())).thenReturn(ByteArray(0))
         `when`(mockTokenBusiness.create(any(), any())).thenReturn("")
         `when`(mockUserRepo.findByIdToken(any())).thenReturn(Optional.empty())
 
@@ -113,10 +113,9 @@ class CreateAccountServiceTest {
         // given:
         val req = newCreateAccountRequest(randomEnumConst(LoginType::class.java))
         val httpReq = HttpTransportUtils.newMockHttpServletRequestByLocalhost()
-        val credentialArray = req.credential.value.toByteArray()
 
         // and:
-        `when`(mockTokenBusiness.hash(credentialArray)).thenReturn(ByteArray(0))
+        `when`(mockTokenBusiness.hash(any())).thenReturn(ByteArray(0))
         val existingUser = newRandomUser()
         `when`(mockUserRepo.findByIdToken(req.invitedBy ?: ""))
                 .thenReturn(Optional.of(existingUser))

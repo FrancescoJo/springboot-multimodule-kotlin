@@ -30,7 +30,7 @@ class AccessTokenBusinessFactory @Inject constructor(
     }
 
     private val jwtTokenBusiness: AccessTokenBusiness by lazy {
-        JwtAccessTokenBusinessImpl(appProperties, rsaKeyPairManager)
+        JwtAccessTokenBusinessImpl(appProperties, rsaKeyPairManager, userRepository)
     }
 
     fun get(): AccessTokenBusiness {

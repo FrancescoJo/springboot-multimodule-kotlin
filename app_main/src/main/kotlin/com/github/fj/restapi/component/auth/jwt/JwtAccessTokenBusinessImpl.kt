@@ -8,19 +8,24 @@ import com.github.fj.lib.time.LOCAL_DATE_TIME_MIN
 import com.github.fj.lib.time.utcNow
 import com.github.fj.restapi.appconfig.AppProperties
 import com.github.fj.restapi.component.auth.AccessTokenBusiness
+import com.github.fj.restapi.component.auth.AccessTokenBusiness.Companion.LOG
+import com.github.fj.restapi.component.auth.AuthenticationObjectImpl
 import com.github.fj.restapi.component.security.RsaKeyPairManager
 import com.github.fj.restapi.exception.AuthTokenException
+import com.github.fj.restapi.exception.GeneralHttpException
+import com.github.fj.restapi.exception.account.AuthTokenExpiredException
 import com.github.fj.restapi.persistence.entity.User
+import com.github.fj.restapi.persistence.repository.UserRepository
 import com.nimbusds.jose.JOSEException
 import com.nimbusds.jose.JOSEObjectType
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.JWSObject
 import com.nimbusds.jose.Payload
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import java.text.ParseException
 import java.time.LocalDateTime
-import java.util.*
 
 /**
  * @author Francesco Jo(nimbusob@gmail.com)
@@ -28,7 +33,8 @@ import java.util.*
  */
 internal class JwtAccessTokenBusinessImpl(
         private val appProperties: AppProperties,
-        private val rsaKeyPairManager: RsaKeyPairManager
+        private val rsaKeyPairManager: RsaKeyPairManager,
+        private val userRepo: UserRepository
 ) : AccessTokenBusiness {
     override fun create(user: User, timestamp: LocalDateTime): String {
         val now = utcNow()
@@ -63,6 +69,7 @@ internal class JwtAccessTokenBusinessImpl(
             with(JWSObject.parse(token)) {
                 rsaKeyPairManager.getById(header.keyID).let {
                     if (!verify(it.rsaVerifier)) {
+                        logW("RSA verification failure")
                         throw AuthTokenException("Not a genuine jwt token.")
                     }
                 }
@@ -70,18 +77,44 @@ internal class JwtAccessTokenBusinessImpl(
                 return@with JwtObject.fromJsonString(payload.toString())
             }
         } catch (e: ParseException) {
+            logW("Wrong jwt format")
             throw AuthTokenException("Error while parsing token.", e)
         } catch (e: JOSEException) {
-            throw AuthTokenException("Cannot verify given token.", e)
+            LOG.error("Error in RSA key retrieval logic")
+            throw GeneralHttpException.create(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Unable to verify token.", e)
         }
 
-        println(jwtObject)
+        if (appProperties.jwtIssuer != jwtObject.issuer) {
+            logW("Wrong issuer - ${jwtObject.issuer}")
+            throw AuthTokenException("Not a genuine jwt token.")
+        }
 
-        // verify info of jwtObject
-        // TODO catch exceptions -> AuthTokenException or AuthTokenExpiredException
+        val user = userRepo.findByIdToken(jwtObject.audience).takeIf { it.isPresent }
+                ?.run { get() }
+                ?: run {
+                    logW("User not found")
+                    throw AuthTokenException("Not a valid user.")
+                }
 
-        // AuthenticationObjectImpl: User, Token
+        if (user.role != jwtObject.subject) {
+            logW("Role mismatch - Expected: ${user.role} vs Actual: ${jwtObject.subject}")
+            throw AuthTokenException("Not a genuine jwt token.")
+        }
 
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (jwtObject.issuedAt < jwtObject.notBefore) {
+            logW("Wrong time constraint: ${jwtObject.issuedAt} < ${jwtObject.notBefore}")
+            throw AuthTokenException("Not a genuine jwt token.")
+        }
+
+        if (utcNow() > jwtObject.expiration) {
+            throw AuthTokenExpiredException("This token is expired.")
+        }
+
+        return AuthenticationObjectImpl(user, token)
+    }
+
+    private fun logW(message: String) {
+        LOG.warn("Login attempt with tampered jwt token - $message")
     }
 }
