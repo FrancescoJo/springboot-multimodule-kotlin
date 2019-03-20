@@ -50,9 +50,9 @@ class AuthenticationObjectImpl(
     }
 
     /**
-     * [isAuthenticated] is omitted because it is mutable.
+     * Inefficient but inevitable since `isAuthenticated` is mutable 
      */
-    override fun hashCode(): Int = Objects.hash(user, token)
+    override fun hashCode(): Int = Objects.hash(user, token, isAuthenticated)
 
     override fun toString(): String {
         return "AuthenticationObjectImpl(" +
